@@ -5,9 +5,15 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Samuel Comissões PRO</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 
@@ -15,22 +21,64 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
+font-family:'Poppins',sans-serif;
 }
 
 body{
 
 background:#0b3d91;
 
-padding:20px;
+background:linear-gradient(180deg,#114aa7,#07295d);
+
+min-height:100vh;
+
+padding:25px;
 
 }
 
 .container{
 
-max-width:900px;
+max-width:1200px;
 
 margin:auto;
+
+}
+
+.topo{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:25px;
+
+color:#fff;
+
+}
+
+.topo h1{
+
+font-size:34px;
+
+font-weight:700;
+
+}
+
+.cards{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:20px;
+
+margin-bottom:25px;
+
+}
+
+.card{
 
 background:white;
 
@@ -38,83 +86,61 @@ border-radius:18px;
 
 padding:20px;
 
-box-shadow:0 15px 35px rgba(0,0,0,.25);
+box-shadow:0 15px 35px rgba(0,0,0,.18);
 
 }
 
-h1{
+.card h3{
 
-text-align:center;
+font-size:15px;
 
-color:#003b95;
+color:#666;
 
-margin-bottom:20px;
-
-}
-
-.dashboard{
-
-display:grid;
-
-grid-template-columns:repeat(3,1fr);
-
-gap:15px;
-
-margin-bottom:20px;
-
-}
-
-.card{
-
-background:#003b95;
-
-color:white;
-
-padding:15px;
-
-border-radius:12px;
-
-text-align:center;
+margin-bottom:10px;
 
 }
 
 .card h2{
 
-font-size:15px;
+color:#114aa7;
 
-margin-bottom:8px;
-
-}
-
-.card span{
-
-font-size:24px;
-
-font-weight:bold;
+font-size:30px;
 
 }
 
 .formulario{
 
-background:#f5f7fb;
+background:white;
 
-padding:20px;
+border-radius:18px;
 
-border-radius:15px;
+padding:25px;
 
-margin-bottom:20px;
+box-shadow:0 15px 35px rgba(0,0,0,.18);
+
+margin-bottom:25px;
+
+}
+
+.grid{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:18px;
 
 }
 
 label{
 
+font-weight:600;
+
+color:#114aa7;
+
 display:block;
 
-margin-top:10px;
-
-font-weight:bold;
-
-color:#003b95;
+margin-bottom:6px;
 
 }
 
@@ -122,15 +148,15 @@ input,select{
 
 width:100%;
 
-padding:12px;
+padding:14px;
 
-margin-top:6px;
+border-radius:12px;
 
 border:1px solid #ccc;
 
-border-radius:10px;
-
 font-size:16px;
+
+margin-bottom:15px;
 
 outline:none;
 
@@ -138,39 +164,46 @@ outline:none;
 
 input:focus{
 
-border-color:#003b95;
+border-color:#114aa7;
 
 }
 
 button{
 
-margin-top:18px;
-
-width:100%;
-
-padding:14px;
-
-background:#003b95;
+background:#114aa7;
 
 color:white;
 
-font-size:17px;
-
-font-weight:bold;
+padding:15px;
 
 border:none;
 
 border-radius:12px;
 
+font-size:17px;
+
+font-weight:bold;
+
 cursor:pointer;
 
-transition:.3s;
+width:100%;
 
 }
 
 button:hover{
 
-background:#00296b;
+background:#0b377d;
+
+}
+  .historico{
+
+background:white;
+
+border-radius:18px;
+
+padding:25px;
+
+box-shadow:0 15px 35px rgba(0,0,0,.18);
 
 }
 
@@ -186,33 +219,37 @@ margin-top:20px;
 
 th{
 
-background:#003b95;
+background:#114aa7;
 
 color:white;
 
-padding:12px;
+padding:14px;
+
+font-size:15px;
 
 }
 
 td{
 
-padding:10px;
+padding:12px;
 
-border-bottom:1px solid #ddd;
+border-bottom:1px solid #e5e5e5;
 
 font-size:14px;
 
+text-align:center;
+
 }
 
-.excluir{
+.btnExcluir{
 
-background:red;
+background:#e53935;
 
-padding:8px;
+padding:8px 14px;
+
+border-radius:8px;
 
 border:none;
-
-border-radius:6px;
 
 color:white;
 
@@ -220,29 +257,61 @@ cursor:pointer;
 
 }
 
-.editar{
+.btnEditar{
 
 background:#ff9800;
 
-padding:8px;
+padding:8px 14px;
+
+border-radius:8px;
 
 border:none;
-
-border-radius:6px;
 
 color:white;
 
 cursor:pointer;
 
-margin-right:5px;
+margin-right:6px;
 
 }
 
-@media(max-width:700px){
+.pesquisa{
 
-.dashboard{
+margin-bottom:15px;
+
+}
+
+@media(max-width:900px){
+
+.cards{
+
+grid-template-columns:1fr 1fr;
+
+}
+
+.grid{
 
 grid-template-columns:1fr;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.cards{
+
+grid-template-columns:1fr;
+
+}
+
+.topo{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:10px;
 
 }
 
@@ -256,67 +325,62 @@ grid-template-columns:1fr;
 
 <div class="container">
 
-<h1>
+<div class="topo">
 
-Samuel Comissões PRO
+<h1>Samuel Comissões PRO</h1>
 
-</h1>
+</div>
 
-<div class="dashboard">
+<div class="cards">
 
 <div class="card">
 
-<h2>Total Vendido</h2>
+<h3>Total Vendido</h3>
 
-<span id="totalVendido">
-
-R$0,00
-
-</span>
+<h2 id="totalVendido">R$ 0,00</h2>
 
 </div>
 
 <div class="card">
 
-<h2>Comissão</h2>
+<h3>Comissão</h3>
 
-<span id="totalComissao">
-
-R$0,00
-
-</span>
+<h2 id="totalComissao">R$ 0,00</h2>
 
 </div>
 
 <div class="card">
 
-<h2>Vendas</h2>
+<h3>Vendas</h3>
 
-<span id="quantidade">
-
-0
-
-</span>
+<h2 id="qtdVendas">0</h2>
 
 </div>
 
+<div class="card">
+
+<h3>Ticket Médio</h3>
+
+<h2 id="ticketMedio">R$ 0,00</h2>
+
+</div>
 </div>
 
 <div class="formulario">
 
-<label>
+<div class="grid">
 
-Cliente
+<div>
 
-</label>
+<label>Cliente</label>
 
-<input id="cliente">
+<input id="cliente" type="text" placeholder="Nome do cliente">
 
-<label>
+</div>
 
-Produto
+<div>
 
-</label>
+<label>Produto</label>
 
 <select id="produto">
 
@@ -328,38 +392,43 @@ Produto
 
 </select>
 
-<label>
+</div>
 
-Modelo
+<div>
 
-</label>
+<label>Modelo</label>
 
-<input id="modelo">
+<input id="modelo" type="text" placeholder="Ex.: Lander 250">
 
-<label>
+</div>
 
-Valor da Venda
+<div>
 
-</label>
+<label>Valor da Venda</label>
 
-<input
+<input id="valor" type="text" placeholder="R$ 0,00">
 
-id="valor"
+</div>
 
-placeholder="R$ 0,00">
+<div>
 
-<label>
+<label>Comissão (%)</label>
 
-Comissão %
+<input id="percentual" type="number" value="1.5" step="0.1">
 
-</label>
+</div>
 
-<input
+<div>
 
-id="percentual"
+<label>Data</label>
 
-value="1.5">
-  <button onclick="salvarVenda()">
+<input id="data" type="date">
+
+</div>
+
+</div>
+
+<button onclick="salvarVenda()">
 
 Salvar Venda
 
@@ -367,19 +436,16 @@ Salvar Venda
 
 </div>
 
-<h2 style="color:#003b95;margin-top:25px">
+<div class="historico">
 
-Histórico de Vendas
-
-</h2>
+<h2>Histórico de Vendas</h2>
 
 <input
-
+class="pesquisa"
 id="pesquisa"
-
-placeholder="Pesquisar cliente..."
-
-onkeyup="filtrar()">
+type="text"
+placeholder="Pesquisar cliente ou modelo..."
+onkeyup="filtrarHistorico()">
 
 <table>
 
@@ -405,7 +471,7 @@ onkeyup="filtrar()">
 
 </thead>
 
-<tbody id="listaVendas">
+<tbody id="tabelaVendas">
 
 </tbody>
 
@@ -415,95 +481,74 @@ onkeyup="filtrar()">
 
 <script>
 
-let vendas=
+let vendas = JSON.parse(localStorage.getItem("samuel_vendas")) || [];
+  function formatarMoeda(valor){
 
-JSON.parse(
-
-localStorage.getItem("samuel_vendas")
-
-)||[];
-
-let editando=-1;
-
-function moeda(v){
-
-return Number(v)
-
-.toLocaleString(
-
-"pt-BR",
-
-{
-
+return valor.toLocaleString("pt-BR",{
 style:"currency",
-
 currency:"BRL"
+});
 
 }
 
-);
+function converterValor(texto){
+
+texto=texto.replace(/\./g,"");
+texto=texto.replace(",",".");
+texto=texto.replace(/[^\d.]/g,"");
+
+return parseFloat(texto)||0;
 
 }
 
-function numero(txt){
+document.getElementById("valor")
+.addEventListener("input",function(){
 
-return Number(
+let numeros=this.value.replace(/\D/g,"");
 
-txt.replace(/\./g,"")
+if(numeros==""){
 
-.replace(",",".")
+this.value="";
 
-.replace(/[^\d,]/g,"")
-
-);
-
-}
-
-valor.addEventListener(
-
-"input",
-
-function(){
-
-let n=this.value
-
-.replace(/\D/g,"");
-
-n=(Number(n)/100)
-
-.toLocaleString(
-
-"pt-BR",
-
-{
-
-minimumFractionDigits:2
+return;
 
 }
 
-);
+this.value=(Number(numeros)/100)
 
-this.value=n;
+.toLocaleString("pt-BR",{
+
+minimumFractionDigits:2,
+
+maximumFractionDigits:2
 
 });
-  function salvarVenda(){
 
-let cliente=
-document.getElementById("cliente").value.trim();
+});
 
-let produto=
-document.getElementById("produto").value;
+function salvarVenda(){
 
-let modelo=
-document.getElementById("modelo").value.trim();
+let cliente=document.getElementById("cliente").value.trim();
 
-let valorVenda=
-numero(document.getElementById("valor").value);
+let produto=document.getElementById("produto").value;
 
-let percentual=
-parseFloat(document.getElementById("percentual").value.replace(",","."));
+let modelo=document.getElementById("modelo").value.trim();
 
-if(cliente==""||modelo==""||valorVenda<=0){
+let valor=converterValor(
+
+document.getElementById("valor").value
+
+);
+
+let percentual=parseFloat(
+
+document.getElementById("percentual").value
+
+);
+
+let data=document.getElementById("data").value;
+
+if(cliente==""||modelo==""||valor<=0){
 
 alert("Preencha todos os campos.");
 
@@ -511,13 +556,9 @@ return;
 
 }
 
-let comissao=
+let comissao=(valor*percentual)/100;
 
-(valorVenda*percentual)/100;
-
-let venda={
-
-data:new Date().toLocaleDateString("pt-BR"),
+vendas.push({
 
 cliente,
 
@@ -525,25 +566,15 @@ produto,
 
 modelo,
 
-valor:valorVenda,
+valor,
 
 percentual,
 
-comissao
+comissao,
 
-};
+data
 
-if(editando==-1){
-
-vendas.push(venda);
-
-}else{
-
-vendas[editando]=venda;
-
-editando=-1;
-
-}
+});
 
 localStorage.setItem(
 
@@ -553,42 +584,62 @@ JSON.stringify(vendas)
 
 );
 
-limpar();
+atualizarDashboard();
 
 atualizarTabela();
 
-}
-
-function limpar(){
-
-cliente.value="";
-
-modelo.value="";
-
-valor.value="";
-
-percentual.value="1.5";
+limparCampos();
 
 }
-  function atualizarTabela(){
-
-let lista=
-
-document.getElementById("listaVendas");
-
-lista.innerHTML="";
+  function atualizarDashboard(){
 
 let totalVenda=0;
 
 let totalComissao=0;
 
-vendas.forEach((v,i)=>{
+vendas.forEach(v=>{
 
 totalVenda+=v.valor;
 
 totalComissao+=v.comissao;
 
-lista.innerHTML+=`
+});
+
+document.getElementById("totalVendido").innerHTML=
+
+formatarMoeda(totalVenda);
+
+document.getElementById("totalComissao").innerHTML=
+
+formatarMoeda(totalComissao);
+
+document.getElementById("qtdVendas").innerHTML=
+
+vendas.length;
+
+document.getElementById("ticketMedio").innerHTML=
+
+formatarMoeda(
+
+vendas.length?
+
+totalVenda/vendas.length:0
+
+);
+
+}
+
+function atualizarTabela(){
+
+const tbody=
+
+document.getElementById("tabelaVendas");
+
+tbody.innerHTML="";
+
+vendas.forEach((v,i)=>{
+
+tbody.innerHTML+=`
 
 <tr>
 
@@ -600,21 +651,21 @@ lista.innerHTML+=`
 
 <td>${v.modelo}</td>
 
-<td>${moeda(v.valor)}</td>
+<td>${formatarMoeda(v.valor)}</td>
 
-<td>${moeda(v.comissao)}</td>
+<td>${formatarMoeda(v.comissao)}</td>
 
 <td>
 
-<button class="editar"
-
-onclick="editarVenda(${i})">
+<button class="btnEditar">
 
 Editar
 
 </button>
 
-<button class="excluir"
+<button
+
+class="btnExcluir"
 
 onclick="excluirVenda(${i})">
 
@@ -630,46 +681,11 @@ Excluir
 
 });
 
-document.getElementById("totalVendido").innerHTML=
-
-moeda(totalVenda);
-
-document.getElementById("totalComissao").innerHTML=
-
-moeda(totalComissao);
-
-document.getElementById("quantidade").innerHTML=
-
-vendas.length;
-
 }
 
-function editarVenda(i){
+function excluirVenda(i){
 
-let v=vendas[i];
-
-cliente.value=v.cliente;
-
-produto.value=v.produto;
-
-modelo.value=v.modelo;
-
-valor.value=v.valor.toLocaleString(
-
-"pt-BR",
-
-{minimumFractionDigits:2}
-
-);
-
-percentual.value=v.percentual;
-
-editando=i;
-
-}
-  function excluirVenda(i){
-
-if(confirm("Deseja excluir esta venda?")){
+if(confirm("Excluir venda?")){
 
 vendas.splice(i,1);
 
@@ -681,13 +697,26 @@ JSON.stringify(vendas)
 
 );
 
+atualizarDashboard();
+
 atualizarTabela();
 
 }
 
 }
 
-function filtrar(){
+function limparCampos(){
+
+cliente.value="";
+
+modelo.value="";
+
+valor.value="";
+
+percentual.value="1.5";
+
+}
+  function filtrarHistorico(){
 
 let texto=
 
@@ -697,17 +726,13 @@ document.getElementById("pesquisa")
 
 .toLowerCase();
 
-let linhas=
-
 document.querySelectorAll(
 
-"#listaVendas tr"
+"#tabelaVendas tr"
 
-);
+).forEach(linha=>{
 
-linhas.forEach(linha=>{
-
-if(
+linha.style.display=
 
 linha.innerText
 
@@ -715,19 +740,23 @@ linha.innerText
 
 .includes(texto)
 
-){
+? ""
 
-linha.style.display="";
-
-}else{
-
-linha.style.display="none";
-
-}
+: "none";
 
 });
 
 }
+
+document.getElementById("data").value=
+
+new Date()
+
+.toISOString()
+
+.split("T")[0];
+
+atualizarDashboard();
 
 atualizarTabela();
 
@@ -736,4 +765,3 @@ atualizarTabela();
 </body>
 
 </html>
-
