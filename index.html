@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
 <title>Samuel Comissões PRO</title>
 
 <style>
+
 *{
 margin:0;
 padding:0;
@@ -14,90 +19,235 @@ font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
+
 background:#0b3d91;
+
 padding:20px;
+
 }
 
 .container{
-max-width:700px;
+
+max-width:900px;
+
 margin:auto;
-background:#fff;
-border-radius:15px;
+
+background:white;
+
+border-radius:18px;
+
 padding:20px;
-box-shadow:0 10px 30px rgba(0,0,0,.25);
+
+box-shadow:0 15px 35px rgba(0,0,0,.25);
+
 }
 
 h1{
-color:#0b3d91;
+
 text-align:center;
+
+color:#003b95;
+
 margin-bottom:20px;
+
+}
+
+.dashboard{
+
+display:grid;
+
+grid-template-columns:repeat(3,1fr);
+
+gap:15px;
+
+margin-bottom:20px;
+
 }
 
 .card{
-background:#f4f7fb;
+
+background:#003b95;
+
+color:white;
+
 padding:15px;
-border-radius:10px;
-margin-bottom:15px;
+
+border-radius:12px;
+
+text-align:center;
+
+}
+
+.card h2{
+
+font-size:15px;
+
+margin-bottom:8px;
+
+}
+
+.card span{
+
+font-size:24px;
+
+font-weight:bold;
+
+}
+
+.formulario{
+
+background:#f5f7fb;
+
+padding:20px;
+
+border-radius:15px;
+
+margin-bottom:20px;
+
+}
+
+label{
+
+display:block;
+
+margin-top:10px;
+
+font-weight:bold;
+
+color:#003b95;
+
 }
 
 input,select{
+
 width:100%;
+
 padding:12px;
-margin-top:8px;
-margin-bottom:10px;
+
+margin-top:6px;
+
 border:1px solid #ccc;
-border-radius:8px;
+
+border-radius:10px;
+
 font-size:16px;
+
+outline:none;
+
+}
+
+input:focus{
+
+border-color:#003b95;
+
 }
 
 button{
+
+margin-top:18px;
+
 width:100%;
+
 padding:14px;
-border:none;
-border-radius:10px;
-background:#0047ba;
-color:#fff;
+
+background:#003b95;
+
+color:white;
+
 font-size:17px;
+
 font-weight:bold;
+
+border:none;
+
+border-radius:12px;
+
 cursor:pointer;
+
+transition:.3s;
+
 }
 
 button:hover{
-background:#00378f;
-}
 
-.total{
-font-size:18px;
-font-weight:bold;
-margin-top:15px;
-color:#0047ba;
+background:#00296b;
+
 }
 
 table{
+
 width:100%;
-margin-top:20px;
+
 border-collapse:collapse;
+
+margin-top:20px;
+
 }
 
 th{
-background:#0047ba;
-color:#fff;
-padding:10px;
+
+background:#003b95;
+
+color:white;
+
+padding:12px;
+
 }
 
 td{
+
 padding:10px;
+
 border-bottom:1px solid #ddd;
+
 font-size:14px;
+
 }
 
 .excluir{
+
 background:red;
-padding:6px 10px;
-border-radius:6px;
-color:#fff;
+
+padding:8px;
+
 border:none;
+
+border-radius:6px;
+
+color:white;
+
+cursor:pointer;
+
 }
+
+.editar{
+
+background:#ff9800;
+
+padding:8px;
+
+border:none;
+
+border-radius:6px;
+
+color:white;
+
+cursor:pointer;
+
+margin-right:5px;
+
+}
+
+@media(max-width:700px){
+
+.dashboard{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
 </style>
 
 </head>
@@ -106,37 +256,130 @@ border:none;
 
 <div class="container">
 
-<h1>Samuel Comissões PRO</h1>
+<h1>
+
+Samuel Comissões PRO
+
+</h1>
+
+<div class="dashboard">
 
 <div class="card">
 
-<input id="cliente" placeholder="Nome do Cliente">
+<h2>Total Vendido</h2>
+
+<span id="totalVendido">
+
+R$0,00
+
+</span>
+
+</div>
+
+<div class="card">
+
+<h2>Comissão</h2>
+
+<span id="totalComissao">
+
+R$0,00
+
+</span>
+
+</div>
+
+<div class="card">
+
+<h2>Vendas</h2>
+
+<span id="quantidade">
+
+0
+
+</span>
+
+</div>
+
+</div>
+
+<div class="formulario">
+
+<label>
+
+Cliente
+
+</label>
+
+<input id="cliente">
+
+<label>
+
+Produto
+
+</label>
 
 <select id="produto">
+
 <option>Moto</option>
+
 <option>Barco</option>
+
 <option>Motor</option>
+
 </select>
 
-<input id="modelo" placeholder="Modelo">
+<label>
 
-<input id="valor" type="number" placeholder="Valor da Venda">
+Modelo
 
-<input id="percentual" type="number" value="1.5">
+</label>
 
-<button onclick="salvarVenda()">
+<input id="modelo">
+
+<label>
+
+Valor da Venda
+
+</label>
+
+<input
+
+id="valor"
+
+placeholder="R$ 0,00">
+
+<label>
+
+Comissão %
+
+</label>
+
+<input
+
+id="percentual"
+
+value="1.5">
+  <button onclick="salvarVenda()">
+
 Salvar Venda
+
 </button>
 
-<div class="total">
-Total Comissão:
-R$
-<span id="totalComissao">
-0,00
-</span>
 </div>
 
-</div>
+<h2 style="color:#003b95;margin-top:25px">
+
+Histórico de Vendas
+
+</h2>
+
+<input
+
+id="pesquisa"
+
+placeholder="Pesquisar cliente..."
+
+onkeyup="filtrar()">
 
 <table>
 
@@ -144,19 +387,25 @@ R$
 
 <tr>
 
+<th>Data</th>
+
 <th>Cliente</th>
+
+<th>Produto</th>
 
 <th>Modelo</th>
 
+<th>Venda</th>
+
 <th>Comissão</th>
 
-<th></th>
+<th>Ações</th>
 
 </tr>
 
 </thead>
 
-<tbody id="lista">
+<tbody id="listaVendas">
 
 </tbody>
 
@@ -167,40 +416,207 @@ R$
 <script>
 
 let vendas=
+
 JSON.parse(
-localStorage.getItem("vendasSamuel")
+
+localStorage.getItem("samuel_vendas")
+
 )||[];
 
-function atualizar(){
+let editando=-1;
+
+function moeda(v){
+
+return Number(v)
+
+.toLocaleString(
+
+"pt-BR",
+
+{
+
+style:"currency",
+
+currency:"BRL"
+
+}
+
+);
+
+}
+
+function numero(txt){
+
+return Number(
+
+txt.replace(/\./g,"")
+
+.replace(",",".")
+
+.replace(/[^\d,]/g,"")
+
+);
+
+}
+
+valor.addEventListener(
+
+"input",
+
+function(){
+
+let n=this.value
+
+.replace(/\D/g,"");
+
+n=(Number(n)/100)
+
+.toLocaleString(
+
+"pt-BR",
+
+{
+
+minimumFractionDigits:2
+
+}
+
+);
+
+this.value=n;
+
+});
+  function salvarVenda(){
+
+let cliente=
+document.getElementById("cliente").value.trim();
+
+let produto=
+document.getElementById("produto").value;
+
+let modelo=
+document.getElementById("modelo").value.trim();
+
+let valorVenda=
+numero(document.getElementById("valor").value);
+
+let percentual=
+parseFloat(document.getElementById("percentual").value.replace(",","."));
+
+if(cliente==""||modelo==""||valorVenda<=0){
+
+alert("Preencha todos os campos.");
+
+return;
+
+}
+
+let comissao=
+
+(valorVenda*percentual)/100;
+
+let venda={
+
+data:new Date().toLocaleDateString("pt-BR"),
+
+cliente,
+
+produto,
+
+modelo,
+
+valor:valorVenda,
+
+percentual,
+
+comissao
+
+};
+
+if(editando==-1){
+
+vendas.push(venda);
+
+}else{
+
+vendas[editando]=venda;
+
+editando=-1;
+
+}
+
+localStorage.setItem(
+
+"samuel_vendas",
+
+JSON.stringify(vendas)
+
+);
+
+limpar();
+
+atualizarTabela();
+
+}
+
+function limpar(){
+
+cliente.value="";
+
+modelo.value="";
+
+valor.value="";
+
+percentual.value="1.5";
+
+}
+  function atualizarTabela(){
 
 let lista=
-document.getElementById("lista");
+
+document.getElementById("listaVendas");
 
 lista.innerHTML="";
 
-let total=0;
-  let tbody="";
+let totalVenda=0;
 
-vendas.forEach((venda,index)=>{
+let totalComissao=0;
 
-total+=venda.comissao;
+vendas.forEach((v,i)=>{
 
-tbody+=`
+totalVenda+=v.valor;
+
+totalComissao+=v.comissao;
+
+lista.innerHTML+=`
+
 <tr>
 
-<td>${venda.cliente}</td>
+<td>${v.data}</td>
 
-<td>${venda.modelo}</td>
+<td>${v.cliente}</td>
+
+<td>${v.produto}</td>
+
+<td>${v.modelo}</td>
+
+<td>${moeda(v.valor)}</td>
+
+<td>${moeda(v.comissao)}</td>
 
 <td>
-R$ ${venda.comissao.toFixed(2)}
-</td>
 
-<td>
+<button class="editar"
 
-<button
-class="excluir"
-onclick="excluirVenda(${index})">
+onclick="editarVenda(${i})">
+
+Editar
+
+</button>
+
+<button class="excluir"
+
+onclick="excluirVenda(${i})">
 
 Excluir
 
@@ -214,90 +630,106 @@ Excluir
 
 });
 
-lista.innerHTML=tbody;
+document.getElementById("totalVendido").innerHTML=
+
+moeda(totalVenda);
 
 document.getElementById("totalComissao").innerHTML=
-total.toFixed(2);
+
+moeda(totalComissao);
+
+document.getElementById("quantidade").innerHTML=
+
+vendas.length;
+
+}
+
+function editarVenda(i){
+
+let v=vendas[i];
+
+cliente.value=v.cliente;
+
+produto.value=v.produto;
+
+modelo.value=v.modelo;
+
+valor.value=v.valor.toLocaleString(
+
+"pt-BR",
+
+{minimumFractionDigits:2}
+
+);
+
+percentual.value=v.percentual;
+
+editando=i;
+
+}
+  function excluirVenda(i){
+
+if(confirm("Deseja excluir esta venda?")){
+
+vendas.splice(i,1);
 
 localStorage.setItem(
-"vendasSamuel",
+
+"samuel_vendas",
+
 JSON.stringify(vendas)
+
 );
+
+atualizarTabela();
 
 }
 
-function salvarVenda(){
-
-let cliente=
-document.getElementById("cliente").value;
-
-let produto=
-document.getElementById("produto").value;
-
-let modelo=
-document.getElementById("modelo").value;
-
-let valor=
-parseFloat(
-document.getElementById("valor").value
-);
-
-let percentual=
-parseFloat(
-document.getElementById("percentual").value
-);
-
-if(cliente==""||modelo==""||isNaN(valor)){
-
-alert("Preencha todos os campos.");
-
-return;
-
 }
 
-let comissao=
-(valor*percentual)/100;
+function filtrar(){
 
-vendas.push({
+let texto=
 
-cliente,
+document.getElementById("pesquisa")
 
-produto,
+.value
 
-modelo,
+.toLowerCase();
 
-valor,
+let linhas=
 
-percentual,
+document.querySelectorAll(
 
-comissao,
+"#listaVendas tr"
 
-data:new Date().toLocaleDateString()
+);
+
+linhas.forEach(linha=>{
+
+if(
+
+linha.innerText
+
+.toLowerCase()
+
+.includes(texto)
+
+){
+
+linha.style.display="";
+
+}else{
+
+linha.style.display="none";
+
+}
 
 });
 
-document.getElementById("cliente").value="";
-
-document.getElementById("modelo").value="";
-
-document.getElementById("valor").value="";
-
-atualizar();
-
-}
-  function excluirVenda(index){
-
-if(confirm("Excluir esta venda?")){
-
-vendas.splice(index,1);
-
-atualizar();
-
 }
 
-}
-
-atualizar();
+atualizarTabela();
 
 </script>
 
