@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samuel Comissões PRO</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#0b3d91;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:#fff;
+border-radius:15px;
+padding:20px;
+box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+h1{
+color:#0b3d91;
+text-align:center;
+margin-bottom:20px;
+}
+
+.card{
+background:#f4f7fb;
+padding:15px;
+border-radius:10px;
+margin-bottom:15px;
+}
+
+input,select{
+width:100%;
+padding:12px;
+margin-top:8px;
+margin-bottom:10px;
+border:1px solid #ccc;
+border-radius:8px;
+font-size:16px;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+background:#0047ba;
+color:#fff;
+font-size:17px;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#00378f;
+}
+
+.total{
+font-size:18px;
+font-weight:bold;
+margin-top:15px;
+color:#0047ba;
+}
+
+table{
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+}
+
+th{
+background:#0047ba;
+color:#fff;
+padding:10px;
+}
+
+td{
+padding:10px;
+border-bottom:1px solid #ddd;
+font-size:14px;
+}
+
+.excluir{
+background:red;
+padding:6px 10px;
+border-radius:6px;
+color:#fff;
+border:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Samuel Comissões PRO</h1>
+
+<div class="card">
+
+<input id="cliente" placeholder="Nome do Cliente">
+
+<select id="produto">
+<option>Moto</option>
+<option>Barco</option>
+<option>Motor</option>
+</select>
+
+<input id="modelo" placeholder="Modelo">
+
+<input id="valor" type="number" placeholder="Valor da Venda">
+
+<input id="percentual" type="number" value="1.5">
+
+<button onclick="salvarVenda()">
+Salvar Venda
+</button>
+
+<div class="total">
+Total Comissão:
+R$
+<span id="totalComissao">
+0,00
+</span>
+</div>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Cliente</th>
+
+<th>Modelo</th>
+
+<th>Comissão</th>
+
+<th></th>
+
+</tr>
+
+</thead>
+
+<tbody id="lista">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+let vendas=
+JSON.parse(
+localStorage.getItem("vendasSamuel")
+)||[];
+
+function atualizar(){
+
+let lista=
+document.getElementById("lista");
+
+lista.innerHTML="";
+
+let total=0;
+  let tbody="";
+
+vendas.forEach((venda,index)=>{
+
+total+=venda.comissao;
+
+tbody+=`
+<tr>
+
+<td>${venda.cliente}</td>
+
+<td>${venda.modelo}</td>
+
+<td>
+R$ ${venda.comissao.toFixed(2)}
+</td>
+
+<td>
+
+<button
+class="excluir"
+onclick="excluirVenda(${index})">
+
+Excluir
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+lista.innerHTML=tbody;
+
+document.getElementById("totalComissao").innerHTML=
+total.toFixed(2);
+
+localStorage.setItem(
+"vendasSamuel",
+JSON.stringify(vendas)
+);
+
+}
+
+function salvarVenda(){
+
+let cliente=
+document.getElementById("cliente").value;
+
+let produto=
+document.getElementById("produto").value;
+
+let modelo=
+document.getElementById("modelo").value;
+
+let valor=
+parseFloat(
+document.getElementById("valor").value
+);
+
+let percentual=
+parseFloat(
+document.getElementById("percentual").value
+);
+
+if(cliente==""||modelo==""||isNaN(valor)){
+
+alert("Preencha todos os campos.");
+
+return;
+
+}
+
+let comissao=
+(valor*percentual)/100;
+
+vendas.push({
+
+cliente,
+
+produto,
+
+modelo,
+
+valor,
+
+percentual,
+
+comissao,
+
+data:new Date().toLocaleDateString()
+
+});
+
+document.getElementById("cliente").value="";
+
+document.getElementById("modelo").value="";
+
+document.getElementById("valor").value="";
+
+atualizar();
+
+}
+  function excluirVenda(index){
+
+if(confirm("Excluir esta venda?")){
+
+vendas.splice(index,1);
+
+atualizar();
+
+}
+
+}
+
+atualizar();
+
+</script>
+
+</body>
+
+</html>
+
