@@ -1,11 +1,11 @@
-const STORAGE_KEY = "samuel_comissoes_pro_v2";
+const STORAGE = "samuel_comissoes_pro";
 
-let vendas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+let vendas = JSON.parse(localStorage.getItem(STORAGE)) || [];
 
 const $ = (id) => document.getElementById(id);
 
 function salvarBanco() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(vendas));
+    localStorage.setItem(STORAGE, JSON.stringify(vendas));
 }
 
 function abrirTela(id) {
@@ -16,9 +16,17 @@ function abrirTela(id) {
 
     const tela = $(id);
 
-    if (tela) tela.classList.add("ativa");
+    if (tela) {
+        tela.classList.add("ativa");
+    }
 
-    if (id === "dashboard") atualizarDashboard();
+    if (id === "dashboard") {
+        atualizarDashboard();
+    }
+
+    if (id === "historico") {
+        carregarHistorico();
+    }
 
 }
 
@@ -26,9 +34,9 @@ function voltarDashboard() {
     abrirTela("dashboard");
 }
 
-function moeda(numero) {
+function moeda(valor) {
 
-    return Number(numero || 0).toLocaleString("pt-BR", {
+    return Number(valor || 0).toLocaleString("pt-BR", {
         style: "currency",
         currency: "BRL"
     });
@@ -54,17 +62,17 @@ const campoComissao = $("comissao");
 
 if (campoValor) {
 
-    campoValor.addEventListener("input", () => {
+    campoValor.addEventListener("input", function () {
 
-        let v = campoValor.value.replace(/\D/g, "");
+        let valor = this.value.replace(/\D/g, "");
 
-        v = (Number(v) / 100).toFixed(2);
+        valor = (Number(valor) / 100).toFixed(2);
 
-        v = v.replace(".", ",");
+        valor = valor.replace(".", ",");
 
-        v = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-        campoValor.value = v;
+        this.value = valor;
 
         calcularComissao();
 
@@ -80,7 +88,7 @@ if (campoPorcentagem) {
 
 function calcularComissao() {
 
-    if (!campoValor || !campoPorcentagem || !campoComissao) return;
+    if (!campoValor) return;
 
     const valor = numero(campoValor.value);
 
@@ -95,12 +103,13 @@ function calcularComissao() {
 function atualizarDashboard() {
 
     let total = 0;
-    let totalComissao = 0;
+    let comissao = 0;
 
     vendas.forEach(v => {
 
         total += Number(v.valor);
-        totalComissao += Number(v.comissao);
+
+        comissao += Number(v.comissao);
 
     });
 
@@ -108,7 +117,7 @@ function atualizarDashboard() {
         $("dashboardTotal").textContent = moeda(total);
 
     if ($("dashboardComissao"))
-        $("dashboardComissao").textContent = moeda(totalComissao);
+        $("dashboardComissao").textContent = moeda(comissao);
 
     if ($("dashboardQtd"))
         $("dashboardQtd").textContent = vendas.length;
@@ -119,63 +128,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
     atualizarDashboard();
 
-    abrirTela("dashboard");
-
 });
-const formulario = document.getElementById("formVenda");
+const formulario = $("formVenda");
 
 if (formulario) {
 
-    formulario.addEventListener("submit", salvarVenda);
+    formulario.addEventListener("submit", function (e) {
 
-}
+        e.preventDefault();
 
-function salvarVenda(e) {
-
-    e.preventDefault();
-
-    const venda = {
-
-        id: Date.now(),
-
-        cliente: $("cliente").value,
-
-        telefone: $("telefone").value,
-
-        produto: $("produto").value,
-
-        tipo: $("tipoVenda").value,
-
-        valor: numero($("valorVenda").value),
-
-        porcentagem: parseFloat($("porcentagem").value) || 0,
-
-        comissao:
-            numero(
-                $("comissao").value
-                    .replace("R$", "")
-                    .trim()
+        const venda = {
+            id: Date.now(),
+            cliente: $("cliente").value,
+            telefone: $("telefone").value,
+            produto: $("produto").value,
+            tipo: $("tipoVenda").value,
+            valor: numero($("valorVenda").value),
+            porcentagem: parseFloat($("porcentagem").value) || 0,
+            comissao: numero(
+                $("comissao").value.replace("R$", "").trim()
             ),
+            data: $("dataVenda").value,
+            observacao: $("observacao").value
+        };
 
-        data: $("dataVenda").value,
+        vendas.push(venda);
 
-        observacao: $("observacao").value
+        salvarBanco();
 
-    };
+        atualizarDashboard();
 
-    vendas.push(venda);
+        formulario.reset();
 
-    salvarBanco();
+        $("comissao").value = "";
 
-    atualizarDashboard();
+        alert("Venda salva com sucesso!");
 
-    formulario.reset();
+        voltarDashboard();
 
-    $("comissao").value = "";
-
-    alert("Venda salva com sucesso!");
-
-    voltarDashboard();
+    });
 
 }
 function carregarHistorico() {
@@ -192,25 +183,22 @@ function carregarHistorico() {
 
     lista.innerHTML = "";
 
-    meses.forEach((mes, indice) => {
+    meses.forEach((mes, i) => {
 
-        const quantidade = vendas.filter(v => {
+        const qtd = vendas.filter(v => {
 
             if (!v.data) return false;
 
-            return new Date(v.data).getMonth() === indice;
+            return new Date(v.data).getMonth() === i;
 
         }).length;
 
-        const div = document.createElement("div");
-
-        div.className = "mes";
-
-        div.innerHTML = <strong>${mes}</strong><br>${quantidade} venda(s);
-
-        div.onclick = () => abrirMes(indice);
-
-        lista.appendChild(div);
+        lista.innerHTML += `
+            <div class="mes" onclick="abrirMes(${i})">
+                <strong>${mes}</strong><br>
+                ${qtd} venda(s)
+            </div>
+        `;
 
     });
 
@@ -218,63 +206,7 @@ function carregarHistorico() {
 
 function abrirMes(mes) {
 
-    const nomes = [
-        "Janeiro","Fevereiro","Março","Abril",
-        "Maio","Junho","Julho","Agosto",
-        "Setembro","Outubro","Novembro","Dezembro"
-    ];
-
-    const lista = $("listaMeses");
-
-    if (!lista) return;
-
-    let total = 0;
-    let totalComissao = 0;
-
-    let html = <h3>${nomes[mes]}</h3>;
-
-    const vendasMes = vendas.filter(v => {
-
-        if (!v.data) return false;
-
-        return new Date(v.data).getMonth() === mes;
-
-    });
-
-    vendasMes.forEach(v => {
-
-        total += Number(v.valor);
-        totalComissao += Number(v.comissao);
-
-        html += `
-        <div class="card">
-            <b>${v.cliente}</b><br>
-            ${v.produto}<br>
-            ${moeda(v.valor)}<br>
-            Comissão: ${moeda(v.comissao)}
-        </div>
-        `;
-
-    });
-
-    html += `
-    <div class="card">
-        <strong>Total vendido</strong><br>
-        ${moeda(total)}<br><br>
-
-        <strong>Comissão total</strong><br>
-        ${moeda(totalComissao)}<br><br>
-
-        <strong>Quantidade</strong><br>
-        ${vendasMes.length}
-    </div>
-
-    <button onclick="carregarHistorico()">
-        ← Voltar aos meses
-    </button>
-    `;
-
-    lista.innerHTML = html;
+    alert("Tela do mês será adicionada na Parte 4.");
 
 }
 
@@ -317,31 +249,9 @@ function editarVenda(id){
     excluirVenda(id);
 
 }
-const pesquisa = $("pesquisaHistorico");
-
-if (pesquisa) {
-
-    pesquisa.addEventListener("input", function () {
-
-        const texto = this.value.toLowerCase();
-
-        document.querySelectorAll(".mes").forEach(item => {
-
-            item.style.display =
-                item.innerText.toLowerCase().includes(texto)
-                ? "block"
-                : "none";
-
-        });
-
-    });
-
-}
-
 const btnBackup = $("exportarBackup");
 
 if (btnBackup) {
-
     btnBackup.onclick = function () {
 
         const blob = new Blob(
@@ -356,22 +266,15 @@ if (btnBackup) {
         link.download = "backup_comissoes.json";
 
         link.click();
-
     };
-
 }
 
 const btnPDF = $("exportarPDF");
 
 if (btnPDF) {
-
     btnPDF.onclick = function () {
-
         alert("Exportação em PDF será implementada na próxima versão.");
-
     };
-
 }
 
-atualizarDashboard();
-carregarHistorico();
+abrirTela("dashboard");
