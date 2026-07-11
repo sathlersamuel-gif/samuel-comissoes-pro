@@ -295,112 +295,128 @@ const btnPDF = $("exportarPDF");
 if (btnPDF) {
     btnPDF.onclick = function () {
 
-       const vendasSalvas = vendas;
-
-        if (vendasSalvas.length === 0) {
+        if (!vendas || vendas.length === 0) {
             alert("Nenhuma venda cadastrada.");
             return;
         }
 
-        let html = `
-        <html>
-        <head>
-            <title>Samuel Comissões PRO</title>
-            <style>
-                body{
-                    font-family:Arial;
-                    padding:25px;
-                }
+        function numero(valor) {
+            if (typeof valor === "number") return valor;
 
-                h1{
-                    text-align:center;
-                }
+            return Number(
+                String(valor || 0)
+                    .replace("R$", "")
+                    .replace(/\./g, "")
+                    .replace(",", ".")
+                    .trim()
+            ) || 0;
+        }
 
-                table{
-                    width:100%;
-                    border-collapse:collapse;
-                    margin-top:20px;
-                }
+        function moeda(valor) {
+            return numero(valor).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+            });
+        }
 
-                th,td{
-                    border:1px solid #000;
-                    padding:8px;
-                    font-size:13px;
-                }
+        let totalVendido = 0;
+        let linhas = "";
 
-                th{
-                    background:#0d47a1;
-                    color:white;
-                }
-            </style>
-        </head>
-        <body>
+        vendas.forEach(function (venda) {
+            const valorVenda = numero(venda.valor);
 
-        <h1>Samuel Comissões PRO</h1>
+            totalVendido += valorVenda;
 
-        <table>
+            linhas += `
+                <tr>
+                    <td>${venda.cliente || ""}</td>
+                    <td>${venda.modelo || venda.produto || ""}</td>
+                    <td>${moeda(valorVenda)}</td>
+                    <td>${moeda(venda.comissao)}</td>
+                    <td>${venda.data || ""}</td>
+                </tr>
+            `;
+        });
 
-        <tr>
-            <th>Cliente</th>
-            <th>Produto</th>
-            <th>Valor</th>
-            <th>Comissão</th>
-            <th>Data</th>
-        </tr>
+        const html = `
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <title>Samuel Comissões PRO</title>
+
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        padding: 25px;
+                        color: #111;
+                    }
+
+                    h1 {
+                        text-align: center;
+                        margin-bottom: 25px;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+
+                    th, td {
+                        border: 1px solid #333;
+                        padding: 8px;
+                        font-size: 12px;
+                    }
+
+                    th {
+                        background: #eeeeee;
+                    }
+
+                    .total {
+                        margin-top: 20px;
+                        text-align: right;
+                        font-size: 18px;
+                        font-weight: bold;
+                    }
+                </style>
+            </head>
+
+            <body>
+                <h1>Samuel Comissões PRO</h1>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Produto</th>
+                            <th>Valor</th>
+                            <th>Comissão</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        ${linhas}
+                    </tbody>
+                </table>
+
+                <div class="total">
+                    Total vendido: ${moeda(totalVendido)}
+                </div>
+            </body>
+            </html>
         `;
 
-      let totalVendido = 0;
+        const janela = window.open("", "_blank");
 
-vendasSalvas.forEach(venda => {
-
-    const valor = Number(venda.valor || 0);
-    totalVendido += valor;
-
-    html += `
-    <tr>
-        <td>${venda.cliente || ""}</td>
-        <td>${venda.modelo || ""}</td>
-        <td>${valor.toLocaleString("pt-BR",{
-            style:"currency",
-            currency:"BRL"
-        })}</td>
-        <td>${Number(venda.comissao || 0).toLocaleString("pt-BR",{
-            style:"currency",
-            currency:"BRL"
-        })}</td>
-        <td>${venda.data || ""}</td>
-    </tr>
-    `;
-
-});
-
-      html += `
-</table>
-
-<h2 style="text-align:right;margin-top:20px;">
-Total vendido:
-${totalVendido.toLocaleString("pt-BR",{
-    style:"currency",
-    currency:"BRL"
-})}
-</h2>
-
-</html>
-`;
-
-        </body>
-        </html>
-        `;
-
-        const janela = window.open("");
-
+        janela.document.open();
         janela.document.write(html);
-
         janela.document.close();
 
-        janela.print();
-
+        setTimeout(function () {
+            janela.focus();
+            janela.print();
+        }, 700);
     };
 }
-
 abrirTela("dashboard");
