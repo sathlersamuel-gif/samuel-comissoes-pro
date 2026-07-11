@@ -349,22 +349,44 @@ if (btnPDF) {
         </tr>
         `;
 
-        vendasSalvas.forEach(venda=>{
+      let totalVendido = 0;
 
-            html += `
-            <tr>
-                <td>${venda.cliente||""}</td>
-                <td>${venda.modelo||""}</td>
-                <td>${venda.valor||""}</td>
-                <td>${venda.comissao||""}</td>
-                <td>${venda.data||""}</td>
-            </tr>
-            `;
+vendasSalvas.forEach(venda => {
 
-        });
+    const valor = Number(venda.valor || 0);
+    totalVendido += valor;
 
-        html += `
-        </table>
+    html += `
+    <tr>
+        <td>${venda.cliente || ""}</td>
+        <td>${venda.modelo || ""}</td>
+        <td>${valor.toLocaleString("pt-BR",{
+            style:"currency",
+            currency:"BRL"
+        })}</td>
+        <td>${Number(venda.comissao || 0).toLocaleString("pt-BR",{
+            style:"currency",
+            currency:"BRL"
+        })}</td>
+        <td>${venda.data || ""}</td>
+    </tr>
+    `;
+
+});
+
+      html += `
+</table>
+
+<h2 style="text-align:right;margin-top:20px;">
+Total vendido:
+${totalVendido.toLocaleString("pt-BR",{
+    style:"currency",
+    currency:"BRL"
+})}
+</h2>
+
+</html>
+`;
 
         </body>
         </html>
