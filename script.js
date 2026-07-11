@@ -294,7 +294,7 @@ const btnPDF = $("exportarPDF");
 
 if (btnPDF) {
     btnPDF.onclick = function () {
-        alert("Exportação em PDF será implementada na próxima versão.");
+        window.print();
     };
 }
 
