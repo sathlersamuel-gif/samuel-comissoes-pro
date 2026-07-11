@@ -1,29 +1,74 @@
+const STORAGE_KEY = "samuel_comissoes_pro_v2";
+
+let vendas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+const $ = (id) => document.getElementById(id);
+
+function salvarBanco() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(vendas));
+}
+
 function abrirTela(id) {
 
-    document.querySelectorAll(".tela").forEach(tela => {
-        tela.classList.remove("ativa");
+    document.querySelectorAll(".tela").forEach(t => {
+        t.classList.remove("ativa");
     });
 
-    document.getElementById(id).classList.add("ativa");
+    const tela = $(id);
+
+    if (tela) tela.classList.add("ativa");
 
     if (id === "dashboard") atualizarDashboard();
 
-    if (id === "historico") carregarHistorico();
 }
 
 function voltarDashboard() {
     abrirTela("dashboard");
 }
 
-// ---------- Formatação ----------
+function moeda(numero) {
 
-const campoValor = document.getElementById("valorVenda");
-const campoPorcentagem = document.getElementById("porcentagem");
-const campoComissao = document.getElementById("comissao");
+    return Number(numero || 0).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+
+}
+
+function numero(valor) {
+
+    if (!valor) return 0;
+
+    return Number(
+        valor
+            .replace(/\./g, "")
+            .replace(",", ".")
+            .replace(/[^\d.-]/g, "")
+    ) || 0;
+
+}
+
+const campoValor = $("valorVenda");
+const campoPorcentagem = $("porcentagem");
+const campoComissao = $("comissao");
 
 if (campoValor) {
 
-    campoValor.addEventListener("input", formatarValor);
+    campoValor.addEventListener("input", () => {
+
+        let v = campoValor.value.replace(/\D/g, "");
+
+        v = (Number(v) / 100).toFixed(2);
+
+        v = v.replace(".", ",");
+
+        v = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        campoValor.value = v;
+
+        calcularComissao();
+
+    });
 
 }
 
@@ -33,50 +78,50 @@ if (campoPorcentagem) {
 
 }
 
-function formatarValor(e) {
+function calcularComissao() {
 
-    let valor = e.target.value.replace(/\D/g, "");
+    if (!campoValor || !campoPorcentagem || !campoComissao) return;
 
-    valor = (Number(valor) / 100).toFixed(2);
+    const valor = numero(campoValor.value);
 
-    valor = valor.replace(".", ",");
+    const porcentagem = parseFloat(campoPorcentagem.value) || 0;
 
-    valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-    e.target.value = valor;
-
-    calcularComissao();
-}
-
-function valorNumerico(texto) {
-
-    if (!texto) return 0;
-
-    return Number(
-        texto
-            .replace(/\./g, "")
-            .replace(",", ".")
+    campoComissao.value = moeda(
+        valor * porcentagem / 100
     );
 
 }
 
-function calcularComissao() {
+function atualizarDashboard() {
 
-    const valor = valorNumerico(campoValor.value);
+    let total = 0;
+    let totalComissao = 0;
 
-    const porcentagem = Number(campoPorcentagem.value) || 0;
+    vendas.forEach(v => {
 
-    const comissao = valor * (porcentagem / 100);
+        total += Number(v.valor);
+        totalComissao += Number(v.comissao);
 
-    campoComissao.value =
-        comissao.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-        });
+    });
+
+    if ($("dashboardTotal"))
+        $("dashboardTotal").textContent = moeda(total);
+
+    if ($("dashboardComissao"))
+        $("dashboardComissao").textContent = moeda(totalComissao);
+
+    if ($("dashboardQtd"))
+        $("dashboardQtd").textContent = vendas.length;
+
 }
 
-// ---------- Cadastro ----------
+document.addEventListener("DOMContentLoaded", () => {
 
+    atualizarDashboard();
+
+    abrirTela("dashboard");
+
+});
 const formulario = document.getElementById("formVenda");
 
 if (formulario) {
@@ -93,101 +138,56 @@ function salvarVenda(e) {
 
         id: Date.now(),
 
-        cliente: document.getElementById("cliente").value,
+        cliente: $("cliente").value,
 
-        telefone: document.getElementById("telefone").value,
+        telefone: $("telefone").value,
 
-        produto: document.getElementById("produto").value,
+        produto: $("produto").value,
 
-        tipo: document.getElementById("tipoVenda").value,
+        tipo: $("tipoVenda").value,
 
-        valor: valorNumerico(document.getElementById("valorVenda").value),
+        valor: numero($("valorVenda").value),
 
-        porcentagem: Number(document.getElementById("porcentagem").value),
+        porcentagem: parseFloat($("porcentagem").value) || 0,
 
-        comissao: valorNumerico(
-            campoComissao.value
-                .replace("R$", "")
-                .trim()
-        ),
+        comissao:
+            numero(
+                $("comissao").value
+                    .replace("R$", "")
+                    .trim()
+            ),
 
-        data: document.getElementById("dataVenda").value,
+        data: $("dataVenda").value,
 
-        observacao: document.getElementById("observacao").value
+        observacao: $("observacao").value
 
     };
 
     vendas.push(venda);
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(vendas)
-    );
-
-    alert("Venda salva com sucesso!");
-
-    formulario.reset();
-
-    campoComissao.value = "";
+    salvarBanco();
 
     atualizarDashboard();
 
-    abrirTela("dashboard");
-}
+    formulario.reset();
 
-// ---------- Dashboard ----------
+    $("comissao").value = "";
 
-function atualizarDashboard() {
+    alert("Venda salva com sucesso!");
 
-    let total = 0;
-
-    let comissao = 0;
-
-    vendas.forEach(venda => {
-
-        total += venda.valor;
-
-        comissao += venda.comissao;
-
-    });
-
-    document.getElementById("dashboardTotal").innerHTML =
-        total.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-        });
-
-    document.getElementById("dashboardComissao").innerHTML =
-        comissao.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-        });
-
-    document.getElementById("dashboardQtd").innerHTML =
-        vendas.length;
+    voltarDashboard();
 
 }
-
-atualizarDashboard();
 function carregarHistorico() {
 
-    const lista = document.getElementById("listaMeses");
+    const lista = $("listaMeses");
 
     if (!lista) return;
 
     const meses = [
-        "Janeiro",
-        "Fevereiro",
-        "Março",
-        "Abril",
-        "Maio",
-        "Junho",
-        "Julho",
-        "Agosto",
-        "Setembro",
-        "Outubro",
-        "Novembro",
-        "Dezembro"
+        "Janeiro","Fevereiro","Março","Abril",
+        "Maio","Junho","Julho","Agosto",
+        "Setembro","Outubro","Novembro","Dezembro"
     ];
 
     lista.innerHTML = "";
@@ -198,218 +198,98 @@ function carregarHistorico() {
 
             if (!v.data) return false;
 
-            const data = new Date(v.data);
-
-            return data.getMonth() === indice;
+            return new Date(v.data).getMonth() === indice;
 
         }).length;
 
-        const card = document.createElement("div");
+        const div = document.createElement("div");
 
-        card.className = "mes";
+        div.className = "mes";
 
-        card.innerHTML = `
-            <strong>${mes}</strong>
-            <br>
-            ${quantidade} venda(s)
-        `;
+        div.innerHTML = <strong>${mes}</strong><br>${quantidade} venda(s);
 
-        card.onclick = () => abrirMes(indice);
+        div.onclick = () => abrirMes(indice);
 
-        lista.appendChild(card);
+        lista.appendChild(div);
 
     });
 
 }
 
-// =====================================
+function abrirMes(mes) {
 
-function abrirMes(numeroMes){
-
-    const nomesMeses=[
+    const nomes = [
         "Janeiro","Fevereiro","Março","Abril",
         "Maio","Junho","Julho","Agosto",
         "Setembro","Outubro","Novembro","Dezembro"
     ];
 
-    const vendasMes=vendas.filter(v=>{
+    const lista = $("listaMeses");
 
-        if(!v.data) return false;
+    if (!lista) return;
 
-        return new Date(v.data).getMonth()==numeroMes;
+    let total = 0;
+    let totalComissao = 0;
+
+    let html = <h3>${nomes[mes]}</h3>;
+
+    const vendasMes = vendas.filter(v => {
+
+        if (!v.data) return false;
+
+        return new Date(v.data).getMonth() === mes;
 
     });
 
-    let html=`
+    vendasMes.forEach(v => {
 
-    <div class="barra">
+        total += Number(v.valor);
+        totalComissao += Number(v.comissao);
 
-        <button onclick="abrirTela('historico')">
-
-        ← Voltar
-
-        </button>
-
-        <h2>${nomesMeses[numeroMes]}</h2>
-
-    </div>
-
-    `;
-
-    let total=0;
-
-    let comissao=0;
-
-    if(vendasMes.length===0){
-
-        html+="<p>Nenhuma venda neste mês.</p>";
-
-    }else{
-
-        vendasMes.forEach(v=>{
-
-            total+=v.valor;
-
-            comissao+=v.comissao;
-
-            html+=`
-
-            <div class="card">
-
-            <b>${v.cliente}</b>
-
-            <br>
-
-            ${v.produto}
-
-            <br>
-
-            ${v.tipo}
-
-            <br>
-
-            ${new Date(v.data).toLocaleDateString("pt-BR")}
-
-            <br><br>
-
-            <b>
-
-            ${v.valor.toLocaleString("pt-BR",{
-                style:"currency",
-                currency:"BRL"
-            })}
-
-            </b>
-
-            <br>
-
-            Comissão
-
-            ${v.comissao.toLocaleString("pt-BR",{
-                style:"currency",
-                currency:"BRL"
-            })}
-
-            <br><br>
-
-            <button onclick="editarVenda(${v.id})">
-
-            ✏️ Editar
-
-            </button>
-
-            <button onclick="excluirVenda(${v.id})">
-
-            🗑️ Excluir
-
-            </button>
-
-            </div>
-
-            `;
-
-        });
-
-        html+=`
-
+        html += `
         <div class="card">
-
-        <h3>Total vendido</h3>
-
-        <p>
-
-        ${total.toLocaleString("pt-BR",{
-            style:"currency",
-            currency:"BRL"
-        })}
-
-        </p>
-
-        <br>
-
-        <h3>Comissão total</h3>
-
-        <p>
-
-        ${comissao.toLocaleString("pt-BR",{
-            style:"currency",
-            currency:"BRL"
-        })}
-
-        </p>
-
-        <br>
-
-        <h3>Quantidade de vendas</h3>
-
-        <p>${vendasMes.length}</p>
-
+            <b>${v.cliente}</b><br>
+            ${v.produto}<br>
+            ${moeda(v.valor)}<br>
+            Comissão: ${moeda(v.comissao)}
         </div>
-
         `;
 
-    }
+    });
 
-    document.getElementById("historico").innerHTML=html;
+    html += `
+    <div class="card">
+        <strong>Total vendido</strong><br>
+        ${moeda(total)}<br><br>
 
-}
+        <strong>Comissão total</strong><br>
+        ${moeda(totalComissao)}<br><br>
 
-// =====================================
+        <strong>Quantidade</strong><br>
+        ${vendasMes.length}
+    </div>
 
-const pesquisa=document.getElementById("pesquisaHistorico");
+    <button onclick="carregarHistorico()">
+        ← Voltar aos meses
+    </button>
+    `;
 
-if(pesquisa){
-
-pesquisa.addEventListener("input",function(){
-
-const texto=this.value.toLowerCase();
-
-document.querySelectorAll(".mes").forEach(card=>{
-
-card.style.display=
-card.innerText.toLowerCase().includes(texto)
-?"block":"none";
-
-});
-
-});
+    lista.innerHTML = html;
 
 }
+
+document.addEventListener("DOMContentLoaded", carregarHistorico);
 function excluirVenda(id){
 
-    if(!confirm("Deseja excluir esta venda?")) return;
+    if(!confirm("Excluir esta venda?")) return;
 
     vendas = vendas.filter(v => v.id !== id);
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(vendas)
-    );
+    salvarBanco();
 
     atualizarDashboard();
-    carregarHistorico();
 
-    alert("Venda excluída com sucesso!");
+    carregarHistorico();
 
 }
 
@@ -421,174 +301,77 @@ function editarVenda(id){
 
     abrirTela("novaVenda");
 
-    document.getElementById("cliente").value = venda.cliente;
-
-    document.getElementById("telefone").value = venda.telefone;
-
-    document.getElementById("produto").value = venda.produto;
-
-    document.getElementById("tipoVenda").value = venda.tipo;
-
-    document.getElementById("valorVenda").value =
-        venda.valor.toLocaleString("pt-BR",{
-            minimumFractionDigits:2,
-            maximumFractionDigits:2
-        });
-
-    document.getElementById("porcentagem").value =
-        venda.porcentagem;
+    $("cliente").value = venda.cliente;
+    $("telefone").value = venda.telefone;
+    $("produto").value = venda.produto;
+    $("tipoVenda").value = venda.tipo;
+    $("valorVenda").value = venda.valor.toLocaleString("pt-BR",{
+        minimumFractionDigits:2
+    });
+    $("porcentagem").value = venda.porcentagem;
+    $("dataVenda").value = venda.data;
+    $("observacao").value = venda.observacao;
 
     calcularComissao();
 
-    document.getElementById("dataVenda").value =
-        venda.data;
+    excluirVenda(id);
 
-    document.getElementById("observacao").value =
-        venda.observacao;
+}
+const pesquisa = $("pesquisaHistorico");
 
-    vendas = vendas.filter(v => v.id !== id);
+if (pesquisa) {
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(vendas)
-    );
+    pesquisa.addEventListener("input", function () {
+
+        const texto = this.value.toLowerCase();
+
+        document.querySelectorAll(".mes").forEach(item => {
+
+            item.style.display =
+                item.innerText.toLowerCase().includes(texto)
+                ? "block"
+                : "none";
+
+        });
+
+    });
 
 }
 
-window.onload = function(){
-
-    atualizarDashboard();
-
-    carregarHistorico();
-
-};
-const btnBackup = document.getElementById("exportarBackup");
+const btnBackup = $("exportarBackup");
 
 if (btnBackup) {
 
-    btnBackup.addEventListener("click", () => {
+    btnBackup.onclick = function () {
 
         const blob = new Blob(
             [JSON.stringify(vendas, null, 2)],
             { type: "application/json" }
         );
 
-        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
 
-        const a = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
 
-        a.href = url;
-        a.download = "backup_comissoes.json";
-        a.click();
+        link.download = "backup_comissoes.json";
 
-        URL.revokeObjectURL(url);
+        link.click();
 
-    });
+    };
 
 }
 
-const btnImportar = document.getElementById("importarBackup");
-
-if (btnImportar) {
-
-    btnImportar.addEventListener("click", () => {
-
-        const input = document.createElement("input");
-
-        input.type = "file";
-        input.accept = ".json";
-
-        input.onchange = e => {
-
-            const arquivo = e.target.files[0];
-
-            const leitor = new FileReader();
-
-            leitor.onload = evento => {
-
-                vendas = JSON.parse(evento.target.result);
-
-                localStorage.setItem(
-                    STORAGE_KEY,
-                    JSON.stringify(vendas)
-                );
-
-                atualizarDashboard();
-                carregarHistorico();
-
-                alert("Backup restaurado com sucesso!");
-
-            };
-
-            leitor.readAsText(arquivo);
-
-        };
-
-        input.click();
-
-    });
-
-}
-const btnPDF = document.getElementById("exportarPDF");
+const btnPDF = $("exportarPDF");
 
 if (btnPDF) {
 
-    btnPDF.addEventListener("click", exportarPDF);
+    btnPDF.onclick = function () {
+
+        alert("Exportação em PDF será implementada na próxima versão.");
+
+    };
 
 }
 
-function exportarPDF() {
-
-    let texto = "RELATÓRIO DE VENDAS\n\n";
-
-    let total = 0;
-    let totalComissao = 0;
-
-    vendas.forEach((v, i) => {
-
-        texto += ${i + 1}. ${v.cliente}\n;
-        texto += ${v.produto}\n;
-        texto += ${v.tipo}\n;
-        texto += ${v.data}\n;
-        texto += `Venda: ${v.valor.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-        })}\n`;
-
-        texto += `Comissão: ${v.comissao.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-        })}\n`;
-
-        texto += "------------------------------\n";
-
-        total += v.valor;
-        totalComissao += v.comissao;
-
-    });
-
-    texto += "\nTOTAL VENDIDO\n";
-
-    texto += total.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-    });
-
-    texto += "\n\nCOMISSÃO TOTAL\n";
-
-    texto += totalComissao.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-    });
-
-    const blob = new Blob([texto], { type: "text/plain" });
-
-    const link = document.createElement("a");
-
-    link.href = URL.createObjectURL(blob);
-
-    link.download = "Relatorio_Vendas.txt";
-
-    link.click();
-
-}
+atualizarDashboard();
+carregarHistorico();
