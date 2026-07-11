@@ -148,7 +148,7 @@ if (formulario) {
             comissao: numero(
                 $("comissao").value.replace("R$", "").trim()
             ),
-            data: $("dataVenda").value,
+            data: $("dataVenda").value || new Date().toISOString().split("T")[0],
             observacao: $("observacao").value
         };
 
