@@ -295,7 +295,7 @@ const btnPDF = $("exportarPDF");
 if (btnPDF) {
     btnPDF.onclick = function () {
 
-        const vendasSalvas = JSON.parse(localStorage.getItem("vendas")) || [];
+       const vendasSalvas = vendas;
 
         if (vendasSalvas.length === 0) {
             alert("Nenhuma venda cadastrada.");
