@@ -1,14 +1,3 @@
-// ===============================
-// Samuel Comissões PRO v2
-// app.js - Parte 1
-// ===============================
-
-const STORAGE_KEY = "samuel_comissoes_pro";
-
-let vendas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-// ---------- Navegação ----------
-
 function abrirTela(id) {
 
     document.querySelectorAll(".tela").forEach(tela => {
@@ -180,10 +169,6 @@ function atualizarDashboard() {
 }
 
 atualizarDashboard();
-// =====================================
-// PARTE 2 - HISTÓRICO E PESQUISA
-// =====================================
-
 function carregarHistorico() {
 
     const lista = document.getElementById("listaMeses");
@@ -408,5 +393,202 @@ card.innerText.toLowerCase().includes(texto)
 });
 
 });
+
+}
+function excluirVenda(id){
+
+    if(!confirm("Deseja excluir esta venda?")) return;
+
+    vendas = vendas.filter(v => v.id !== id);
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(vendas)
+    );
+
+    atualizarDashboard();
+    carregarHistorico();
+
+    alert("Venda excluída com sucesso!");
+
+}
+
+function editarVenda(id){
+
+    const venda = vendas.find(v => v.id === id);
+
+    if(!venda) return;
+
+    abrirTela("novaVenda");
+
+    document.getElementById("cliente").value = venda.cliente;
+
+    document.getElementById("telefone").value = venda.telefone;
+
+    document.getElementById("produto").value = venda.produto;
+
+    document.getElementById("tipoVenda").value = venda.tipo;
+
+    document.getElementById("valorVenda").value =
+        venda.valor.toLocaleString("pt-BR",{
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        });
+
+    document.getElementById("porcentagem").value =
+        venda.porcentagem;
+
+    calcularComissao();
+
+    document.getElementById("dataVenda").value =
+        venda.data;
+
+    document.getElementById("observacao").value =
+        venda.observacao;
+
+    vendas = vendas.filter(v => v.id !== id);
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(vendas)
+    );
+
+}
+
+window.onload = function(){
+
+    atualizarDashboard();
+
+    carregarHistorico();
+
+};
+const btnBackup = document.getElementById("exportarBackup");
+
+if (btnBackup) {
+
+    btnBackup.addEventListener("click", () => {
+
+        const blob = new Blob(
+            [JSON.stringify(vendas, null, 2)],
+            { type: "application/json" }
+        );
+
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = "backup_comissoes.json";
+        a.click();
+
+        URL.revokeObjectURL(url);
+
+    });
+
+}
+
+const btnImportar = document.getElementById("importarBackup");
+
+if (btnImportar) {
+
+    btnImportar.addEventListener("click", () => {
+
+        const input = document.createElement("input");
+
+        input.type = "file";
+        input.accept = ".json";
+
+        input.onchange = e => {
+
+            const arquivo = e.target.files[0];
+
+            const leitor = new FileReader();
+
+            leitor.onload = evento => {
+
+                vendas = JSON.parse(evento.target.result);
+
+                localStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify(vendas)
+                );
+
+                atualizarDashboard();
+                carregarHistorico();
+
+                alert("Backup restaurado com sucesso!");
+
+            };
+
+            leitor.readAsText(arquivo);
+
+        };
+
+        input.click();
+
+    });
+
+}
+const btnPDF = document.getElementById("exportarPDF");
+
+if (btnPDF) {
+
+    btnPDF.addEventListener("click", exportarPDF);
+
+}
+
+function exportarPDF() {
+
+    let texto = "RELATÓRIO DE VENDAS\n\n";
+
+    let total = 0;
+    let totalComissao = 0;
+
+    vendas.forEach((v, i) => {
+
+        texto += ${i + 1}. ${v.cliente}\n;
+        texto += ${v.produto}\n;
+        texto += ${v.tipo}\n;
+        texto += ${v.data}\n;
+        texto += `Venda: ${v.valor.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        })}\n`;
+
+        texto += `Comissão: ${v.comissao.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        })}\n`;
+
+        texto += "------------------------------\n";
+
+        total += v.valor;
+        totalComissao += v.comissao;
+
+    });
+
+    texto += "\nTOTAL VENDIDO\n";
+
+    texto += total.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+
+    texto += "\n\nCOMISSÃO TOTAL\n";
+
+    texto += totalComissao.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+
+    const blob = new Blob([texto], { type: "text/plain" });
+
+    const link = document.createElement("a");
+
+    link.href = URL.createObjectURL(blob);
+
+    link.download = "Relatorio_Vendas.txt";
+
+    link.click();
 
 }
