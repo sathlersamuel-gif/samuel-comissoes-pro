@@ -294,7 +294,90 @@ const btnPDF = $("exportarPDF");
 
 if (btnPDF) {
     btnPDF.onclick = function () {
-        window.print();
+
+        const vendasSalvas = JSON.parse(localStorage.getItem("vendas")) || [];
+
+        if (vendasSalvas.length === 0) {
+            alert("Nenhuma venda cadastrada.");
+            return;
+        }
+
+        let html = `
+        <html>
+        <head>
+            <title>Samuel Comissões PRO</title>
+            <style>
+                body{
+                    font-family:Arial;
+                    padding:25px;
+                }
+
+                h1{
+                    text-align:center;
+                }
+
+                table{
+                    width:100%;
+                    border-collapse:collapse;
+                    margin-top:20px;
+                }
+
+                th,td{
+                    border:1px solid #000;
+                    padding:8px;
+                    font-size:13px;
+                }
+
+                th{
+                    background:#0d47a1;
+                    color:white;
+                }
+            </style>
+        </head>
+        <body>
+
+        <h1>Samuel Comissões PRO</h1>
+
+        <table>
+
+        <tr>
+            <th>Cliente</th>
+            <th>Produto</th>
+            <th>Valor</th>
+            <th>Comissão</th>
+            <th>Data</th>
+        </tr>
+        `;
+
+        vendasSalvas.forEach(venda=>{
+
+            html += `
+            <tr>
+                <td>${venda.cliente||""}</td>
+                <td>${venda.modelo||""}</td>
+                <td>${venda.valor||""}</td>
+                <td>${venda.comissao||""}</td>
+                <td>${venda.data||""}</td>
+            </tr>
+            `;
+
+        });
+
+        html += `
+        </table>
+
+        </body>
+        </html>
+        `;
+
+        const janela = window.open("");
+
+        janela.document.write(html);
+
+        janela.document.close();
+
+        janela.print();
+
     };
 }
 
