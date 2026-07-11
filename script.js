@@ -206,8 +206,29 @@ function carregarHistorico() {
 
 function abrirMes(mes) {
 
-    alert("Tela do mês será adicionada na Parte 4.");
+    const lista = vendas.filter(v => {
+        if (!v.data) return false;
+        return new Date(v.data).getMonth() === mes;
+    });
 
+    if (lista.length === 0) {
+        alert("Nenhuma venda neste mês.");
+        return;
+    }
+
+    let texto = "";
+
+    lista.forEach((v, i) => {
+        texto +=
+`${i + 1}. ${v.cliente}
+${v.produto}
+R$ ${v.valor.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+Comissão: R$ ${v.comissao.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+
+`;
+    });
+
+    alert(texto);
 }
 
 document.addEventListener("DOMContentLoaded", carregarHistorico);
