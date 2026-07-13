@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
     <title>Samuel Comissões PRO</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json?v=1">
+    <link rel="icon" href="app-icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="app-icon.svg">
     <link rel="stylesheet" href="style.css?v=3">
     <meta name="theme-color" content="#061326">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Samuel Comissões PRO">
+    <meta name="apple-mobile-web-app-title" content="Comissões PRO">
+    <meta name="format-detection" content="telephone=no">
 </head>
 <body>
 <header class="topo">
@@ -56,7 +60,7 @@
 </main>
 <nav class="bottom"><button onclick="abrirTela('dashboard')"><span>⌂</span><small>Início</small></button><button onclick="abrirTela('novaVenda')"><span>＋</span><small>Nova Venda</small></button><button onclick="abrirTela('historico')"><span>▤</span><small>Histórico</small></button><button onclick="abrirTela('relatorios')"><span>▥</span><small>Relatórios</small></button></nav>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="script.js?v=4"></script><script src="import-backup.js?v=2"></script><script src="app-upgrades.js?v=1"></script><script src="app-features.js?v=2"></script><script src="premium-ui.js?v=1"></script><script src="report-options-fix.js?v=1"></script><script src="firebase-integration.js?v=7"></script>
+<script src="pwa-enhancements.js?v=1"></script><script src="script.js?v=4"></script><script src="import-backup.js?v=2"></script><script src="app-upgrades.js?v=1"></script><script src="app-features.js?v=2"></script><script src="premium-ui.js?v=1"></script><script src="report-options-fix.js?v=1"></script><script src="firebase-integration.js?v=7"></script>
 <script>document.getElementById('dataHoje').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});</script>
 </body>
 </html>
