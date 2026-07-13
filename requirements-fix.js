@@ -14,17 +14,16 @@
         return Number(String(valor || "0").replace("R$", "").replace(/\./g, "").replace(",", ".").trim()) || 0;
     }
 
+    function percentualNumero(valor) {
+        return Number(String(valor || "0").replace(",", ".").replace(/[^\d.-]/g, "")) || 0;
+    }
+
     function moeda(valor) {
         return Number(valor || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     }
 
     function escapar(texto) {
-        return String(texto || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+        return String(texto || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     function persistir() {
@@ -52,20 +51,12 @@
     };
 
     function aplicarBusca() {
-        const campo = $id("pesquisaHistorico");
-        const termo = String(campo?.value || "").trim().toLowerCase();
+        const termo = String($id("pesquisaHistorico")?.value || "").trim().toLowerCase();
         document.querySelectorAll("#listaMeses .mes").forEach(botao => {
-            if (!termo) {
-                botao.style.display = "block";
-                return;
-            }
+            if (!termo) { botao.style.display = "block"; return; }
             const textoBotao = botao.textContent.toLowerCase();
-            const onclick = botao.getAttribute("onclick") || "";
-            const numeros = onclick.match(/abrirMesAno\((\d+),\s*(\d+)\)/);
-            if (!numeros) {
-                botao.style.display = textoBotao.includes(termo) ? "block" : "none";
-                return;
-            }
+            const numeros = (botao.getAttribute("onclick") || "").match(/abrirMesAno\((\d+),\s*(\d+)\)/);
+            if (!numeros) { botao.style.display = textoBotao.includes(termo) ? "block" : "none"; return; }
             const ano = Number(numeros[1]);
             const mes = Number(numeros[2]);
             const encontrou = (vendas || []).some(venda => {
@@ -109,9 +100,9 @@
     function salvarVenda(evento) {
         evento.preventDefault();
         evento.stopImmediatePropagation();
-
+        const foiEdicao = edicaoId !== null;
         const valor = valorNumero($id("valorVenda")?.value);
-        const porcentagem = valorNumero($id("porcentagem")?.value);
+        const porcentagem = percentualNumero($id("porcentagem")?.value);
         const agora = new Date();
         const dados = {
             cliente: $id("cliente")?.value.trim() || "",
@@ -128,19 +119,17 @@
             atualizadoEm: agora.toISOString(),
             observacao: $id("observacao")?.value.trim() || ""
         };
-
-        if (edicaoId !== null) {
+        if (foiEdicao) {
             const indice = (vendas || []).findIndex(item => Number(item.id) === edicaoId);
             if (indice >= 0) vendas[indice] = { ...vendas[indice], ...dados };
         } else {
             vendas.push({ id: Date.now(), criadoEm: agora.toISOString(), ...dados });
         }
-
         persistir();
         atualizarDashboard();
         if (typeof carregarHistoricoOriginal === "function") carregarHistoricoOriginal();
         limparFormulario();
-        alert(edicaoId !== null ? "Venda atualizada com sucesso!" : "Venda salva com sucesso!");
+        alert(foiEdicao ? "Venda atualizada com sucesso!" : "Venda salva com sucesso!");
         abrirTela("dashboard");
     }
 
@@ -149,11 +138,11 @@
         if (typeof abrirMesOriginal === "function") abrirMesOriginal(ano, mes);
         const conteudo = $id("listaVendasMes");
         if (!conteudo) return;
+        const lista = (vendas || []).filter(venda => {
+            const data = dataLocal(venda.data);
+            return data && data.getFullYear() === Number(ano) && data.getMonth() === Number(mes);
+        }).sort((a, b) => String(a.data).localeCompare(String(b.data)));
         conteudo.querySelectorAll(".card").forEach((card, indice) => {
-            const lista = (vendas || []).filter(venda => {
-                const data = dataLocal(venda.data);
-                return data && data.getFullYear() === Number(ano) && data.getMonth() === Number(mes);
-            }).sort((a, b) => String(a.data).localeCompare(String(b.data)));
             const venda = lista[indice];
             if (!venda) return;
             const extras = document.createElement("div");
@@ -169,6 +158,6 @@
         atualizarDashboard();
         $id("pesquisaHistorico")?.addEventListener("input", aplicarBusca);
         $id("formVenda")?.addEventListener("submit", salvarVenda, true);
-        $id("dataVenda").value = $id("dataVenda").value || new Date().toISOString().slice(0, 10);
+        if ($id("dataVenda")) $id("dataVenda").value = $id("dataVenda").value || new Date().toISOString().slice(0, 10);
     });
 })();
