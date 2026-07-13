@@ -12,7 +12,7 @@
       .yamaha-emblema{width:30px!important;height:30px!important;max-width:30px!important;max-height:30px!important;object-fit:contain!important;display:block!important}
       .marca-yamaha-samuel-texto{font-size:14px!important;line-height:1!important;color:#ef2638!important;letter-spacing:.2px!important;font-weight:800!important;white-space:nowrap!important}
       .perfil-boas-vindas{display:grid!important;grid-template-columns:50px minmax(0,1fr) auto!important;align-items:center!important;gap:11px!important;margin:5px 0 18px!important}
-      .avatar-perfil{position:relative!important;width:50px!important;height:50px!important;min-width:50px!important;border-radius:50%!important;border:1px solid #28588c!important;background:linear-gradient(145deg,#14355d,#0a1f39)!important;color:#fff!important;display:grid!important;place-items:center!important;overflow:hidden!important;padding:0!important;box-shadow:0 8px 18px rgba(0,0,0,.22)!important}
+      .avatar-perfil{position:relative!important;width:50px!important;height:50px!important;min-width:50px!important;border-radius:50%!important;border:1px solid #28588c!important;background:linear-gradient(145deg,#14355d,#0a1f39)!important;color:#fff!important;display:grid!important;place-items:center!important;overflow:hidden!important;padding:0!important;box-shadow:0 8px 18px rgba(0,0,0,.22)!important;cursor:pointer!important;-webkit-tap-highlight-color:transparent!important}
       .avatar-perfil img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
       .avatar-perfil>span{font-size:20px!important;font-weight:800!important}
       .avatar-perfil small{position:absolute!important;right:0!important;bottom:0!important;width:18px!important;height:18px!important;border-radius:50%!important;background:#0877ff!important;display:grid!important;place-items:center!important;font-size:9px!important;border:2px solid #061326!important}
@@ -37,7 +37,7 @@
     const marca=document.querySelector('.marca');
     if(!marca) return;
     const emblema=marca.querySelector('.yamaha-emblema');
-    if(emblema) emblema.src='yamaha-emblem.svg?v=2';
+    if(emblema) emblema.src='yamaha-emblem.svg?v=3';
     let texto=marca.querySelector('.marca-yamaha-samuel-texto');
     if(!texto){
       texto=document.createElement('strong');
@@ -78,26 +78,28 @@
     aplicarPerfil();
   }
 
-  function escolherFoto(){
-    const input=document.getElementById('inputFotoPerfil');
-    if(input) input.click();
-  }
-
   document.addEventListener('DOMContentLoaded',function(){
     aplicarEstilos();
     aplicarMarcaTopo();
     const editar=document.getElementById('editarNomePerfil');
-    const avatar=document.getElementById('avatarPerfil');
     const input=document.getElementById('inputFotoPerfil');
     if(editar) editar.addEventListener('click',abrirEditor);
-    if(avatar) avatar.addEventListener('click',escolherFoto);
     if(input) input.addEventListener('change',function(event){
       const arquivo=event.target.files&&event.target.files[0];
       if(!arquivo) return;
       if(!arquivo.type.startsWith('image/')){alert('Escolha uma imagem válida.');return;}
-      if(arquivo.size>2*1024*1024){alert('Escolha uma imagem com até 2 MB.');return;}
+      if(arquivo.size>5*1024*1024){alert('Escolha uma imagem com até 5 MB.');event.target.value='';return;}
       const leitor=new FileReader();
-      leitor.onload=function(){localStorage.setItem(FOTO_KEY,String(leitor.result));aplicarPerfil();};
+      leitor.onload=function(){
+        try{
+          localStorage.setItem(FOTO_KEY,String(leitor.result));
+          aplicarPerfil();
+        }catch(erro){
+          alert('Não foi possível salvar essa foto. Escolha uma imagem menor.');
+        }
+        event.target.value='';
+      };
+      leitor.onerror=function(){alert('Não foi possível ler a imagem selecionada.');};
       leitor.readAsDataURL(arquivo);
     });
     aplicarPerfil();
