@@ -53,14 +53,8 @@
         };
     }
 
-    function imprimir(titulo, conteudo, total, anual) {
-        const janela = window.open("", "_blank");
-        if (!janela) {
-            alert("Permita a abertura de janelas para exportar o relatório.");
-            return;
-        }
-
-        janela.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${escapar(titulo)}</title>
+    function montarDocumento(titulo, conteudo, total, anual) {
+        return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapar(titulo)}</title>
         <style>
             body{font-family:Arial,sans-serif;color:#111;margin:24px}h1{text-align:center;color:#003b8e;margin-bottom:28px}
             h2{background:#003b8e;color:#fff;padding:9px 12px;font-size:17px;margin:0 0 8px}
@@ -69,9 +63,41 @@
             .total-geral{font-size:19px;border-top:2px solid #003b8e;padding-top:12px;margin-top:18px}.mes-pdf{page-break-inside:avoid;margin-bottom:24px}
             ${anual ? ".nova-folha{page-break-before:always}" : ""}
             @media print{body{margin:10mm}}
-        </style></head><body><h1>${escapar(titulo)}</h1>${conteudo}<div class="total-geral">Total geral: ${moeda(total)}</div></body></html>`);
-        janela.document.close();
-        setTimeout(() => janela.print(), 500);
+        </style></head><body><h1>${escapar(titulo)}</h1>${conteudo}<div class="total-geral">Total geral: ${moeda(total)}</div></body></html>`;
+    }
+
+    function imprimir(titulo, conteudo, total, anual) {
+        const html = montarDocumento(titulo, conteudo, total, anual);
+        let iframe = document.getElementById("iframeImpressaoRelatorio");
+        if (iframe) iframe.remove();
+
+        iframe = document.createElement("iframe");
+        iframe.id = "iframeImpressaoRelatorio";
+        iframe.setAttribute("aria-hidden", "true");
+        iframe.style.position = "fixed";
+        iframe.style.right = "0";
+        iframe.style.bottom = "0";
+        iframe.style.width = "1px";
+        iframe.style.height = "1px";
+        iframe.style.border = "0";
+        iframe.style.opacity = "0";
+        document.body.appendChild(iframe);
+
+        const documento = iframe.contentDocument || iframe.contentWindow.document;
+        documento.open();
+        documento.write(html);
+        documento.close();
+
+        setTimeout(() => {
+            try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            } catch (erro) {
+                console.error("Falha ao imprimir relatório:", erro);
+                alert("Não foi possível abrir a impressão. Tente novamente pelo Safari ou Chrome.");
+            }
+            setTimeout(() => iframe.remove(), 2000);
+        }, 350);
     }
 
     function exportarMensal(evento) {
