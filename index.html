@@ -41,7 +41,7 @@
         <div class="barra"><button onclick="voltarDashboard()">←</button><h2>Nova Venda</h2></div>
         <form id="formVenda">
             <input type="text" id="cliente" placeholder="Nome do Cliente" required>
-            <input type="tel" id="telefone" placeholder="Telefone" inputmode="numeric" maxlength="15">
+            <input type="tel" id="telefone" placeholder="Telefone" inputmode="numeric" maxlength="15" autocomplete="tel">
             <input type="text" id="produto" list="listaProdutos" placeholder="Pesquise ou digite o Produto/Modelo" autocomplete="off" required>
             <datalist id="listaProdutos">
                 <option value="Factor"></option><option value="Factor DX"></option><option value="Fazer FZ15 ABS Connected"></option><option value="Fazer FZ25 Connected"></option><option value="Crosser 150 S ABS"></option><option value="Crosser 150 Z ABS"></option><option value="Lander Connected"></option><option value="R15 ABS"></option><option value="R3 ABS Connected"></option><option value="MT-03 Connected"></option><option value="MT-07 Connected"></option><option value="Ténéré 700"></option><option value="NMAX ABS Connected"></option><option value="XMAX 300 Connected"></option><option value="TT-R 230"></option><option value="Motor de Popa Yamaha 15 HP"></option><option value="Motor de Popa Yamaha 20 HP 4T"></option><option value="Motor de Popa Yamaha 25 HP"></option><option value="Motor de Popa Yamaha 30 HP"></option><option value="Motor de Popa Yamaha 40 HP 2T"></option><option value="Motor de Popa Yamaha 40 HP 4T"></option><option value="Motor de Popa Yamaha 60 HP 4T"></option><option value="Motor de Popa Yamaha 90 HP 4T"></option><option value="Motor de Popa Yamaha 115 HP 4T"></option><option value="Barco 6 m Fox Aquaforce"></option><option value="Reboque"></option><option value="Carta de Crédito Contemplada"></option><option value="Consórcio Yamaha"></option><option value="Outro Produto"></option>
@@ -60,7 +60,7 @@
 </main>
 <nav class="bottom"><button onclick="abrirTela('dashboard')"><span>⌂</span><small>Início</small></button><button onclick="abrirTela('novaVenda')"><span>＋</span><small>Nova Venda</small></button><button onclick="abrirTela('historico')"><span>▤</span><small>Histórico</small></button><button onclick="abrirTela('relatorios')"><span>▥</span><small>Relatórios</small></button></nav>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="pwa-enhancements.js?v=1"></script><script src="script.js?v=4"></script><script src="import-backup.js?v=2"></script><script src="app-upgrades.js?v=1"></script><script src="app-features.js?v=2"></script><script src="premium-ui.js?v=1"></script><script src="report-options-fix.js?v=1"></script><script src="firebase-integration.js?v=7"></script>
+<script src="pwa-enhancements.js?v=1"></script><script src="script.js?v=4"></script><script src="phone-mask.js?v=1"></script><script src="import-backup.js?v=2"></script><script src="app-upgrades.js?v=1"></script><script src="app-features.js?v=2"></script><script src="premium-ui.js?v=1"></script><script src="report-options-fix.js?v=1"></script><script src="firebase-integration.js?v=7"></script>
 <script>document.getElementById('dataHoje').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});</script>
 </body>
 </html>
