@@ -1,0 +1,20 @@
+{
+  "name": "Samuel Comissões PRO",
+  "short_name": "Comissões PRO",
+  "description": "Controle de vendas e comissões do Samuel",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
+  "background_color": "#061326",
+  "theme_color": "#061326",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
