@@ -6,8 +6,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
-import android.webkit.DownloadListener;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -20,9 +21,12 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
     private static final String APP_URL = "https://sathlersamuel-gif.github.io/samuel-comissoes-pro/";
+    private static final int FILE_CHOOSER_REQUEST = 1001;
+
     private WebView webView;
     private ProgressBar progressBar;
     private TextView errorView;
+    private ValueCallback<Uri[]> fileChooserCallback;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -68,9 +72,30 @@ public class MainActivity extends Activity {
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-        settings.setUserAgentString(settings.getUserAgentString() + " SamuelComissoesPRO-Android/2.0");
+        settings.setUserAgentString(settings.getUserAgentString() + " SamuelComissoesPRO-Android/3.1");
 
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(
+                    WebView webView,
+                    ValueCallback<Uri[]> filePathCallback,
+                    FileChooserParams fileChooserParams
+            ) {
+                if (fileChooserCallback != null) fileChooserCallback.onReceiveValue(null);
+                fileChooserCallback = filePathCallback;
+
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                try {
+                    startActivityForResult(intent, FILE_CHOOSER_REQUEST);
+                    return true;
+                } catch (Exception e) {
+                    fileChooserCallback = null;
+                    return false;
+                }
+            }
+        });
+
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -113,6 +138,19 @@ public class MainActivity extends Activity {
         carregarApp();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != FILE_CHOOSER_REQUEST || fileChooserCallback == null) return;
+
+        Uri[] resultado = null;
+        if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+            resultado = new Uri[]{data.getData()};
+        }
+        fileChooserCallback.onReceiveValue(resultado);
+        fileChooserCallback = null;
+    }
+
     private void carregarApp() {
         errorView.setVisibility(View.GONE);
         webView.setVisibility(View.VISIBLE);
@@ -122,18 +160,17 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
-        }
+        if (webView != null && webView.canGoBack()) webView.goBack();
+        else super.onBackPressed();
     }
 
     @Override
     protected void onDestroy() {
-        if (webView != null) {
-            webView.destroy();
+        if (fileChooserCallback != null) {
+            fileChooserCallback.onReceiveValue(null);
+            fileChooserCallback = null;
         }
+        if (webView != null) webView.destroy();
         super.onDestroy();
     }
 }
