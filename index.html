@@ -22,11 +22,11 @@
 <main>
     <section id="dashboard" class="tela ativa">
         <div class="perfil-boas-vindas">
-            <button type="button" id="avatarPerfil" class="avatar-perfil" aria-label="Escolher foto de perfil">
+            <label for="inputFotoPerfil" id="avatarPerfil" class="avatar-perfil" aria-label="Escolher foto de perfil" role="button" tabindex="0">
                 <img id="fotoPerfil" alt="Foto de perfil" hidden>
                 <span id="iniciaisPerfil">U</span>
                 <small>📷</small>
-            </button>
+            </label>
             <div class="perfil-textos">
                 <button type="button" id="editarNomePerfil" class="nome-editavel" aria-label="Editar nome">
                     <h1 id="nomePerfil">Olá, Usuário! 👋</h1><span>✏️</span>
@@ -35,7 +35,7 @@
             </div>
             <div class="data-hoje" id="dataHoje">Hoje</div>
         </div>
-        <input type="file" id="inputFotoPerfil" accept="image/*" hidden>
+        <input type="file" id="inputFotoPerfil" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
         <div class="cards">
             <div class="card card-azul"><span class="card-icone">💰</span><div><h3>Comissão do mês</h3><p id="dashboardComissao">R$ 0,00</p></div></div>
             <div class="card card-verde"><span class="card-icone">🛒</span><div><h3>Total vendido no mês</h3><p id="dashboardTotal">R$ 0,00</p></div></div>
@@ -71,7 +71,7 @@
 </main>
 <nav class="bottom"><button onclick="abrirTela('dashboard')"><span>⌂</span><small>Início</small></button><button onclick="abrirTela('novaVenda')"><span>＋</span><small>Nova Venda</small></button><button onclick="abrirTela('historico')"><span>▤</span><small>Histórico</small></button><button onclick="abrirTela('relatorios')"><span>▥</span><small>Relatórios</small></button></nav>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="pwa-enhancements.js?v=3"></script><script src="phone-mask.js?v=3"></script><script src="script.js?v=4"></script><script src="import-backup.js?v=2"></script><script src="app-upgrades.js?v=1"></script><script src="app-features.js?v=2"></script><script src="premium-ui.js?v=1"></script><script src="report-options-fix.js?v=1"></script><script src="firebase-integration.js?v=7"></script><script src="admin-controls.js?v=2"></script><script src="install-guide.js?v=1"></script><script src="admin-nav-fix.js?v=1"></script><script src="profile-settings.js?v=3"></script><script src="requirements-fix.js?v=1"></script>
+<script src="pwa-enhancements.js?v=3"></script><script src="phone-mask.js?v=3"></script><script src="script.js?v=4"></script><script src="import-backup.js?v=2"></script><script src="app-upgrades.js?v=1"></script><script src="app-features.js?v=2"></script><script src="premium-ui.js?v=1"></script><script src="report-options-fix.js?v=1"></script><script src="firebase-integration.js?v=7"></script><script src="admin-controls.js?v=2"></script><script src="install-guide.js?v=1"></script><script src="admin-nav-fix.js?v=1"></script><script src="profile-settings.js?v=4"></script><script src="requirements-fix.js?v=1"></script>
 <script>document.getElementById('dataHoje').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});</script>
 </body>
 </html>
