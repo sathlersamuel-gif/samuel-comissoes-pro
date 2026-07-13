@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v7';
+const CACHE_NAME = 'samuel-comissoes-pro-v8';
 const APP_SHELL = [
   './',
   './index.html',
@@ -18,7 +18,7 @@ const APP_SHELL = [
   './profile-settings.js?v=4',
   './requirements-fix.js?v=1',
   './manifest.json?v=2',
-  './app-icon.svg?v=5'
+  './app-icon.svg?v=6'
 ];
 
 self.addEventListener('install', event => {
