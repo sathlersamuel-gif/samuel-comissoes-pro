@@ -1,8 +1,8 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v5';
+const CACHE_NAME = 'samuel-comissoes-pro-v6';
 const APP_SHELL = [
   './',
   './index.html',
-  './style.css?v=3',
+  './style.css?v=4',
   './pwa-enhancements.js?v=3',
   './phone-mask.js?v=3',
   './script.js?v=4',
@@ -15,8 +15,10 @@ const APP_SHELL = [
   './admin-controls.js?v=2',
   './install-guide.js?v=1',
   './admin-nav-fix.js?v=1',
-  './manifest.json?v=1',
-  './app-icon.svg'
+  './profile-settings.js?v=4',
+  './requirements-fix.js?v=1',
+  './manifest.json?v=2',
+  './app-icon.svg?v=5'
 ];
 
 self.addEventListener('install', event => {
