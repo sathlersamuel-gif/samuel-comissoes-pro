@@ -44,10 +44,21 @@ jobs:
       - name: Renomear APK
         run: cp android-app/app/build/outputs/apk/debug/app-debug.apk Samuel-Comissoes-PRO.apk
 
+      - name: Validar estrutura e assinatura do APK
+        run: |
+          test -s Samuel-Comissoes-PRO.apk
+          $ANDROID_HOME/build-tools/35.0.0/aapt dump badging Samuel-Comissoes-PRO.apk
+          $ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose --print-certs Samuel-Comissoes-PRO.apk
+          unzip -t Samuel-Comissoes-PRO.apk
+          sha256sum Samuel-Comissoes-PRO.apk | tee Samuel-Comissoes-PRO.sha256
+          ls -lh Samuel-Comissoes-PRO.apk
+
       - name: Disponibilizar APK para download
         uses: actions/upload-artifact@v4
         with:
-          name: Samuel-Comissoes-PRO-APK
-          path: Samuel-Comissoes-PRO.apk
+          name: Samuel-Comissoes-PRO-Android-v2
+          path: |
+            Samuel-Comissoes-PRO.apk
+            Samuel-Comissoes-PRO.sha256
           retention-days: 30
           if-no-files-found: error
