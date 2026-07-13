@@ -2,6 +2,20 @@
   const NOME_KEY='scp_nome_perfil';
   const FOTO_KEY='scp_foto_perfil';
 
+  function aplicarMarcaTopo(){
+    const marca=document.querySelector('.marca');
+    if(!marca) return;
+    let texto=marca.querySelector('.marca-yamaha-samuel-texto');
+    if(!texto){
+      texto=document.createElement('strong');
+      texto.className='marca-yamaha-samuel-texto';
+      texto.textContent='Yamaha Samuel';
+      marca.appendChild(texto);
+    }else{
+      texto.textContent='Yamaha Samuel';
+    }
+  }
+
   function aplicarPerfil(){
     const nome=(localStorage.getItem(NOME_KEY)||'Usuário').trim()||'Usuário';
     const foto=localStorage.getItem(FOTO_KEY)||'';
@@ -39,6 +53,7 @@
   }
 
   document.addEventListener('DOMContentLoaded',function(){
+    aplicarMarcaTopo();
     const editar=document.getElementById('editarNomePerfil');
     const avatar=document.getElementById('avatarPerfil');
     const input=document.getElementById('inputFotoPerfil');
