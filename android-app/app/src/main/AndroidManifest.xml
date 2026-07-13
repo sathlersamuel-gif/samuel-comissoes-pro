@@ -5,7 +5,8 @@
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
-        android:label="Samuel Comissões PRO"
+        android:roundIcon="@drawable/ic_launcher"
+        android:label="Comissões PRO"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false">
