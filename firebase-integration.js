@@ -1,5 +1,5 @@
-(async function () {
-    const CONFIG_PADRAO = {
+(function () {
+    const firebaseConfig = {
         apiKey: "AIzaSyC7kLLmbU3mAWeyDj_oPKAWsJTU1QU_QjQ",
         authDomain: "samuel-comissoes-pro.firebaseapp.com",
         projectId: "samuel-comissoes-pro",
@@ -8,23 +8,6 @@
         appId: "1:217399693317:web:fa4d7971cf4e869cbc4c6c",
         measurementId: "G-BVHF6K0X81"
     };
-
-    async function carregarConfigAtual() {
-        try {
-            const resposta = await fetch(
-                "https://samuel-comissoes-pro.firebaseapp.com/__/firebase/init.json?v=" + Date.now(),
-                { cache: "no-store" }
-            );
-            if (!resposta.ok) throw new Error("Não foi possível carregar a configuração atual.");
-            const config = await resposta.json();
-            return config && config.apiKey ? config : CONFIG_PADRAO;
-        } catch (erro) {
-            console.warn("Usando configuração local do Firebase:", erro);
-            return CONFIG_PADRAO;
-        }
-    }
-
-    const firebaseConfig = await carregarConfigAtual();
 
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -36,7 +19,6 @@
 
     function criarTelaAcesso() {
         if (document.getElementById("firebaseAuthOverlay")) return;
-
         const estilo = document.createElement("style");
         estilo.textContent = `
             #firebaseAuthOverlay{position:fixed;inset:0;background:#f3f6fb;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -142,7 +124,7 @@
             "auth/too-many-requests": "Muitas tentativas. Aguarde alguns minutos.",
             "auth/network-request-failed": "Falha de internet. Verifique a conexão e tente novamente.",
             "auth/unauthorized-domain": "Este endereço ainda não está autorizado no Firebase.",
-            "auth/api-key-not-valid.-please-pass-a-valid-api-key.": "A chave do Firebase está bloqueada ou desativada no Google Cloud."
+            "auth/api-key-not-valid.-please-pass-a-valid-api-key.": "A chave do Firebase continua inválida no Google Cloud."
         };
         return erros[codigo] || `Não foi possível concluir${codigo ? ` (${codigo})` : ""}.`;
     }
