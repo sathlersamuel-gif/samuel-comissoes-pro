@@ -4,287 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
     <title>Samuel Comissões PRO</title>
-
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
-
     <meta name="theme-color" content="#003b8e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Samuel Comissões PRO">
 </head>
-
 <body>
-
-<header class="topo">
-    <h1>Samuel Comissões PRO</h1>
-</header>
-
+<header class="topo"><h1>Samuel Comissões PRO</h1></header>
 <main>
-
-<!-- DASHBOARD -->
-
-<section id="dashboard" class="tela ativa">
-
-<div class="cards">
-
-<div class="card">
-<h3>Comissão do mês</h3>
-<p id="dashboardComissao">R$ 0,00</p>
-</div>
-
-<div class="card">
-<h3>Total vendido</h3>
-<p id="dashboardTotal">R$ 0,00</p>
-</div>
-
-<div class="card">
-<h3>Vendas</h3>
-<p id="dashboardQtd">0</p>
-</div>
-
-</div>
-
-<div class="menu">
-
-<button onclick="abrirTela('novaVenda')">
-➕ Nova Venda
-</button>
-
-<button onclick="abrirTela('historico')">
-📋 Histórico
-</button>
-
-<button onclick="abrirTela('relatorios')">
-📊 Relatórios
-</button>
-
-<button onclick="abrirTela('backup')">
-💾 Backup
-</button>
-
-</div>
-
-</section>
-
-<!-- NOVA VENDA -->
-
-<section id="novaVenda" class="tela">
-
-<div class="barra">
-<button onclick="voltarDashboard()">← Voltar</button>
-<h2>Nova Venda</h2>
-</div>
-
-<form id="formVenda">
-
-<input
-type="text"
-id="cliente"
-placeholder="Nome do Cliente"
-required>
-
-<input
-type="tel"
-id="telefone"
-placeholder="Telefone">
-
-<input
-type="text"
-id="produto"
-placeholder="Produto"
-required>
-
-<select id="tipoVenda">
-
-<option>À Vista</option>
-<option>Financiamento</option>
-<option>Consórcio</option>
-<option>Cartão</option>
-
-</select>
-
-<input
-type="text"
-id="valorVenda"
-placeholder="Valor da Venda">
-
-<input
-type="number"
-id="porcentagem"
-placeholder="% Comissão">
-
-<input
-type="text"
-id="comissao"
-readonly
-placeholder="Comissão">
-
-<input
-type="date"
-id="dataVenda">
-
-<textarea
-id="observacao"
-placeholder="Observações"></textarea>
-
-<button type="submit">
-
-SALVAR VENDA
-
-</button>
-
-</form>
-
-</section>
-
-<!-- HISTÓRICO -->
-
-<section id="historico" class="tela">
-
-<div class="barra">
-<button onclick="voltarDashboard()">← Voltar</button>
-<h2>Histórico</h2>
-</div>
-
-<input
-type="search"
-placeholder="Pesquisar cliente ou produto..."
-id="pesquisaHistorico">
-
-<div id="listaMeses">
-
-<div class="mes" onclick="abrirMes('Janeiro')">
-Janeiro
-</div>
-
-<div class="mes" onclick="abrirMes('Fevereiro')">
-Fevereiro
-</div>
-
-<div class="mes" onclick="abrirMes('Março')">
-Março
-</div>
-
-<div class="mes" onclick="abrirMes('Abril')">
-Abril
-</div>
-
-<div class="mes" onclick="abrirMes('Maio')">
-Maio
-</div>
-
-<div class="mes" onclick="abrirMes('Junho')">
-Junho
-</div>
-
-<div class="mes" onclick="abrirMes('Julho')">
-Julho
-</div>
-
-<div class="mes" onclick="abrirMes('Agosto')">
-Agosto
-</div>
-
-<div class="mes" onclick="abrirMes('Setembro')">
-Setembro
-</div>
-
-<div class="mes" onclick="abrirMes('Outubro')">
-Outubro
-</div>
-
-<div class="mes" onclick="abrirMes('Novembro')">
-Novembro
-</div>
-
-<div class="mes" onclick="abrirMes('Dezembro')">
-Dezembro
-</div>
-
-</div>
-<div id="detalhesMes" style="display:none">
-
-    <div class="barra">
-        <button onclick="fecharDetalhes()">
-            ← Voltar
-        </button>
-
-        <h2 id="tituloMes"></h2>
-    </div>
-
-    <div id="listaVendasMes"></div>
-
-</div>
-</section>
-
-<!-- RELATÓRIOS -->
-
-<section id="relatorios" class="tela">
-
-<div class="barra">
-<button onclick="voltarDashboard()">← Voltar</button>
-
-<h2>Relatórios</h2>
-
-</div>
-
-<button id="exportarPDF">
-📄 Exportar PDF
-</button>
-
-<div id="resultadoRelatorio"></div>
-
-</section>
-
-<!-- BACKUP -->
-
-<section id="backup" class="tela">
-
-<div class="barra">
-
-<button onclick="voltarDashboard()">
-← Voltar
-</button>
-
-<h2>Backup</h2>
-
-</div>
-
-<button id="exportarBackup">
-Exportar Backup
-</button>
-
-<button id="importarBackup">
-Importar Backup
-</button>
-
-</section>
-
+    <section id="dashboard" class="tela ativa">
+        <div class="cards">
+            <div class="card"><h3>Comissão do mês</h3><p id="dashboardComissao">R$ 0,00</p></div>
+            <div class="card"><h3>Total vendido</h3><p id="dashboardTotal">R$ 0,00</p></div>
+            <div class="card"><h3>Vendas</h3><p id="dashboardQtd">0</p></div>
+        </div>
+        <div class="menu">
+            <button onclick="abrirTela('novaVenda')">➕ Nova Venda</button>
+            <button onclick="abrirTela('historico')">📋 Histórico</button>
+            <button onclick="abrirTela('relatorios')">📊 Relatórios</button>
+            <button onclick="abrirTela('backup')">💾 Backup</button>
+        </div>
+    </section>
+
+    <section id="novaVenda" class="tela">
+        <div class="barra"><button onclick="voltarDashboard()">← Voltar</button><h2>Nova Venda</h2></div>
+        <form id="formVenda">
+            <input type="text" id="cliente" placeholder="Nome do Cliente" required>
+            <input type="tel" id="telefone" placeholder="Telefone">
+            <input type="text" id="produto" placeholder="Produto" required>
+            <select id="tipoVenda">
+                <option>À Vista</option>
+                <option>Financiamento</option>
+                <option>Consórcio</option>
+                <option>Cartão</option>
+            </select>
+            <input type="text" id="valorVenda" placeholder="Valor da Venda" inputmode="numeric">
+            <input type="text" id="porcentagem" placeholder="% Comissão" inputmode="decimal" autocomplete="off">
+            <input type="text" id="comissao" readonly placeholder="Comissão">
+            <input type="date" id="dataVenda">
+            <textarea id="observacao" placeholder="Observações"></textarea>
+            <button type="submit">SALVAR VENDA</button>
+        </form>
+    </section>
+
+    <section id="historico" class="tela">
+        <div class="barra"><button onclick="voltarDashboard()">← Voltar</button><h2>Histórico</h2></div>
+        <input type="search" placeholder="Pesquisar cliente ou produto..." id="pesquisaHistorico">
+        <div id="listaMeses"></div>
+        <div id="detalhesMes" style="display:none">
+            <div class="barra"><button onclick="fecharDetalhes()">← Voltar</button><h2 id="tituloMes"></h2></div>
+            <div id="listaVendasMes"></div>
+        </div>
+    </section>
+
+    <section id="relatorios" class="tela">
+        <div class="barra"><button onclick="voltarDashboard()">← Voltar</button><h2>Relatórios</h2></div>
+        <label for="anoRelatorio"><strong>Ano</strong></label>
+        <select id="anoRelatorio"></select>
+        <label for="mesRelatorio"><strong>Mês</strong></label>
+        <select id="mesRelatorio"></select>
+        <button id="exportarPDFMes">📄 Exportar mês selecionado</button>
+        <button id="exportarPDFTodos">📚 Exportar todos os meses do ano</button>
+        <div id="resultadoRelatorio"></div>
+    </section>
+
+    <section id="backup" class="tela">
+        <div class="barra"><button onclick="voltarDashboard()">← Voltar</button><h2>Backup</h2></div>
+        <p>Salve uma cópia para guardar seus dados ao trocar de aparelho ou navegador.</p>
+        <button id="exportarBackup">Exportar Backup</button>
+        <button id="importarBackup">Importar Backup</button>
+    </section>
 </main>
-
 <nav class="bottom">
-
-<button onclick="abrirTela('dashboard')">
-🏠
-</button>
-
-<button onclick="abrirTela('novaVenda')">
-➕
-</button>
-
-<button onclick="abrirTela('historico')">
-📋
-</button>
-
-<button onclick="abrirTela('relatorios')">
-📊
-</button>
-
+    <button onclick="abrirTela('dashboard')">🏠</button>
+    <button onclick="abrirTela('novaVenda')">➕</button>
+    <button onclick="abrirTela('historico')">📋</button>
+    <button onclick="abrirTela('relatorios')">📊</button>
 </nav>
-
-<script src="script.js?v=3"></script>
-<script src="import-backup.js?v=1"></script>
-
+<script src="script.js?v=4"></script>
+<script src="app-enhancements.js?v=2"></script>
+<script src="import-backup.js?v=2"></script>
+<script src="app-upgrades.js?v=1"></script>
 </body>
 </html>
