@@ -1,0 +1,2 @@
+Este arquivo força uma nova compilação automática do APK pelo GitHub Actions.
+Gerado em 13/07/2026.
