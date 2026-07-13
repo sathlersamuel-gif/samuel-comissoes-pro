@@ -1,5 +1,7 @@
 (function () {
-    const STORAGE_KEY = "samuel_install_guide_seen_v1";
+    const STORAGE_KEY = "samuel_install_guide_seen_v2";
+    const WHATSAPP_URL = "https://wa.me/5569984810587?text=Ol%C3%A1%20Samuel%2C%20preciso%20de%20ajuda%20com%20o%20Comiss%C3%B5es%20PRO.";
+    const APK_PAGE = "https://github.com/sathlersamuel-gif/samuel-comissoes-pro/actions";
 
     function standalone() {
         return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
@@ -7,6 +9,7 @@
 
     function plataforma() {
         const ua = navigator.userAgent || "";
+        if (/SamuelComissoesPRO-Android/i.test(ua)) return "apk";
         if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
         if (/Android/i.test(ua)) return "android";
         return "outro";
@@ -18,13 +21,13 @@
         style.id = "installGuideStyles";
         style.textContent = `
             #installGuide{position:fixed;inset:0;z-index:30000;background:rgba(2,9,22,.92);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:20px}
-            #installGuideCard{width:min(430px,100%);background:linear-gradient(160deg,#0b1f3b,#081426);color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+            #installGuideCard{width:min(430px,100%);max-height:90vh;overflow:auto;background:linear-gradient(160deg,#0b1f3b,#081426);color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
             #installGuideCard h2{font-size:24px;margin:0 0 8px}#installGuideCard>p{color:#c7d2e5;line-height:1.45;margin-bottom:18px}
             .install-step{display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,.06);border-radius:15px;padding:13px;margin-bottom:10px}
             .install-step b{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:#1769e0;flex:none}.install-step span{line-height:1.4;color:#e7edf7}
-            #installGuideClose,#installGuideAction{width:100%;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:800;margin-top:10px;cursor:pointer}
-            #installGuideClose{background:#1769e0;color:#fff}#installGuideAction{background:#25d366;color:#fff;display:none}
-            #installHelpBtn{width:100%;border:none;border-radius:12px;padding:12px;background:#eef3fb;color:#003b8e;font-weight:800;margin-top:2px;cursor:pointer}
+            #installGuideClose,#installAndroidBtn,#installWhatsBtn{width:100%;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:800;margin-top:10px;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px}
+            #installGuideClose{background:#1769e0;color:#fff}#installAndroidBtn{background:#18a957;color:#fff}#installWhatsBtn{background:#25d366;color:#fff}
+            #installHelpBtn{width:100%;border:none;border-radius:12px;padding:12px;background:#eef3fb;color:#003b8e;font-weight:800;margin-top:8px;cursor:pointer}
             .install-note{font-size:12px;color:#91a4bd;text-align:center;margin-top:12px}
         `;
         document.head.appendChild(style);
@@ -35,16 +38,16 @@
         if (tipo === "ios") {
             return `
                 <div class="install-step"><b>1</b><span>Abra este link pelo <strong>Safari</strong>.</span></div>
-                <div class="install-step"><b>2</b><span>Toque no botão <strong>Compartilhar</strong> na barra do Safari.</span></div>
-                <div class="install-step"><b>3</b><span>Escolha <strong>Adicionar à Tela de Início</strong> e confirme em <strong>Adicionar</strong>.</span></div>`;
+                <div class="install-step"><b>2</b><span>Toque no botão <strong>Compartilhar</strong>.</span></div>
+                <div class="install-step"><b>3</b><span>Escolha <strong>Adicionar à Tela de Início</strong>.</span></div>`;
         }
         if (tipo === "android") {
-            return `
-                <div class="install-step"><b>1</b><span>Abra o menu do navegador.</span></div>
-                <div class="install-step"><b>2</b><span>Toque em <strong>Instalar aplicativo</strong> ou <strong>Adicionar à tela inicial</strong>.</span></div>
-                <div class="install-step"><b>3</b><span>Confirme a instalação.</span></div>`;
+            return `<div class="install-step"><b>✓</b><span>Você pode instalar a versão Android pelo botão verde abaixo.</span></div>`;
         }
-        return `<div class="install-step"><b>1</b><span>Abra o menu do navegador e procure por <strong>Instalar</strong> ou <strong>Adicionar à tela inicial</strong>.</span></div>`;
+        if (tipo === "apk") {
+            return `<div class="install-step"><b>✓</b><span>Você já está usando o aplicativo Android.</span></div>`;
+        }
+        return `<div class="install-step"><b>1</b><span>No iPhone, use o Safari. No Android, use o botão de download abaixo.</span></div>`;
     }
 
     function criarModal() {
@@ -53,14 +56,16 @@
         modal.id = "installGuide";
         modal.innerHTML = `
             <div id="installGuideCard">
-                <h2>📲 Acesso mais rápido</h2>
-                <p>Adicione o Samuel Comissões PRO à Tela de Início para abrir em tela cheia e acessar com apenas um toque.</p>
+                <h2>📲 Instalar Comissões PRO</h2>
+                <p>Escolha a forma de acesso para abrir como aplicativo.</p>
                 <div id="installGuideSteps">${conteudo()}</div>
-                <button id="installGuideAction">Instalar agora</button>
-                <button id="installGuideClose">Entendi, continuar</button>
-                <div class="install-note">Você poderá abrir esta orientação novamente na tela de acesso.</div>
+                <a id="installAndroidBtn" href="${APK_PAGE}" target="_blank" rel="noopener">🤖 Baixar aplicativo para Android</a>
+                <a id="installWhatsBtn" href="${WHATSAPP_URL}" target="_blank" rel="noopener">💬 Falar com Samuel no WhatsApp</a>
+                <button id="installGuideClose">Continuar no sistema</button>
+                <div class="install-note">No iPhone, adicione pela Tela de Início do Safari.</div>
             </div>`;
         document.body.appendChild(modal);
+        if (plataforma() === "apk") document.getElementById("installAndroidBtn").style.display = "none";
         document.getElementById("installGuideClose").onclick = () => {
             localStorage.setItem(STORAGE_KEY, "1");
             modal.style.display = "none";
@@ -81,7 +86,7 @@
         const botao = document.createElement("button");
         botao.id = "installHelpBtn";
         botao.type = "button";
-        botao.textContent = "📲 Como adicionar à Tela de Início";
+        botao.textContent = "📲 Instalar aplicativo / Ajuda";
         botao.onclick = abrirGuia;
         const mensagem = document.getElementById("authMensagem");
         card.insertBefore(botao, mensagem || null);
@@ -91,12 +96,10 @@
         estilos();
         criarModal();
         adicionarBotaoLogin();
-
         const observer = new MutationObserver(adicionarBotaoLogin);
         observer.observe(document.body, { childList: true, subtree: true });
-
-        if (!standalone() && localStorage.getItem(STORAGE_KEY) !== "1") {
-            setTimeout(abrirGuia, 1100);
+        if (!standalone() && plataforma() !== "apk" && localStorage.getItem(STORAGE_KEY) !== "1") {
+            setTimeout(abrirGuia, 900);
         }
     }
 
