@@ -36,6 +36,8 @@
   function aplicarMarcaTopo(){
     const marca=document.querySelector('.marca');
     if(!marca) return;
+    const emblema=marca.querySelector('.yamaha-emblema');
+    if(emblema) emblema.src='yamaha-emblem.svg?v=2';
     let texto=marca.querySelector('.marca-yamaha-samuel-texto');
     if(!texto){
       texto=document.createElement('strong');
