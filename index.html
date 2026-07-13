@@ -32,7 +32,7 @@
         <div class="barra"><button onclick="voltarDashboard()">← Voltar</button><h2>Nova Venda</h2></div>
         <form id="formVenda">
             <input type="text" id="cliente" placeholder="Nome do Cliente" required>
-            <input type="tel" id="telefone" placeholder="Telefone">
+            <input type="tel" id="telefone" placeholder="Telefone: (69) 98481-0587" inputmode="numeric" autocomplete="tel" maxlength="15" oninput="let v=this.value.replace(/\D/g,'').slice(0,11); if(v.length<=10){this.value=v.replace(/^(\d{2})(\d)/,'($1) $2').replace(/(\d{4})(\d)/,'$1-$2')}else{this.value=v.replace(/^(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2')}">
             <input type="text" id="produto" list="listaProdutos" placeholder="Pesquise ou digite o Produto/Modelo" autocomplete="off" required>
             <datalist id="listaProdutos">
                 <option value="Factor"></option>
