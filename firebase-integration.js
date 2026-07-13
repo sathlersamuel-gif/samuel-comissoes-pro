@@ -1,6 +1,6 @@
 (function () {
     const firebaseConfig = {
-        apiKey: "AIzaSyC7kLLmbU3mAWeyDj_oPKAWsJTU1QU_QjQ",
+        apiKey: "AIzaSyC7kLlmbU3mAWeyDj_oPKAWsJTU1QU_QjQ",
         authDomain: "samuel-comissoes-pro.firebaseapp.com",
         projectId: "samuel-comissoes-pro",
         storageBucket: "samuel-comissoes-pro.firebasestorage.app",
