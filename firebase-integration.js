@@ -1,5 +1,5 @@
-(function () {
-    const firebaseConfig = {
+(async function () {
+    const CONFIG_PADRAO = {
         apiKey: "AIzaSyC7kLLmbU3mAWeyDj_oPKAWsJTU1QU_QjQ",
         authDomain: "samuel-comissoes-pro.firebaseapp.com",
         projectId: "samuel-comissoes-pro",
@@ -9,14 +9,34 @@
         measurementId: "G-BVHF6K0X81"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    async function carregarConfigAtual() {
+        try {
+            const resposta = await fetch(
+                "https://samuel-comissoes-pro.firebaseapp.com/__/firebase/init.json?v=" + Date.now(),
+                { cache: "no-store" }
+            );
+            if (!resposta.ok) throw new Error("Não foi possível carregar a configuração atual.");
+            const config = await resposta.json();
+            return config && config.apiKey ? config : CONFIG_PADRAO;
+        } catch (erro) {
+            console.warn("Usando configuração local do Firebase:", erro);
+            return CONFIG_PADRAO;
+        }
+    }
+
+    const firebaseConfig = await carregarConfigAtual();
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    auth.useDeviceLanguage();
 
     let usuarioAtual = null;
     let sincronizando = false;
 
     function criarTelaAcesso() {
+        if (document.getElementById("firebaseAuthOverlay")) return;
+
         const estilo = document.createElement("style");
         estilo.textContent = `
             #firebaseAuthOverlay{position:fixed;inset:0;background:#f3f6fb;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -26,7 +46,7 @@
             #firebaseAuthCard input{width:100%;margin-bottom:12px}
             .auth-primary,.auth-secondary,.auth-link{width:100%;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:bold;margin-bottom:10px;cursor:pointer}
             .auth-primary{background:#003b8e;color:#fff}.auth-secondary{background:#0b7a2d;color:#fff}.auth-link{background:#eef3fb;color:#003b8e}
-            #authMensagem{min-height:22px;text-align:center;font-size:14px;color:#b00020;margin-top:5px}
+            #authMensagem{min-height:22px;text-align:center;font-size:14px;color:#b00020;margin-top:5px;overflow-wrap:anywhere}
             #firebaseUserBar{display:none;background:#fff;padding:10px 14px;border-radius:12px;margin:12px 18px;box-shadow:0 2px 8px rgba(0,0,0,.08);font-size:14px;align-items:center;justify-content:space-between;gap:10px}
             #firebaseUserBar button{border:none;background:#d62828;color:#fff;padding:8px 12px;border-radius:8px}
         `;
@@ -80,7 +100,7 @@
             await auth.signInWithEmailAndPassword(email, senha);
         } catch (erro) {
             console.error("Erro ao entrar:", erro);
-            mensagem(traduzirErro(erro.code));
+            mensagem(traduzirErro(erro));
         }
     }
 
@@ -94,7 +114,7 @@
             mensagem("Conta criada. Enviamos um e-mail de confirmação.", true);
         } catch (erro) {
             console.error("Erro ao criar conta:", erro);
-            mensagem(traduzirErro(erro.code));
+            mensagem(traduzirErro(erro));
         }
     }
 
@@ -105,26 +125,26 @@
             await auth.sendPasswordResetEmail(email);
             mensagem("Enviamos o link para redefinir sua senha.", true);
         } catch (erro) {
-            console.error("Erro ao recuperar senha:", erro);
-            mensagem(traduzirErro(erro.code));
+            console.error("Erro ao redefinir senha:", erro);
+            mensagem(traduzirErro(erro));
         }
     }
 
-    function traduzirErro(codigo) {
+    function traduzirErro(erro) {
+        const codigo = erro && erro.code ? erro.code : "";
         const erros = {
-            "auth/email-already-in-use": "Este e-mail já possui uma conta. Toque em Entrar.",
+            "auth/email-already-in-use": "Este e-mail já possui uma conta. Use Entrar ou Esqueci minha senha.",
             "auth/invalid-email": "E-mail inválido.",
             "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.",
             "auth/user-not-found": "Conta não encontrada.",
             "auth/wrong-password": "Senha incorreta.",
             "auth/invalid-credential": "E-mail ou senha incorretos.",
             "auth/too-many-requests": "Muitas tentativas. Aguarde alguns minutos.",
-            "auth/network-request-failed": "Falha de internet. Verifique sua conexão.",
-            "auth/unauthorized-domain": "Este endereço ainda não foi autorizado no Firebase. Adicione sathlersamuel-gif.github.io em Domínios autorizados.",
-            "auth/operation-not-allowed": "O login por e-mail/senha ainda não está ativado no Firebase.",
-            "auth/internal-error": "Erro interno do Firebase. Tente novamente em alguns instantes."
+            "auth/network-request-failed": "Falha de internet. Verifique a conexão e tente novamente.",
+            "auth/unauthorized-domain": "Este endereço ainda não está autorizado no Firebase.",
+            "auth/api-key-not-valid.-please-pass-a-valid-api-key.": "A chave do Firebase está bloqueada ou desativada no Google Cloud."
         };
-        return erros[codigo] || `Não foi possível concluir (${codigo || "erro desconhecido"}).`;
+        return erros[codigo] || `Não foi possível concluir${codigo ? ` (${codigo})` : ""}.`;
     }
 
     function documentoUsuario() {
@@ -158,7 +178,7 @@
             if (typeof carregarHistorico === "function") carregarHistorico();
         } catch (erro) {
             console.error("Erro na sincronização inicial:", erro);
-            alert("Login realizado, mas houve um erro ao sincronizar com a nuvem.");
+            alert("Login realizado, mas não foi possível sincronizar com a nuvem.");
         } finally {
             sincronizando = false;
         }
@@ -187,11 +207,12 @@
         };
     }
 
+    criarTelaAcesso();
+
     auth.onAuthStateChanged(async user => {
         usuarioAtual = user;
         const overlay = document.getElementById("firebaseAuthOverlay");
         const barra = document.getElementById("firebaseUserBar");
-        if (!overlay || !barra) return;
         if (user) {
             overlay.style.display = "none";
             barra.style.display = "flex";
@@ -203,6 +224,4 @@
             barra.style.display = "none";
         }
     });
-
-    document.addEventListener("DOMContentLoaded", criarTelaAcesso);
 })();
