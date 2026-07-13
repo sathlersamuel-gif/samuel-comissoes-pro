@@ -41,24 +41,44 @@ jobs:
         working-directory: android-app
         run: gradle --no-daemon clean assembleDebug
 
-      - name: Renomear APK
-        run: cp android-app/app/build/outputs/apk/debug/app-debug.apk Samuel-Comissoes-PRO.apk
-
-      - name: Validar estrutura e assinatura do APK
+      - name: Preparar APK final
         run: |
+          cp android-app/app/build/outputs/apk/debug/app-debug.apk Samuel-Comissoes-PRO.apk
           test -s Samuel-Comissoes-PRO.apk
-          $ANDROID_HOME/build-tools/35.0.0/aapt dump badging Samuel-Comissoes-PRO.apk
-          $ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose --print-certs Samuel-Comissoes-PRO.apk
-          unzip -t Samuel-Comissoes-PRO.apk
-          sha256sum Samuel-Comissoes-PRO.apk | tee Samuel-Comissoes-PRO.sha256
-          ls -lh Samuel-Comissoes-PRO.apk
 
-      - name: Disponibilizar APK para download
+      - name: Verificar APK como pacote Android válido
+        run: |
+          set -e
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          SIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+
+          "$AAPT" dump badging Samuel-Comissoes-PRO.apk | tee apk-badging.txt
+          grep -q "package: name='com.samuel.comissoespro'" apk-badging.txt
+          grep -q "launchable-activity: name='com.samuel.comissoespro.MainActivity'" apk-badging.txt
+
+          "$SIGNER" verify --verbose --print-certs Samuel-Comissoes-PRO.apk | tee apk-signature.txt
+          grep -q "Verified using v2 scheme" apk-signature.txt
+
+          unzip -t Samuel-Comissoes-PRO.apk | tee apk-integrity.txt
+          unzip -l Samuel-Comissoes-PRO.apk | tee apk-files.txt
+          grep -q "AndroidManifest.xml" apk-files.txt
+          grep -q "classes.dex" apk-files.txt
+          grep -q "resources.arsc" apk-files.txt
+
+          sha256sum Samuel-Comissoes-PRO.apk | tee Samuel-Comissoes-PRO.sha256
+          stat --printf='Tamanho em bytes: %s\n' Samuel-Comissoes-PRO.apk | tee apk-size.txt
+
+      - name: Disponibilizar APK verificado
         uses: actions/upload-artifact@v4
         with:
-          name: Samuel-Comissoes-PRO-Android-v2
+          name: Samuel-Comissoes-PRO-Android-v3-VERIFICADO
           path: |
             Samuel-Comissoes-PRO.apk
             Samuel-Comissoes-PRO.sha256
+            apk-badging.txt
+            apk-signature.txt
+            apk-integrity.txt
+            apk-files.txt
+            apk-size.txt
           retention-days: 30
           if-no-files-found: error
