@@ -79,6 +79,7 @@
             mensagem("Entrando...", true);
             await auth.signInWithEmailAndPassword(email, senha);
         } catch (erro) {
+            console.error("Erro ao entrar:", erro);
             mensagem(traduzirErro(erro.code));
         }
     }
@@ -92,6 +93,7 @@
             await credencial.user.sendEmailVerification();
             mensagem("Conta criada. Enviamos um e-mail de confirmação.", true);
         } catch (erro) {
+            console.error("Erro ao criar conta:", erro);
             mensagem(traduzirErro(erro.code));
         }
     }
@@ -103,21 +105,26 @@
             await auth.sendPasswordResetEmail(email);
             mensagem("Enviamos o link para redefinir sua senha.", true);
         } catch (erro) {
+            console.error("Erro ao recuperar senha:", erro);
             mensagem(traduzirErro(erro.code));
         }
     }
 
     function traduzirErro(codigo) {
         const erros = {
-            "auth/email-already-in-use": "Este e-mail já possui uma conta.",
+            "auth/email-already-in-use": "Este e-mail já possui uma conta. Toque em Entrar.",
             "auth/invalid-email": "E-mail inválido.",
             "auth/weak-password": "A senha precisa ter pelo menos 6 caracteres.",
             "auth/user-not-found": "Conta não encontrada.",
             "auth/wrong-password": "Senha incorreta.",
             "auth/invalid-credential": "E-mail ou senha incorretos.",
-            "auth/too-many-requests": "Muitas tentativas. Aguarde alguns minutos."
+            "auth/too-many-requests": "Muitas tentativas. Aguarde alguns minutos.",
+            "auth/network-request-failed": "Falha de internet. Verifique sua conexão.",
+            "auth/unauthorized-domain": "Este endereço ainda não foi autorizado no Firebase. Adicione sathlersamuel-gif.github.io em Domínios autorizados.",
+            "auth/operation-not-allowed": "O login por e-mail/senha ainda não está ativado no Firebase.",
+            "auth/internal-error": "Erro interno do Firebase. Tente novamente em alguns instantes."
         };
-        return erros[codigo] || "Não foi possível concluir. Tente novamente.";
+        return erros[codigo] || `Não foi possível concluir (${codigo || "erro desconhecido"}).`;
     }
 
     function documentoUsuario() {
@@ -151,7 +158,7 @@
             if (typeof carregarHistorico === "function") carregarHistorico();
         } catch (erro) {
             console.error("Erro na sincronização inicial:", erro);
-            alert("Login realizado, mas a nuvem ainda precisa das regras de segurança do Firestore.");
+            alert("Login realizado, mas houve um erro ao sincronizar com a nuvem.");
         } finally {
             sincronizando = false;
         }
@@ -184,6 +191,7 @@
         usuarioAtual = user;
         const overlay = document.getElementById("firebaseAuthOverlay");
         const barra = document.getElementById("firebaseUserBar");
+        if (!overlay || !barra) return;
         if (user) {
             overlay.style.display = "none";
             barra.style.display = "flex";
