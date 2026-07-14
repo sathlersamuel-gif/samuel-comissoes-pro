@@ -1,5 +1,6 @@
 name: Gerar APK Android
 
+# Compilação solicitada em 14/07/2026 para gerar o APK atualizado.
 on:
   workflow_dispatch:
   push:
