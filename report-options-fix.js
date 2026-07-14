@@ -141,40 +141,55 @@
         return { total, fimY };
     }
 
-    async function entregarPDF(doc, arquivo) {
-        const noApkAndroid = /SamuelComissoesPRO-Android/i.test(navigator.userAgent || "")
-            && window.AndroidPdf
-            && typeof window.AndroidPdf.imprimirPdf === "function";
+    async function compartilharPeloSistema(arquivoPDF) {
+        if (!navigator.share) return false;
 
-        if (noApkAndroid) {
-            try {
-                const base64 = doc.output("datauristring");
-                window.AndroidPdf.imprimirPdf(base64, arquivo);
-                return;
-            } catch (erro) {
-                console.error("Erro ao enviar PDF para impressão no Android:", erro);
-                alert("Não foi possível abrir a impressão. Tente novamente.");
-                return;
-            }
+        try {
+            if (navigator.canShare && !navigator.canShare({ files: [arquivoPDF] })) return false;
+
+            await navigator.share({
+                title: "Relatório de vendas",
+                text: "Relatório em PDF do Controle de Vendas PRO",
+                files: [arquivoPDF]
+            });
+            return true;
+        } catch (erro) {
+            if (erro?.name === "AbortError") return true;
+            console.warn("Não foi possível abrir o compartilhamento do sistema:", erro);
+            return false;
         }
+    }
 
+    async function entregarPDF(doc, arquivo) {
         const blob = doc.output("blob");
         const arquivoPDF = new File([blob], arquivo, { type: "application/pdf" });
 
-        try {
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [arquivoPDF] })) {
-                await navigator.share({
-                    title: "Relatório de vendas",
-                    text: "Relatório em PDF do Controle de Vendas PRO",
-                    files: [arquivoPDF]
-                });
+        // Android e iPhone usam primeiro o mesmo compartilhamento nativo do sistema.
+        // Assim o usuário pode escolher WhatsApp, Drive, e-mail, imprimir ou salvar.
+        if (await compartilharPeloSistema(arquivoPDF)) return;
+
+        // Compatibilidade com APKs Android que oferecem uma ponte nativa de compartilhamento.
+        const base64 = doc.output("datauristring");
+        if (window.AndroidPdf && typeof window.AndroidPdf.compartilharPdf === "function") {
+            try {
+                window.AndroidPdf.compartilharPdf(base64, arquivo);
                 return;
+            } catch (erro) {
+                console.error("Erro ao compartilhar PDF pelo Android:", erro);
             }
-        } catch (erro) {
-            if (erro?.name === "AbortError") return;
-            console.warn("Não foi possível abrir o compartilhamento:", erro);
         }
 
+        // Ponte antiga: mantida apenas como último recurso para não quebrar versões anteriores.
+        if (window.AndroidPdf && typeof window.AndroidPdf.imprimirPdf === "function") {
+            try {
+                window.AndroidPdf.imprimirPdf(base64, arquivo);
+                return;
+            } catch (erro) {
+                console.error("Erro ao abrir PDF pelo Android:", erro);
+            }
+        }
+
+        // Último recurso: abre o PDF pronto, sem transformar o relatório em imagem.
         const url = URL.createObjectURL(blob);
         const novaJanela = window.open(url, "_blank");
 
@@ -194,7 +209,6 @@
     async function exportarMensal(evento) {
         evento.preventDefault();
         evento.stopImmediatePropagation();
-
         if (!verificarBiblioteca()) return;
 
         const ano = Number($("anoRelatorio")?.value);
@@ -225,7 +239,6 @@
     async function exportarAnual(evento) {
         evento.preventDefault();
         evento.stopImmediatePropagation();
-
         if (!verificarBiblioteca()) return;
 
         const ano = Number($("anoRelatorio")?.value);
@@ -244,10 +257,7 @@
             const listaMes = listaAno.filter((venda) => dataLocal(venda.data)?.getMonth() === mes);
             if (!listaMes.length) continue;
 
-            if (!primeiroMes) {
-                doc.addPage("a4", "landscape");
-            }
-
+            if (!primeiroMes) doc.addPage("a4", "landscape");
             const resultado = adicionarTabela(doc, listaMes, `${MESES[mes]} de ${ano}`, primeiroMes ? 38 : 18);
             totalGeral += resultado.total;
             primeiroMes = false;
@@ -277,14 +287,12 @@
 
         if (mensal) {
             mensal.replaceWith(mensal.cloneNode(true));
-            const novoMensal = $("exportarPDFMes");
-            novoMensal.addEventListener("click", exportarMensal, true);
+            $("exportarPDFMes").addEventListener("click", exportarMensal, true);
         }
 
         if (anual) {
             anual.replaceWith(anual.cloneNode(true));
-            const novoAnual = $("exportarPDFTodos");
-            novoAnual.addEventListener("click", exportarAnual, true);
+            $("exportarPDFTodos").addEventListener("click", exportarAnual, true);
         }
     });
 })();
