@@ -14,6 +14,7 @@ import android.print.PrintDocumentAdapter;
 import android.print.PrintDocumentInfo;
 import android.print.PrintManager;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -30,7 +31,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.Base64;
 
 public class MainActivity extends Activity {
     private static final String APP_URL = "https://sathlersamuel-gif.github.io/samuel-comissoes-pro/";
@@ -162,7 +162,7 @@ public class MainActivity extends Activity {
                     int virgula = limpo.indexOf(',');
                     if (virgula >= 0) limpo = limpo.substring(virgula + 1);
 
-                    byte[] dados = Base64.getDecoder().decode(limpo);
+                    byte[] dados = Base64.decode(limpo, Base64.DEFAULT);
                     String nomeSeguro = (nomeArquivo == null || nomeArquivo.trim().isEmpty())
                             ? "Relatorio-Controle-de-Vendas.pdf"
                             : nomeArquivo.replaceAll("[^a-zA-Z0-9._-]", "_");
