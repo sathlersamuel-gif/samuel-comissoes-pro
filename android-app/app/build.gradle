@@ -2,21 +2,6 @@ plugins {
     id 'com.android.application'
 }
 
-def generatedIconDir = file("$buildDir/generated/res/appIcon")
-
-tasks.register('generateLauncherIcon') {
-    def base64File = file('src/main/assets/app_icon_base64.txt')
-    inputs.file(base64File)
-    outputs.dir(generatedIconDir)
-
-    doLast {
-        def drawableDir = new File(generatedIconDir, 'drawable')
-        drawableDir.mkdirs()
-        def encoded = base64File.getText('UTF-8').trim()
-        new File(drawableDir, 'app_icon.jpg').bytes = java.util.Base64.getDecoder().decode(encoded)
-    }
-}
-
 android {
     namespace 'com.samuel.comissoespro'
     compileSdk 35
@@ -29,12 +14,6 @@ android {
         versionName '3.6'
     }
 
-    sourceSets {
-        main {
-            res.srcDir generatedIconDir
-        }
-    }
-
     buildTypes {
         debug {
             minifyEnabled false
@@ -44,10 +23,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-}
-
-tasks.named('preBuild').configure {
-    dependsOn tasks.named('generateLauncherIcon')
 }
 
 dependencies {
