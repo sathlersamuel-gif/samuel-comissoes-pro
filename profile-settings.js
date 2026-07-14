@@ -15,12 +15,13 @@
       .avatar-perfil{position:relative!important;width:50px!important;height:50px!important;min-width:50px!important;border-radius:50%!important;border:1px solid #28588c!important;background:linear-gradient(145deg,#14355d,#0a1f39)!important;color:#fff!important;display:grid!important;place-items:center!important;overflow:hidden!important;padding:0!important;box-shadow:0 8px 18px rgba(0,0,0,.22)!important;cursor:pointer!important;-webkit-tap-highlight-color:transparent!important}
       .avatar-perfil img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
       .avatar-perfil>span{font-size:20px!important;font-weight:800!important}
-      .avatar-perfil small{position:absolute!important;right:0!important;bottom:0!important;width:18px!important;height:18px!important;border-radius:50%!important;background:#0877ff!important;display:grid!important;place-items:center!important;font-size:9px!important;border:2px solid #061326!important}
-      .avatar-perfil img:not([hidden])~small{display:none!important}
+      .avatar-perfil small{position:absolute!important;right:1px!important;bottom:1px!important;width:16px!important;height:16px!important;border-radius:50%!important;background:rgba(8,119,255,.92)!important;display:grid!important;place-items:center!important;font-size:8px!important;border:1px solid #061326!important;line-height:1!important}
+      .avatar-perfil.tem-foto small{display:none!important}
       .perfil-textos{min-width:0!important}
-      .nome-editavel{display:flex!important;align-items:center!important;gap:5px!important;width:auto!important;max-width:100%!important;border:0!important;background:transparent!important;color:#fff!important;padding:0!important;margin:0!important;box-shadow:none!important;text-align:left!important}
+      .nome-editavel{display:flex!important;align-items:center!important;gap:5px!important;width:auto!important;max-width:100%!important;border:0!important;background:transparent!important;color:#fff!important;padding:0!important;margin:0!important;box-shadow:none!important;text-align:left!important;cursor:pointer!important}
       .nome-editavel h1{font-size:25px!important;line-height:1.1!important;color:#fff!important;background:transparent!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;margin:0!important;padding:0!important}
-      .nome-editavel>span{font-size:13px!important;opacity:.72!important;flex:0 0 auto!important}
+      .nome-editavel>span{font-size:12px!important;opacity:.55!important;flex:0 0 auto!important}
+      .nome-editavel.nome-definido>span{display:none!important}
       .perfil-textos p{color:#9fb0c8!important;margin-top:6px!important;font-size:14px!important}
       .perfil-boas-vindas .data-hoje{background:rgba(8,119,255,.12)!important;border:1px solid rgba(8,119,255,.42)!important;color:#cfe3ff!important;border-radius:13px!important;padding:8px 10px!important;font-weight:700!important;font-size:13px!important;white-space:nowrap!important}
       @media(max-width:430px){
@@ -49,23 +50,36 @@
   }
 
   function aplicarPerfil(){
-    const nome=(localStorage.getItem(NOME_KEY)||'Usuário').trim()||'Usuário';
+    const nomeSalvo=(localStorage.getItem(NOME_KEY)||'').trim();
+    const nome=nomeSalvo||'Usuário';
     const foto=localStorage.getItem(FOTO_KEY)||'';
     const nomeEl=document.getElementById('nomePerfil');
+    const editarNome=document.getElementById('editarNomePerfil');
+    const avatar=document.getElementById('avatarPerfil');
     const fotoEl=document.getElementById('fotoPerfil');
     const iniciaisEl=document.getElementById('iniciaisPerfil');
+    const lapisFoto=avatar?.querySelector('small');
+    const lapisNome=editarNome?.querySelector('span');
+
     if(nomeEl) nomeEl.textContent=`Olá, ${nome}! 👋`;
+    if(editarNome) editarNome.classList.toggle('nome-definido',Boolean(nomeSalvo));
+    if(lapisNome) lapisNome.textContent='✏️';
+    if(lapisFoto) lapisFoto.textContent='✏️';
+
     if(fotoEl){
       if(foto){
         fotoEl.src=foto;
         fotoEl.hidden=false;
         if(iniciaisEl) iniciaisEl.hidden=true;
+        if(avatar) avatar.classList.add('tem-foto');
       }else{
         fotoEl.hidden=true;
+        fotoEl.removeAttribute('src');
         if(iniciaisEl){
           iniciaisEl.hidden=false;
           iniciaisEl.textContent=nome.charAt(0).toUpperCase();
         }
+        if(avatar) avatar.classList.remove('tem-foto');
       }
     }
   }
