@@ -3,11 +3,21 @@
         "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
         "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
-
+    const STORAGE = "samuel_comissoes_pro";
     const $ = (id) => document.getElementById(id);
 
+    function obterVendas() {
+        try {
+            const dados = JSON.parse(localStorage.getItem(STORAGE) || "[]");
+            return Array.isArray(dados) ? dados : [];
+        } catch (erro) {
+            console.error("Erro ao carregar vendas para o relatório:", erro);
+            return [];
+        }
+    }
+
     function dataLocal(texto) {
-        const partes = String(texto || "").split("-").map(Number);
+        const partes = String(texto || "").slice(0, 10).split("-").map(Number);
         if (partes.length !== 3 || partes.some(Number.isNaN)) return null;
         return new Date(partes[0], partes[1] - 1, partes[2]);
     }
@@ -29,7 +39,7 @@
     }
 
     function tabelaMes(lista, ano, mes, quebraPagina) {
-        const ordenadas = [...lista].sort((a, b) => String(a.data).localeCompare(String(b.data)));
+        const ordenadas = [...lista].sort((a, b) => String(a.data || "").localeCompare(String(b.data || "")));
         const total = ordenadas.reduce((soma, venda) => soma + Number(venda.valor || 0), 0);
         const linhas = ordenadas.map(venda => `
             <tr>
@@ -90,7 +100,7 @@
         };
 
         window.addEventListener("afterprint", limpar, { once: true });
-        requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+        setTimeout(() => window.print(), 150);
         setTimeout(limpar, 60000);
     }
 
@@ -100,7 +110,7 @@
 
         const ano = Number($("anoRelatorio")?.value);
         const mes = Number($("mesRelatorio")?.value);
-        const lista = (window.vendas || []).filter(venda => {
+        const lista = obterVendas().filter(venda => {
             const data = dataLocal(venda.data);
             return data && data.getFullYear() === ano && data.getMonth() === mes;
         });
@@ -119,7 +129,7 @@
         evento.stopImmediatePropagation();
 
         const ano = Number($("anoRelatorio")?.value);
-        const listaAno = (window.vendas || []).filter(venda => dataLocal(venda.data)?.getFullYear() === ano);
+        const listaAno = obterVendas().filter(venda => dataLocal(venda.data)?.getFullYear() === ano);
 
         if (!listaAno.length) {
             alert(`Nenhuma venda encontrada no ano de ${ano}.`);
