@@ -24,7 +24,7 @@
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
+            .replace(/\"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
 
@@ -53,51 +53,45 @@
         };
     }
 
-    function montarDocumento(titulo, conteudo, total, anual) {
-        return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapar(titulo)}</title>
-        <style>
-            body{font-family:Arial,sans-serif;color:#111;margin:24px}h1{text-align:center;color:#003b8e;margin-bottom:28px}
-            h2{background:#003b8e;color:#fff;padding:9px 12px;font-size:17px;margin:0 0 8px}
-            table{width:100%;border-collapse:collapse}th,td{border:1px solid #555;padding:7px;font-size:11px;text-align:left}
-            th{background:#eee}.valor{text-align:right;white-space:nowrap}.subtotal,.total-geral{text-align:right;font-weight:bold;margin-top:10px}
-            .total-geral{font-size:19px;border-top:2px solid #003b8e;padding-top:12px;margin-top:18px}.mes-pdf{page-break-inside:avoid;margin-bottom:24px}
-            ${anual ? ".nova-folha{page-break-before:always}" : ""}
-            @media print{body{margin:10mm}}
-        </style></head><body><h1>${escapar(titulo)}</h1>${conteudo}<div class="total-geral">Total geral: ${moeda(total)}</div></body></html>`;
-    }
-
     function imprimir(titulo, conteudo, total, anual) {
-        const html = montarDocumento(titulo, conteudo, total, anual);
-        let iframe = document.getElementById("iframeImpressaoRelatorio");
-        if (iframe) iframe.remove();
+        document.getElementById("areaImpressaoRelatorio")?.remove();
+        document.getElementById("estiloImpressaoRelatorio")?.remove();
 
-        iframe = document.createElement("iframe");
-        iframe.id = "iframeImpressaoRelatorio";
-        iframe.setAttribute("aria-hidden", "true");
-        iframe.style.position = "fixed";
-        iframe.style.right = "0";
-        iframe.style.bottom = "0";
-        iframe.style.width = "1px";
-        iframe.style.height = "1px";
-        iframe.style.border = "0";
-        iframe.style.opacity = "0";
-        document.body.appendChild(iframe);
+        const area = document.createElement("div");
+        area.id = "areaImpressaoRelatorio";
+        area.innerHTML = `<h1>${escapar(titulo)}</h1>${conteudo}<div class="total-geral">Total geral: ${moeda(total)}</div>`;
+        document.body.appendChild(area);
 
-        const documento = iframe.contentDocument || iframe.contentWindow.document;
-        documento.open();
-        documento.write(html);
-        documento.close();
+        const estilo = document.createElement("style");
+        estilo.id = "estiloImpressaoRelatorio";
+        estilo.textContent = `
+            #areaImpressaoRelatorio{display:none}
+            @media print{
+                body > *:not(#areaImpressaoRelatorio){display:none !important}
+                #areaImpressaoRelatorio{display:block !important;font-family:Arial,sans-serif;color:#111;background:#fff;margin:0;padding:10mm}
+                #areaImpressaoRelatorio h1{text-align:center;color:#003b8e;margin:0 0 28px;font-size:24px}
+                #areaImpressaoRelatorio h2{background:#003b8e;color:#fff;padding:9px 12px;font-size:17px;margin:0 0 8px}
+                #areaImpressaoRelatorio table{width:100%;border-collapse:collapse}
+                #areaImpressaoRelatorio th,#areaImpressaoRelatorio td{border:1px solid #555;padding:7px;font-size:11px;text-align:left}
+                #areaImpressaoRelatorio th{background:#eee}
+                #areaImpressaoRelatorio .valor{text-align:right;white-space:nowrap}
+                #areaImpressaoRelatorio .subtotal,#areaImpressaoRelatorio .total-geral{text-align:right;font-weight:bold;margin-top:10px}
+                #areaImpressaoRelatorio .total-geral{font-size:19px;border-top:2px solid #003b8e;padding-top:12px;margin-top:18px}
+                #areaImpressaoRelatorio .mes-pdf{break-inside:avoid;page-break-inside:avoid;margin-bottom:24px}
+                ${anual ? "#areaImpressaoRelatorio .nova-folha{break-before:page;page-break-before:always}" : ""}
+            }`;
+        document.head.appendChild(estilo);
 
-        setTimeout(() => {
-            try {
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-            } catch (erro) {
-                console.error("Falha ao imprimir relatório:", erro);
-                alert("Não foi possível abrir a impressão. Tente novamente pelo Safari ou Chrome.");
-            }
-            setTimeout(() => iframe.remove(), 2000);
-        }, 350);
+        const limpar = () => {
+            setTimeout(() => {
+                area.remove();
+                estilo.remove();
+            }, 500);
+        };
+
+        window.addEventListener("afterprint", limpar, { once: true });
+        requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+        setTimeout(limpar, 60000);
     }
 
     function exportarMensal(evento) {
@@ -106,7 +100,7 @@
 
         const ano = Number($("anoRelatorio")?.value);
         const mes = Number($("mesRelatorio")?.value);
-        const lista = (vendas || []).filter(venda => {
+        const lista = (window.vendas || []).filter(venda => {
             const data = dataLocal(venda.data);
             return data && data.getFullYear() === ano && data.getMonth() === mes;
         });
@@ -125,7 +119,7 @@
         evento.stopImmediatePropagation();
 
         const ano = Number($("anoRelatorio")?.value);
-        const listaAno = (vendas || []).filter(venda => dataLocal(venda.data)?.getFullYear() === ano);
+        const listaAno = (window.vendas || []).filter(venda => dataLocal(venda.data)?.getFullYear() === ano);
 
         if (!listaAno.length) {
             alert(`Nenhuma venda encontrada no ano de ${ano}.`);
