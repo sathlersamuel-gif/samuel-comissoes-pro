@@ -28,6 +28,8 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.core.content.FileProvider;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -85,7 +87,7 @@ public class MainActivity extends Activity {
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-        settings.setUserAgentString(settings.getUserAgentString() + " SamuelComissoesPRO-Android/3.2");
+        settings.setUserAgentString(settings.getUserAgentString() + " SamuelComissoesPRO-Android/3.3");
 
         webView.addJavascriptInterface(new PdfBridge(), "AndroidPdf");
 
@@ -153,25 +155,56 @@ public class MainActivity extends Activity {
         carregarApp();
     }
 
+    private File salvarPdf(String base64Pdf, String nomeArquivo) throws Exception {
+        String limpo = base64Pdf;
+        int virgula = limpo.indexOf(',');
+        if (virgula >= 0) limpo = limpo.substring(virgula + 1);
+
+        byte[] dados = Base64.decode(limpo, Base64.DEFAULT);
+        String nomeSeguro = (nomeArquivo == null || nomeArquivo.trim().isEmpty())
+                ? "Relatorio-Controle-de-Vendas.pdf"
+                : nomeArquivo.replaceAll("[^a-zA-Z0-9._-]", "_");
+        if (!nomeSeguro.toLowerCase().endsWith(".pdf")) nomeSeguro += ".pdf";
+
+        File arquivo = new File(getCacheDir(), nomeSeguro);
+        try (FileOutputStream saida = new FileOutputStream(arquivo)) {
+            saida.write(dados);
+        }
+        return arquivo;
+    }
+
     private class PdfBridge {
+        @JavascriptInterface
+        public void compartilharPdf(String base64Pdf, String nomeArquivo) {
+            runOnUiThread(() -> {
+                try {
+                    File arquivo = salvarPdf(base64Pdf, nomeArquivo);
+                    Uri uri = FileProvider.getUriForFile(
+                            MainActivity.this,
+                            getPackageName() + ".fileprovider",
+                            arquivo
+                    );
+
+                    Intent compartilhar = new Intent(Intent.ACTION_SEND);
+                    compartilhar.setType("application/pdf");
+                    compartilhar.putExtra(Intent.EXTRA_STREAM, uri);
+                    compartilhar.putExtra(Intent.EXTRA_SUBJECT, "Relatório de vendas");
+                    compartilhar.putExtra(Intent.EXTRA_TEXT, "Relatório em PDF do Controle de Vendas PRO");
+                    compartilhar.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                    startActivity(Intent.createChooser(compartilhar, "Compartilhar relatório em PDF"));
+                } catch (Exception e) {
+                    webView.evaluateJavascript("alert('Não foi possível compartilhar o PDF. Tente novamente.');", null);
+                }
+            });
+        }
+
         @JavascriptInterface
         public void imprimirPdf(String base64Pdf, String nomeArquivo) {
             runOnUiThread(() -> {
                 try {
-                    String limpo = base64Pdf;
-                    int virgula = limpo.indexOf(',');
-                    if (virgula >= 0) limpo = limpo.substring(virgula + 1);
-
-                    byte[] dados = Base64.decode(limpo, Base64.DEFAULT);
-                    String nomeSeguro = (nomeArquivo == null || nomeArquivo.trim().isEmpty())
-                            ? "Relatorio-Controle-de-Vendas.pdf"
-                            : nomeArquivo.replaceAll("[^a-zA-Z0-9._-]", "_");
-                    if (!nomeSeguro.toLowerCase().endsWith(".pdf")) nomeSeguro += ".pdf";
-
-                    File arquivo = new File(getCacheDir(), nomeSeguro);
-                    try (FileOutputStream saida = new FileOutputStream(arquivo)) {
-                        saida.write(dados);
-                    }
+                    File arquivo = salvarPdf(base64Pdf, nomeArquivo);
+                    String nomeSeguro = arquivo.getName();
 
                     PrintManager printManager = (PrintManager) getSystemService(PRINT_SERVICE);
                     PrintAttributes atributos = new PrintAttributes.Builder()
