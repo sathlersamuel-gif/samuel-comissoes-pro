@@ -1,6 +1,7 @@
 (function () {
     const STORAGE_KEY = "samuel_install_guide_seen_v2";
     const WHATSAPP_URL = "https://wa.me/5569984810587?text=Ol%C3%A1%20Samuel%2C%20preciso%20de%20ajuda%20com%20o%20Comiss%C3%B5es%20PRO.";
+    const APK_URL = "https://raw.githubusercontent.com/sathlersamuel-gif/samuel-comissoes-pro/main/downloads/Samuel-Comissoes-PRO.apk";
 
     function standalone() {
         return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
@@ -24,8 +25,8 @@
             #installGuideCard h2{font-size:24px;margin:0 0 8px}#installGuideCard>p{color:#c7d2e5;line-height:1.45;margin-bottom:18px}
             .install-step{display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,.06);border-radius:15px;padding:13px;margin-bottom:10px}
             .install-step b{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:#1769e0;flex:none}.install-step span{line-height:1.4;color:#e7edf7}
-            #installGuideClose,#installWhatsBtn{width:100%;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:800;margin-top:10px;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px}
-            #installGuideClose{background:#1769e0;color:#fff}#installWhatsBtn{background:#25d366;color:#fff}
+            #installGuideClose,#installAndroidBtn,#installWhatsBtn{width:100%;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:800;margin-top:10px;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px}
+            #installGuideClose{background:#1769e0;color:#fff}#installAndroidBtn{background:#18a957;color:#fff}#installWhatsBtn{background:#25d366;color:#fff}
             #installHelpBtn{width:100%;border:none;border-radius:12px;padding:12px;background:#eef3fb;color:#003b8e;font-weight:800;margin-top:8px;cursor:pointer}
             .install-note{font-size:12px;color:#91a4bd;text-align:center;margin-top:12px}
         `;
@@ -41,12 +42,12 @@
                 <div class="install-step"><b>3</b><span>Escolha <strong>Adicionar à Tela de Início</strong>.</span></div>`;
         }
         if (tipo === "android") {
-            return `<div class="install-step"><b>✓</b><span>Abra este sistema pelo navegador e adicione à tela inicial.</span></div>`;
+            return `<div class="install-step"><b>✓</b><span>Toque no botão verde abaixo para baixar o aplicativo Android.</span></div>`;
         }
         if (tipo === "apk") {
             return `<div class="install-step"><b>✓</b><span>Você já está usando o aplicativo Android.</span></div>`;
         }
-        return `<div class="install-step"><b>1</b><span>No iPhone, use o Safari. No Android, abra pelo navegador e adicione à tela inicial.</span></div>`;
+        return `<div class="install-step"><b>1</b><span>No iPhone, use o Safari. No Android, toque no botão de download abaixo.</span></div>`;
     }
 
     function criarModal() {
@@ -58,11 +59,13 @@
                 <h2>📲 Instalar Comissões PRO</h2>
                 <p>Escolha a forma de acesso para abrir como aplicativo.</p>
                 <div id="installGuideSteps">${conteudo()}</div>
+                <a id="installAndroidBtn" href="${APK_URL}" download="Samuel-Comissoes-PRO.apk">🤖 Baixar aplicativo para Android</a>
                 <a id="installWhatsBtn" href="${WHATSAPP_URL}" target="_blank" rel="noopener">💬 Falar com Samuel no WhatsApp</a>
                 <button id="installGuideClose">Continuar no sistema</button>
                 <div class="install-note">No iPhone, adicione pela Tela de Início do Safari.</div>
             </div>`;
         document.body.appendChild(modal);
+        if (plataforma() === "apk") document.getElementById("installAndroidBtn").style.display = "none";
         document.getElementById("installGuideClose").onclick = () => {
             localStorage.setItem(STORAGE_KEY, "1");
             modal.style.display = "none";
