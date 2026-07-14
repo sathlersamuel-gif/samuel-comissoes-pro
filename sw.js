@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v10';
+const CACHE_NAME = 'samuel-comissoes-pro-v11';
 const APP_SHELL = [
   './',
   './index.html',
@@ -10,7 +10,7 @@ const APP_SHELL = [
   './app-upgrades.js?v=1',
   './app-features.js?v=2',
   './premium-ui.js?v=1',
-  './report-options-fix.js?v=2',
+  './report-options-fix.js?v=3',
   './firebase-integration.js?v=7',
   './admin-controls.js?v=2',
   './install-guide.js?v=1',
