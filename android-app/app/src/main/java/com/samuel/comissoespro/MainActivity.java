@@ -6,8 +6,16 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CancellationSignal;
+import android.os.ParcelFileDescriptor;
+import android.print.PageRange;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintDocumentInfo;
+import android.print.PrintManager;
 import android.provider.MediaStore;
 import android.view.View;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -19,6 +27,11 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Base64;
+
 public class MainActivity extends Activity {
     private static final String APP_URL = "https://sathlersamuel-gif.github.io/samuel-comissoes-pro/";
     private static final int FILE_CHOOSER_REQUEST = 1001;
@@ -28,7 +41,7 @@ public class MainActivity extends Activity {
     private TextView errorView;
     private ValueCallback<Uri[]> fileChooserCallback;
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +85,9 @@ public class MainActivity extends Activity {
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-        settings.setUserAgentString(settings.getUserAgentString() + " SamuelComissoesPRO-Android/3.1");
+        settings.setUserAgentString(settings.getUserAgentString() + " SamuelComissoesPRO-Android/3.2");
+
+        webView.addJavascriptInterface(new PdfBridge(), "AndroidPdf");
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -136,6 +151,84 @@ public class MainActivity extends Activity {
         });
 
         carregarApp();
+    }
+
+    private class PdfBridge {
+        @JavascriptInterface
+        public void imprimirPdf(String base64Pdf, String nomeArquivo) {
+            runOnUiThread(() -> {
+                try {
+                    String limpo = base64Pdf;
+                    int virgula = limpo.indexOf(',');
+                    if (virgula >= 0) limpo = limpo.substring(virgula + 1);
+
+                    byte[] dados = Base64.getDecoder().decode(limpo);
+                    String nomeSeguro = (nomeArquivo == null || nomeArquivo.trim().isEmpty())
+                            ? "Relatorio-Controle-de-Vendas.pdf"
+                            : nomeArquivo.replaceAll("[^a-zA-Z0-9._-]", "_");
+                    if (!nomeSeguro.toLowerCase().endsWith(".pdf")) nomeSeguro += ".pdf";
+
+                    File arquivo = new File(getCacheDir(), nomeSeguro);
+                    try (FileOutputStream saida = new FileOutputStream(arquivo)) {
+                        saida.write(dados);
+                    }
+
+                    PrintManager printManager = (PrintManager) getSystemService(PRINT_SERVICE);
+                    PrintAttributes atributos = new PrintAttributes.Builder()
+                            .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                            .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                            .build();
+                    printManager.print(nomeSeguro, new PdfFilePrintAdapter(arquivo, nomeSeguro), atributos);
+                } catch (Exception e) {
+                    webView.evaluateJavascript("alert('Não foi possível abrir o relatório para impressão. Tente novamente.');", null);
+                }
+            });
+        }
+    }
+
+    private static class PdfFilePrintAdapter extends PrintDocumentAdapter {
+        private final File arquivo;
+        private final String nome;
+
+        PdfFilePrintAdapter(File arquivo, String nome) {
+            this.arquivo = arquivo;
+            this.nome = nome;
+        }
+
+        @Override
+        public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes,
+                             CancellationSignal cancellationSignal, LayoutResultCallback callback,
+                             Bundle extras) {
+            if (cancellationSignal.isCanceled()) {
+                callback.onLayoutCancelled();
+                return;
+            }
+            PrintDocumentInfo info = new PrintDocumentInfo.Builder(nome)
+                    .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                    .setPageCount(PrintDocumentInfo.PAGE_COUNT_UNKNOWN)
+                    .build();
+            callback.onLayoutFinished(info, true);
+        }
+
+        @Override
+        public void onWrite(PageRange[] pages, ParcelFileDescriptor destination,
+                            CancellationSignal cancellationSignal, WriteResultCallback callback) {
+            try (FileInputStream entrada = new FileInputStream(arquivo);
+                 FileOutputStream saida = new FileOutputStream(destination.getFileDescriptor())) {
+                byte[] buffer = new byte[8192];
+                int lidos;
+                while ((lidos = entrada.read(buffer)) != -1) {
+                    if (cancellationSignal.isCanceled()) {
+                        callback.onWriteCancelled();
+                        return;
+                    }
+                    saida.write(buffer, 0, lidos);
+                }
+                callback.onWriteFinished(new PageRange[]{PageRange.ALL_PAGES});
+            } catch (Exception e) {
+                callback.onWriteFailed(e.getMessage());
+            }
+        }
     }
 
     @Override
