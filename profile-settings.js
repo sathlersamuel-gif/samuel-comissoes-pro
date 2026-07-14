@@ -16,6 +16,7 @@
       .avatar-perfil img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
       .avatar-perfil>span{font-size:20px!important;font-weight:800!important}
       .avatar-perfil small{position:absolute!important;right:0!important;bottom:0!important;width:18px!important;height:18px!important;border-radius:50%!important;background:#0877ff!important;display:grid!important;place-items:center!important;font-size:9px!important;border:2px solid #061326!important}
+      .avatar-perfil img:not([hidden])~small{display:none!important}
       .perfil-textos{min-width:0!important}
       .nome-editavel{display:flex!important;align-items:center!important;gap:5px!important;width:auto!important;max-width:100%!important;border:0!important;background:transparent!important;color:#fff!important;padding:0!important;margin:0!important;box-shadow:none!important;text-align:left!important}
       .nome-editavel h1{font-size:25px!important;line-height:1.1!important;color:#fff!important;background:transparent!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;margin:0!important;padding:0!important}
