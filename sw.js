@@ -1,15 +1,16 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v13';
+const CACHE_NAME = 'samuel-comissoes-pro-v14';
 const APP_SHELL = [
   './',
   './index.html',
   './style.css?v=4',
-  './pwa-enhancements.js?v=3',
+  './pwa-enhancements.js?v=4',
   './phone-mask.js?v=3',
   './script.js?v=4',
   './import-backup.js?v=2',
   './app-upgrades.js?v=1',
   './app-features.js?v=2',
   './premium-ui.js?v=1',
+  './pdf-viewer-fix.js?v=1',
   './report-options-fix.js?v=5',
   './firebase-integration.js?v=7',
   './admin-controls.js?v=2',
