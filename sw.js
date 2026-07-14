@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v9';
+const CACHE_NAME = 'samuel-comissoes-pro-v10';
 const APP_SHELL = [
   './',
   './index.html',
@@ -17,9 +17,9 @@ const APP_SHELL = [
   './admin-nav-fix.js?v=1',
   './profile-settings.js?v=4',
   './requirements-fix.js?v=1',
-  './manifest.json?v=3',
-  './icon-192.png?v=1',
-  './apple-touch-icon.png?v=1'
+  './manifest.json?v=4',
+  './icon-192.png?v=2',
+  './apple-touch-icon.png?v=2'
 ];
 
 self.addEventListener('install', event => {
