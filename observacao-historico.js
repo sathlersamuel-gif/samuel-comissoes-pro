@@ -14,11 +14,21 @@
       .replace(/'/g,'&#039;');
   }
 
+  function obterVendas(){
+    try{
+      const dados=JSON.parse(localStorage.getItem('samuel_comissoes_pro')||'[]');
+      return Array.isArray(dados)?dados:[];
+    }catch(erro){
+      console.error('Erro ao carregar observações:',erro);
+      return [];
+    }
+  }
+
   function aplicarObservacoes(ano,mes){
     const conteudo=document.getElementById('listaVendasMes');
-    if(!conteudo||!Array.isArray(window.vendas||vendas)) return;
+    if(!conteudo) return;
 
-    const lista=(window.vendas||vendas||[])
+    const lista=obterVendas()
       .filter(function(venda){
         const data=dataLocal(venda.data);
         return data&&data.getFullYear()===Number(ano)&&data.getMonth()===Number(mes);
@@ -27,9 +37,10 @@
 
     const cards=conteudo.querySelectorAll('.card');
     cards.forEach(function(card,indice){
-      card.querySelector('.observacao-destaque')?.remove();
+      const anterior=card.querySelector('.observacao-destaque');
+      if(anterior) anterior.remove();
       const venda=lista[indice];
-      const observacao=String(venda?.observacao||'').trim();
+      const observacao=String(venda&&venda.observacao||'').trim();
       if(!observacao) return;
 
       const bloco=document.createElement('div');
@@ -50,7 +61,7 @@
     const original=window.abrirMesAno;
     const nova=function(ano,mes){
       original.call(this,ano,mes);
-      setTimeout(function(){aplicarObservacoes(ano,mes);},0);
+      setTimeout(function(){aplicarObservacoes(ano,mes);},20);
     };
     nova.__observacaoInstalada=true;
     window.abrirMesAno=nova;
