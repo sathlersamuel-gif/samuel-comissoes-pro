@@ -11,6 +11,27 @@
     if(url) setTimeout(function(){URL.revokeObjectURL(url);},500);
   }
 
+  function nomePdf(){
+    const agora=new Date();
+    const data=agora.toISOString().slice(0,10);
+    return `Relatorio-Controle-de-Vendas-${data}.pdf`;
+  }
+
+  function enviarParaAndroid(url){
+    fetch(url)
+      .then(resposta=>resposta.blob())
+      .then(blob=>new Promise((resolve,reject)=>{
+        const leitor=new FileReader();
+        leitor.onload=()=>resolve(leitor.result);
+        leitor.onerror=reject;
+        leitor.readAsDataURL(blob);
+      }))
+      .then(base64=>window.AndroidPdf.imprimirPdf(String(base64),nomePdf()))
+      .catch(()=>alert('Não foi possível abrir o relatório para impressão. Tente novamente.'));
+
+    return {close:function(){},closed:false,focus:function(){}};
+  }
+
   function abrirNoApp(url){
     fecharVisualizador();
 
@@ -48,6 +69,9 @@
 
   window.open=function(url,alvo,recursos){
     if(typeof url==='string'&&url.startsWith('blob:')){
+      if(window.AndroidPdf&&typeof window.AndroidPdf.imprimirPdf==='function'){
+        return enviarParaAndroid(url);
+      }
       return abrirNoApp(url);
     }
     return abrirOriginal(url,alvo,recursos);
