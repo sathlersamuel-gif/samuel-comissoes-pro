@@ -62,7 +62,7 @@
             const encontrou = (vendas || []).some(venda => {
                 const data = dataLocal(venda.data);
                 if (!data || data.getFullYear() !== ano || data.getMonth() !== mes) return false;
-                return [venda.cliente, venda.produto, venda.modelo, venda.telefone, venda.tipo, venda.origem, venda.status]
+                return [venda.cliente, venda.produto, venda.modelo, venda.telefone, venda.tipo]
                     .some(valor => String(valor || "").toLowerCase().includes(termo));
             });
             botao.style.display = encontrou || textoBotao.includes(termo) ? "block" : "none";
@@ -86,8 +86,6 @@
         $id("telefone").value = venda.telefone || "";
         $id("produto").value = venda.produto || venda.modelo || "";
         $id("tipoVenda").value = venda.tipo || venda.tipoVenda || "À Vista";
-        $id("origem").value = venda.origem || "";
-        $id("statusVenda").value = venda.status || "Concluída";
         $id("valorVenda").value = Number(venda.valor || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         $id("porcentagem").value = String(venda.porcentagem || "").replace(".", ",");
         $id("dataVenda").value = venda.data || "";
@@ -109,8 +107,6 @@
             telefone: $id("telefone")?.value.trim() || "",
             produto: $id("produto")?.value.trim() || "",
             tipo: $id("tipoVenda")?.value || "À Vista",
-            origem: $id("origem")?.value.trim() || "",
-            status: $id("statusVenda")?.value || "Concluída",
             valor,
             porcentagem,
             comissao: valor * porcentagem / 100,
@@ -144,11 +140,11 @@
         }).sort((a, b) => String(a.data).localeCompare(String(b.data)));
         conteudo.querySelectorAll(".card").forEach((card, indice) => {
             const venda = lista[indice];
-            if (!venda) return;
+            if (!venda || !venda.horario) return;
             const extras = document.createElement("div");
             extras.style.marginTop = "6px";
             extras.style.fontSize = "13px";
-            extras.innerHTML = `${venda.origem ? `Origem: ${escapar(venda.origem)}<br>` : ""}Status: ${escapar(venda.status || "Concluída")}${venda.horario ? `<br>Horário: ${escapar(venda.horario)}` : ""}`;
+            extras.innerHTML = `Horário: ${escapar(venda.horario)}`;
             const botoes = card.querySelector("div[style*='display:flex']");
             card.insertBefore(extras, botoes || null);
         });
