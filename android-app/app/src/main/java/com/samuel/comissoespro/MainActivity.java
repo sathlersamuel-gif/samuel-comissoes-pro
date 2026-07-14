@@ -33,16 +33,19 @@ import androidx.core.content.FileProvider;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends Activity {
     private static final String APP_URL = "https://sathlersamuel-gif.github.io/samuel-comissoes-pro/";
     private static final int FILE_CHOOSER_REQUEST = 1001;
+    private static final int SAVE_BACKUP_REQUEST = 1002;
 
     private WebView webView;
     private ProgressBar progressBar;
     private TextView errorView;
     private ValueCallback<Uri[]> fileChooserCallback;
+    private byte[] backupPendente;
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     @Override
@@ -88,7 +91,7 @@ public class MainActivity extends Activity {
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-        settings.setUserAgentString(settings.getUserAgentString() + " SamuelComissoesPRO-Android/3.4");
+        settings.setUserAgentString(settings.getUserAgentString() + " SamuelComissoesPRO-Android/3.5");
 
         webView.addJavascriptInterface(new PdfBridge(), "AndroidPdf");
 
@@ -102,8 +105,33 @@ public class MainActivity extends Activity {
                 if (fileChooserCallback != null) fileChooserCallback.onReceiveValue(null);
                 fileChooserCallback = filePathCallback;
 
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setType("image/*");
+                String[] tiposAceitos = fileChooserParams.getAcceptTypes();
+                boolean escolherImagem = false;
+                if (tiposAceitos != null) {
+                    for (String tipo : tiposAceitos) {
+                        if (tipo != null && tipo.toLowerCase().startsWith("image/")) {
+                            escolherImagem = true;
+                            break;
+                        }
+                    }
+                }
+
+                Intent intent;
+                if (escolherImagem) {
+                    intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/*");
+                } else {
+                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("application/json");
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
+                            "application/json",
+                            "text/json",
+                            "text/plain",
+                            "application/octet-stream"
+                    });
+                }
+
                 try {
                     startActivityForResult(intent, FILE_CHOOSER_REQUEST);
                     return true;
@@ -217,20 +245,20 @@ public class MainActivity extends Activity {
         public void compartilharBackup(String conteudo, String nomeArquivo) {
             runOnUiThread(() -> {
                 try {
-                    File arquivo = salvarArquivo(
-                            conteudo.getBytes(StandardCharsets.UTF_8),
-                            nomeArquivo,
-                            "backup_controle_vendas.json",
-                            ".json"
-                    );
-                    compartilharArquivo(
-                            arquivo,
-                            "application/json",
-                            "Exportar backup",
-                            "Backup do Controle de Vendas PRO"
-                    );
+                    backupPendente = conteudo.getBytes(StandardCharsets.UTF_8);
+                    String nomeSeguro = (nomeArquivo == null || nomeArquivo.trim().isEmpty())
+                            ? "backup_controle_vendas.json"
+                            : nomeArquivo.replaceAll("[^a-zA-Z0-9._-]", "_");
+                    if (!nomeSeguro.toLowerCase().endsWith(".json")) nomeSeguro += ".json";
+
+                    Intent salvar = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                    salvar.addCategory(Intent.CATEGORY_OPENABLE);
+                    salvar.setType("application/json");
+                    salvar.putExtra(Intent.EXTRA_TITLE, nomeSeguro);
+                    startActivityForResult(salvar, SAVE_BACKUP_REQUEST);
                 } catch (Exception e) {
-                    webView.evaluateJavascript("alert('Não foi possível exportar o backup. Tente novamente.');", null);
+                    backupPendente = null;
+                    webView.evaluateJavascript("alert('Não foi possível abrir a opção de salvar o backup.');", null);
                 }
             });
         }
@@ -312,6 +340,22 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SAVE_BACKUP_REQUEST) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null && backupPendente != null) {
+                try (OutputStream saida = getContentResolver().openOutputStream(data.getData())) {
+                    if (saida == null) throw new Exception("Destino inválido");
+                    saida.write(backupPendente);
+                    saida.flush();
+                    webView.evaluateJavascript("alert('Backup salvo com sucesso!');", null);
+                } catch (Exception e) {
+                    webView.evaluateJavascript("alert('Não foi possível salvar o backup. Tente novamente.');", null);
+                }
+            }
+            backupPendente = null;
+            return;
+        }
+
         if (requestCode != FILE_CHOOSER_REQUEST || fileChooserCallback == null) return;
 
         Uri[] resultado = null;
@@ -341,6 +385,7 @@ public class MainActivity extends Activity {
             fileChooserCallback.onReceiveValue(null);
             fileChooserCallback = null;
         }
+        backupPendente = null;
         if (webView != null) webView.destroy();
         super.onDestroy();
     }
