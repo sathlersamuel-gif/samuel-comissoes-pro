@@ -141,19 +141,41 @@
         return { total, fimY };
     }
 
-    function entregarPDF(doc, arquivo) {
+    async function entregarPDF(doc, arquivo) {
         const blob = doc.output("blob");
+        const arquivoPDF = new File([blob], arquivo, { type: "application/pdf" });
+
+        try {
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [arquivoPDF] })) {
+                await navigator.share({
+                    title: "Relatório de vendas",
+                    text: "Relatório em PDF do Controle de Vendas PRO",
+                    files: [arquivoPDF]
+                });
+                return;
+            }
+        } catch (erro) {
+            if (erro?.name === "AbortError") return;
+            console.warn("Não foi possível abrir o compartilhamento:", erro);
+        }
+
         const url = URL.createObjectURL(blob);
         const novaJanela = window.open(url, "_blank");
 
         if (!novaJanela) {
-            doc.save(arquivo);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = arquivo;
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
         }
 
-        setTimeout(() => URL.revokeObjectURL(url), 120000);
+        setTimeout(() => URL.revokeObjectURL(url), 180000);
     }
 
-    function exportarMensal(evento) {
+    async function exportarMensal(evento) {
         evento.preventDefault();
         evento.stopImmediatePropagation();
 
@@ -181,10 +203,10 @@
         doc.setFontSize(13);
         doc.text(`TOTAL GERAL: ${moeda(resultado.total)}`, 283, resultado.fimY + 13, { align: "right" });
 
-        entregarPDF(doc, `relatorio_${nomeArquivo(MESES[mes])}_${ano}.pdf`);
+        await entregarPDF(doc, `relatorio_${nomeArquivo(MESES[mes])}_${ano}.pdf`);
     }
 
-    function exportarAnual(evento) {
+    async function exportarAnual(evento) {
         evento.preventDefault();
         evento.stopImmediatePropagation();
 
@@ -230,7 +252,7 @@
         doc.setTextColor(0, 59, 142);
         doc.text(`TOTAL GERAL DO ANO: ${moeda(totalGeral)}`, 283, y, { align: "right" });
 
-        entregarPDF(doc, `relatorio_anual_${ano}.pdf`);
+        await entregarPDF(doc, `relatorio_anual_${ano}.pdf`);
     }
 
     document.addEventListener("DOMContentLoaded", function () {
