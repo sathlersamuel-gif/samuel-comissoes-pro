@@ -142,6 +142,22 @@
     }
 
     async function entregarPDF(doc, arquivo) {
+        const noApkAndroid = /SamuelComissoesPRO-Android/i.test(navigator.userAgent || "")
+            && window.AndroidPdf
+            && typeof window.AndroidPdf.imprimirPdf === "function";
+
+        if (noApkAndroid) {
+            try {
+                const base64 = doc.output("datauristring");
+                window.AndroidPdf.imprimirPdf(base64, arquivo);
+                return;
+            } catch (erro) {
+                console.error("Erro ao enviar PDF para impressão no Android:", erro);
+                alert("Não foi possível abrir a impressão. Tente novamente.");
+                return;
+            }
+        }
+
         const blob = doc.output("blob");
         const arquivoPDF = new File([blob], arquivo, { type: "application/pdf" });
 
