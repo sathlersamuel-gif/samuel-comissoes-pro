@@ -19,6 +19,6 @@
   criarSplash();
 
   if('serviceWorker' in navigator){
-    window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(console.error));
+    window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=19').catch(console.error));
   }
 })();
