@@ -61,8 +61,8 @@
 
   function fecharPainel(){document.getElementById('scpSecurityPanel')?.remove();}
   function abrirPainel(){
-    fecharPainel();const enabled=localStorage.getItem(ENABLED_KEY)==='1';const panel=document.createElement('div');panel.id='scpSecurityPanel';panel.className='scp-security-panel';panel.innerHTML=`<div class="scp-security-card"><h2>Segurança e versão</h2><p>Versão instalada: <strong>${CURRENT_VERSION}</strong>. O Face ID protege o acesso e a atualização só acontece quando houver uma versão nova.</p><button type="button" id="scpToggleFace">${enabled?'Desativar Face ID':'Ativar Face ID'}</button><button type="button" id="scpUpdateApp" class="secundario">🔄 Verificar nova versão</button><button type="button" id="scpCloseSecurity" class="secundario">Fechar</button></div>`;document.body.appendChild(panel);
-    panel.addEventListener('click',event=>{if(event.target===panel)fecharPainel();});document.getElementById('scpCloseSecurity')?.addEventListener('click',fecharPainel);document.getElementById('scpUpdateApp')?.addEventListener('click',verificarAtualizacao);
+    fecharPainel();const enabled=localStorage.getItem(ENABLED_KEY)==='1';const panel=document.createElement('div');panel.id='scpSecurityPanel';panel.className='scp-security-panel';panel.innerHTML=`<div class="scp-security-card"><h2>Segurança</h2><p>Use o Face ID para proteger o acesso às suas vendas e comissões.</p><button type="button" id="scpToggleFace">${enabled?'Desativar Face ID':'Ativar Face ID'}</button><button type="button" id="scpCloseSecurity" class="secundario">Fechar</button></div>`;document.body.appendChild(panel);
+    panel.addEventListener('click',event=>{if(event.target===panel)fecharPainel();});document.getElementById('scpCloseSecurity')?.addEventListener('click',fecharPainel);
     document.getElementById('scpToggleFace')?.addEventListener('click',async()=>{if(localStorage.getItem(ENABLED_KEY)==='1'){if(confirm('Desativar o bloqueio por Face ID?')){localStorage.removeItem(ENABLED_KEY);localStorage.removeItem(CREDENTIAL_KEY);alert('Face ID desativado.');fecharPainel();}}else if(await cadastrarFaceId())fecharPainel();});
   }
 
@@ -70,7 +70,7 @@
     if(document.getElementById('scpSecurityTools'))return;
     const barra=document.getElementById('firebaseUserBar');
     if(!barra){setTimeout(criarBotao,100);return;}
-    const tools=document.createElement('div');tools.id='scpSecurityTools';tools.className='scp-security-tools';tools.innerHTML='<button type="button" class="scp-security-button" id="scpSecurityButton" aria-label="Segurança e versão" title="Segurança e versão">⚙️</button>';
+    const tools=document.createElement('div');tools.id='scpSecurityTools';tools.className='scp-security-tools';tools.innerHTML='<button type="button" class="scp-security-button" id="scpSecurityButton" aria-label="Segurança" title="Segurança">⚙️</button>';
     barra.appendChild(tools);
     document.getElementById('scpSecurityButton')?.addEventListener('click',abrirPainel);
   }
