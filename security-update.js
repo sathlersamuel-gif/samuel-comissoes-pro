@@ -17,7 +17,7 @@
   function criarEstilo(){
     if(document.getElementById('scpSecurityStyle'))return;
     const style=document.createElement('style');style.id='scpSecurityStyle';
-    style.textContent=`.scp-security-tools{position:fixed;right:14px;top:calc(10px + env(safe-area-inset-top));bottom:auto;z-index:8500}.scp-security-button{width:48px;height:48px;border:1px solid rgba(255,255,255,.18);border-radius:16px;background:#0b2a5a;color:#fff;box-shadow:0 9px 24px rgba(0,0,0,.28);font-size:21px;display:grid;place-items:center;padding:0}.scp-security-panel{position:fixed;inset:0;z-index:19000;background:rgba(1,9,22,.78);backdrop-filter:blur(10px);display:grid;place-items:end center;padding:18px 14px calc(20px + env(safe-area-inset-bottom))}.scp-security-card{width:min(100%,430px);background:#0a1d35;border:1px solid #234b79;border-radius:24px;padding:20px;color:#fff}.scp-security-card h2{margin:0 0 8px;font-size:21px}.scp-security-card p{margin:0 0 16px;color:#aec0d8;line-height:1.45}.scp-security-card button{width:100%;margin-top:9px}.scp-security-card .secundario{background:#172b45;color:#fff}.scp-lock{position:fixed;inset:0;z-index:25000;background:linear-gradient(160deg,#061326,#0b2a5a);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:28px}.scp-lock-icon{width:94px;height:94px;border-radius:28px;background:#d90429;display:grid;place-items:center;font-size:45px}.scp-lock button{max-width:320px;width:100%}`;
+    style.textContent=`#firebaseUserBar #btnSairFirebase{margin-left:auto}.scp-security-tools{position:static;flex:0 0 auto;display:flex;align-items:center}.scp-security-button{width:48px;height:48px;border:1px solid rgba(255,255,255,.18);border-radius:16px;background:#0b2a5a;color:#fff;box-shadow:0 9px 24px rgba(0,0,0,.28);font-size:21px;display:grid;place-items:center;padding:0}.scp-security-panel{position:fixed;inset:0;z-index:19000;background:rgba(1,9,22,.78);backdrop-filter:blur(10px);display:grid;place-items:end center;padding:18px 14px calc(20px + env(safe-area-inset-bottom))}.scp-security-card{width:min(100%,430px);background:#0a1d35;border:1px solid #234b79;border-radius:24px;padding:20px;color:#fff}.scp-security-card h2{margin:0 0 8px;font-size:21px}.scp-security-card p{margin:0 0 16px;color:#aec0d8;line-height:1.45}.scp-security-card button{width:100%;margin-top:9px}.scp-security-card .secundario{background:#172b45;color:#fff}.scp-lock{position:fixed;inset:0;z-index:25000;background:linear-gradient(160deg,#061326,#0b2a5a);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:28px}.scp-lock-icon{width:94px;height:94px;border-radius:28px;background:#d90429;display:grid;place-items:center;font-size:45px}.scp-lock button{max-width:320px;width:100%}`;
     document.head.appendChild(style);
   }
 
@@ -66,7 +66,14 @@
     document.getElementById('scpToggleFace')?.addEventListener('click',async()=>{if(localStorage.getItem(ENABLED_KEY)==='1'){if(confirm('Desativar o bloqueio por Face ID?')){localStorage.removeItem(ENABLED_KEY);localStorage.removeItem(CREDENTIAL_KEY);alert('Face ID desativado.');fecharPainel();}}else if(await cadastrarFaceId())fecharPainel();});
   }
 
-  function criarBotao(){if(document.getElementById('scpSecurityTools'))return;const tools=document.createElement('div');tools.id='scpSecurityTools';tools.className='scp-security-tools';tools.innerHTML='<button type="button" class="scp-security-button" id="scpSecurityButton" aria-label="Segurança e versão" title="Segurança e versão">⚙️</button>';document.body.appendChild(tools);document.getElementById('scpSecurityButton')?.addEventListener('click',abrirPainel);}
+  function criarBotao(){
+    if(document.getElementById('scpSecurityTools'))return;
+    const barra=document.getElementById('firebaseUserBar');
+    if(!barra){setTimeout(criarBotao,100);return;}
+    const tools=document.createElement('div');tools.id='scpSecurityTools';tools.className='scp-security-tools';tools.innerHTML='<button type="button" class="scp-security-button" id="scpSecurityButton" aria-label="Segurança e versão" title="Segurança e versão">⚙️</button>';
+    barra.appendChild(tools);
+    document.getElementById('scpSecurityButton')?.addEventListener('click',abrirPainel);
+  }
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&localStorage.getItem(ENABLED_KEY)==='1')mostrarBloqueio();});
   document.addEventListener('DOMContentLoaded',()=>{criarEstilo();criarBotao();if(localStorage.getItem(ENABLED_KEY)==='1')mostrarBloqueio();});
 })();
