@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v17';
+const CACHE_NAME = 'samuel-comissoes-pro-v18';
 const APP_SHELL = [
   './',
   './index.html',
@@ -20,10 +20,10 @@ const APP_SHELL = [
   './requirements-fix.js?v=2',
   './observacao-historico.js?v=2',
   './dashboard-v2.js?v=4',
-  './security-update.js?v=1',
+  './security-update.js?v=2',
+  './version.json',
   './manifest.json?v=13',
-  './app-icon.svg?v=13',
-  './yamaha-emblem.svg?v=3'
+  './app-icon.svg?v=13'
 ];
 
 self.addEventListener('install', event => {
@@ -45,6 +45,11 @@ self.addEventListener('message', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.pathname.endsWith('/version.json')) {
+    event.respondWith(fetch(event.request, { cache: 'no-store' }));
+    return;
+  }
   event.respondWith(
     fetch(event.request)
       .then(response => {
