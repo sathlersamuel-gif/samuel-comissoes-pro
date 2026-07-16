@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v16';
+const CACHE_NAME = 'samuel-comissoes-pro-v17';
 const APP_SHELL = [
   './',
   './index.html',
@@ -11,7 +11,7 @@ const APP_SHELL = [
   './app-features.js?v=2',
   './premium-ui.js?v=1',
   './pdf-viewer-fix.js?v=2',
-  './report-options-fix.js?v=5',
+  './report-options-fix.js?v=7',
   './firebase-integration.js?v=7',
   './admin-controls.js?v=2',
   './install-guide.js?v=1',
@@ -19,10 +19,11 @@ const APP_SHELL = [
   './profile-settings.js?v=5',
   './requirements-fix.js?v=2',
   './observacao-historico.js?v=2',
-  './manifest.json?v=7',
-  './icon-192.png?v=4',
-  './icon-512.png?v=4',
-  './apple-touch-icon.png?v=4'
+  './dashboard-v2.js?v=4',
+  './security-update.js?v=1',
+  './manifest.json?v=13',
+  './app-icon.svg?v=13',
+  './yamaha-emblem.svg?v=3'
 ];
 
 self.addEventListener('install', event => {
@@ -36,6 +37,10 @@ self.addEventListener('activate', event => {
       keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
     )).then(() => self.clients.claim())
   );
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {
