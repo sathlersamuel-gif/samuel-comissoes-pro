@@ -43,6 +43,12 @@ body:not(.cv-opening-complete){background:#020b1c!important}
 #firebaseAuthCard .cv-approval-note{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 0;color:#75d8ff;font-size:14px;text-align:center}
 #firebaseAuthCard .cv-approval-note::before{content:"✓";display:grid;place-items:center;width:22px;height:22px;border:1px solid #20bfff;border-radius:50%;color:#20d4ff;font-weight:900}
 
+html.cv-android #cvSplash{background:#020b1c radial-gradient(circle at 50% 38%,#0a2d67 0,#061a3a 34%,#020b1c 72%);transition:opacity .22s linear,visibility .22s linear;transform:translateZ(0);backface-visibility:hidden;contain:strict;isolation:isolate}
+html.cv-android body.cv-opening-mounted:not(.cv-opening-complete)>*:not(#cvSplash){visibility:hidden!important;opacity:0!important}
+html.cv-android #firebaseAuthOverlay:not([data-cv-premium="1"]) #firebaseAuthCard{visibility:hidden!important;opacity:0!important}
+html.cv-android #firebaseAuthOverlay[data-cv-premium="1"] #firebaseAuthCard{visibility:visible!important;opacity:1!important}
+html.cv-android .cv-loading>span{animation-duration:1.65s!important}
+
 @keyframes cvSpin{to{transform:rotate(360deg)}}
 @keyframes cvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @keyframes cvRise{from{transform:scaleY(0);opacity:.2}to{transform:scaleY(1);opacity:1}}
