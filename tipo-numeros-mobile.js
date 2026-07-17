@@ -10,16 +10,33 @@
            document.body.classList.contains('modo-celular');
   }
 
-  function limparAlteracaoErrada(){
+  function restaurarCardsNegociacao(){
     document.querySelectorAll('#dashboard .tipos-v2 .tipo-card').forEach(card=>{
       const numero=card.querySelector('.qtd');
-      PROPRIEDADES_ITEM.forEach(p=>card.style.removeProperty(p));
-      if(numero) PROPRIEDADES_VALOR.forEach(p=>numero.style.removeProperty(p));
+      card.style.setProperty('min-height','0','important');
+      card.style.setProperty('display','block','important');
+      card.style.removeProperty('flex-direction');
+      card.style.removeProperty('align-items');
+      card.style.removeProperty('justify-content');
+      if(numero){
+        numero.style.setProperty('display','block','important');
+        numero.style.setProperty('width','auto','important');
+        numero.style.setProperty('min-height','0','important');
+        numero.style.setProperty('margin','0','important');
+        numero.style.setProperty('font-size','24px','important');
+        numero.style.setProperty('line-height','normal','important');
+        numero.style.setProperty('letter-spacing','normal','important');
+        numero.style.setProperty('text-align','center','important');
+        numero.style.removeProperty('align-items');
+        numero.style.removeProperty('justify-content');
+        numero.style.removeProperty('flex');
+        numero.style.removeProperty('white-space');
+      }
     });
   }
 
   function aplicar(){
-    limparAlteracaoErrada();
+    restaurarCardsNegociacao();
     const ativo=window.innerWidth<=MOBILE_MAX && modoPermitido();
 
     document.querySelectorAll('#dashboard .resumo-v2 .resumo-item').forEach(card=>{
