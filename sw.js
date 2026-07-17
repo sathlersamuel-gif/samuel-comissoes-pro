@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v28';
+const CACHE_NAME = 'samuel-comissoes-pro-v29';
 const APP_SHELL = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const APP_SHELL = [
   './visual-match.css?v=3',
   './bottom-layout-fix.css?v=1',
   './brand-cleanup.css?v=1',
+  './responsive-layout.css?v=1',
   './pwa-enhancements.js?v=7',
   './phone-mask.js?v=3',
   './script.js?v=4',
@@ -27,6 +28,7 @@ const APP_SHELL = [
   './dashboard-v2.js?v=9',
   './security-update.js?v=3',
   './gear-position-fix.js?v=1',
+  './responsive-layout.js?v=1',
   './version.json',
   './manifest.json?v=13',
   './app-icon.svg?v=13'

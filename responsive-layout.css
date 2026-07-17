@@ -1,0 +1,76 @@
+/* Responsividade geral e modo computador. Não altera dados nem funcionalidades. */
+html{width:100%;max-width:100%;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{width:100%;max-width:100%;overflow-x:hidden}
+main,.tela{width:100%;max-width:100%;box-sizing:border-box}
+.tela *,.tela *::before,.tela *::after{box-sizing:border-box;min-width:0}
+img,svg,canvas,video{max-width:100%;height:auto}
+input,select,textarea,button{max-width:100%;font:inherit}
+
+/* Telas internas */
+body:not(.home-modern) main{width:min(100%,760px);margin:0 auto;padding-inline:clamp(10px,3.5vw,24px)}
+body:not(.home-modern) .tela{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+body:not(.home-modern) form{width:100%;display:grid;grid-template-columns:1fr;gap:10px}
+body:not(.home-modern) input,body:not(.home-modern) select,body:not(.home-modern) textarea,body:not(.home-modern) form button{width:100%}
+.barra{gap:10px;align-items:center}.barra h2{overflow-wrap:anywhere}
+#listaMeses,#listaVendasMes,#resultadoRelatorio{max-width:100%;overflow-wrap:anywhere}
+
+/* Cabeçalho e cartões do dashboard */
+.perfil-topo{width:100%;flex-wrap:nowrap}
+.perfil-identidade{flex:1;overflow:hidden}.perfil-identidade strong,.perfil-identidade small{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.perfil-acoes{display:flex;flex:0 0 auto;gap:6px}
+.secao-titulo{flex-wrap:wrap}.secao-titulo>*{max-width:100%}
+.resumo-item,.tipo-card,.acoes-grid button{overflow:hidden}
+.resumo-item strong,.tipo-valor{white-space:normal;overflow-wrap:anywhere}
+
+/* Botão pequeno de escolha de visualização */
+.botao-modo-tela{border:1px solid #2b659f!important;border-radius:12px!important;background:#0a213b!important;color:#fff!important;padding:8px 9px!important;min-width:42px!important;min-height:38px!important;font-size:16px!important;line-height:1!important;box-shadow:none!important}
+.botao-modo-tela small{display:none}
+
+/* Automático e celular */
+body.modo-celular #dashboard,body.modo-automatico #dashboard{width:100%;max-width:760px;margin-inline:auto}
+@media(max-width:430px){
+  #dashboard{padding-inline:clamp(8px,3vw,13px)!important}
+  .perfil-topo{gap:9px;padding:10px 11px}.perfil-topo .avatar-perfil{width:48px;height:48px;flex:0 0 48px}.nome-editavel strong{font-size:clamp(14px,4vw,17px)}.perfil-topo small{font-size:clamp(10px,3vw,12px)}
+  .marca-dashboard h1{font-size:clamp(19px,6vw,24px)}
+  .resumo-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.resumo-item{padding:10px 5px;min-height:138px}.resumo-item>span{width:42px;height:42px;font-size:19px}.resumo-item strong{font-size:clamp(13px,4.2vw,18px)}
+  .grafico-wrap{grid-template-columns:minmax(76px,28%) 1fr}.media-box{padding-right:7px}.media-box strong{font-size:clamp(21px,7vw,27px)}
+  .acoes-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:350px){
+  .perfil-topo{flex-wrap:wrap}.perfil-identidade{min-width:calc(100% - 105px)}.perfil-acoes{margin-left:auto}
+  .resumo-grid{grid-template-columns:1fr}.resumo-item{min-height:118px}
+  .grafico-wrap{grid-template-columns:1fr}.media-box{border-right:0;border-bottom:1px solid #173b61;padding:0 0 10px;min-height:auto}
+  .tipos-grid{grid-template-columns:1fr}.acoes-grid{grid-template-columns:1fr 1fr}
+}
+
+/* Modo computador */
+body.modo-computador{background:#020b16}
+body.modo-computador #dashboard{width:min(96vw,1280px)!important;max-width:1280px!important;margin:0 auto!important;padding:22px 22px 96px!important}
+body.modo-computador .perfil-topo{padding:14px 18px}
+body.modo-computador .marca-dashboard{margin:12px 0 22px}
+body.modo-computador .resumo-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+body.modo-computador .resumo-item{min-height:180px;padding:18px}
+body.modo-computador .resumo-item strong{font-size:24px}
+body.modo-computador .grafico-wrap{grid-template-columns:180px 1fr;gap:22px}
+body.modo-computador .tipos-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+body.modo-computador .acoes-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+body.modo-computador .acoes-grid button{min-height:104px;font-size:12px}
+body.modo-computador .bottom{left:50%!important;transform:translateX(-50%);width:min(96vw,980px)!important;border-radius:18px 18px 0 0}
+body.modo-computador .nova-venda-flutuante{right:max(24px,calc((100vw - 1280px)/2 + 28px))}
+body.modo-computador:not(.home-modern) main{width:min(92vw,980px);max-width:980px;padding:24px}
+body.modo-computador:not(.home-modern) form{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+body.modo-computador:not(.home-modern) form textarea,body.modo-computador:not(.home-modern) form button{grid-column:1/-1}
+
+/* No modo automático, telas largas usam naturalmente o layout de computador. */
+@media(min-width:900px){
+  body.modo-automatico #dashboard{width:min(96vw,1180px);max-width:1180px;padding:22px 22px 96px}
+  body.modo-automatico .tipos-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  body.modo-automatico .acoes-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  body.modo-automatico:not(.home-modern) main{width:min(92vw,920px);max-width:920px}
+  body.modo-automatico:not(.home-modern) form{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  body.modo-automatico:not(.home-modern) form textarea,body.modo-automatico:not(.home-modern) form button{grid-column:1/-1}
+}
+
+/* Respeita zoom e fontes grandes sem cortar conteúdo. */
+@media(hover:none) and (pointer:coarse){button,input,select,textarea{min-height:44px}}
+@supports(padding:max(0px)){body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}}
