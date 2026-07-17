@@ -1,0 +1,31 @@
+/* Correção exclusiva para Safari/iPhone: mantém o valor da venda dentro do card do Histórico. */
+@supports (-webkit-touch-callout: none) {
+  #historico .venda-card {
+    overflow: hidden;
+  }
+
+  #historico .venda-topo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #historico .venda-topo > strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #historico .venda-valor {
+    min-width: 0;
+    max-width: 42vw;
+    justify-self: end;
+    text-align: right;
+    white-space: nowrap;
+    font-size: clamp(14px, 4vw, 18px);
+    line-height: 1.1;
+    letter-spacing: -0.25px;
+  }
+}
