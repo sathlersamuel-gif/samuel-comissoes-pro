@@ -1,4 +1,9 @@
 (function(){
+  const ajuste=document.createElement('link');
+  ajuste.rel='stylesheet';
+  ajuste.href='tipo-numeros-mobile.css?v=1';
+  document.head.appendChild(ajuste);
+
   function instalado(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
@@ -31,7 +36,7 @@
       try{
         const registros=await navigator.serviceWorker.getRegistrations();
         await Promise.all(registros.map(reg=>reg.update().catch(()=>{})));
-        const registration=await navigator.serviceWorker.register('./sw.js?v=23',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=24',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'SKIP_WAITING'});
       }catch(error){
