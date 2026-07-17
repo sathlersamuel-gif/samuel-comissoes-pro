@@ -1,10 +1,10 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v19';
+const CACHE_NAME = 'samuel-comissoes-pro-v20';
 const APP_SHELL = [
   './',
   './index.html',
   './style.css?v=4',
   './dashboard-v2.css?v=2',
-  './pwa-enhancements.js?v=5',
+  './pwa-enhancements.js?v=6',
   './phone-mask.js?v=3',
   './script.js?v=4',
   './import-backup.js?v=2',
@@ -22,7 +22,7 @@ const APP_SHELL = [
   './observacao-historico.js?v=2',
   './dashboard-v2.js?v=4',
   './cartao-dashboard-fix.js?v=2',
-  './security-update.js?v=3',
+  './security-update.js?v=4',
   './version.json',
   './manifest.json?v=13',
   './app-icon.svg?v=13'
@@ -30,7 +30,11 @@ const APP_SHELL = [
 
 self.addEventListener('install', event => {
   self.skipWaiting();
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.allSettled(APP_SHELL.map(url => cache.add(url)))
+    )
+  );
 });
 
 self.addEventListener('activate', event => {
@@ -48,17 +52,34 @@ self.addEventListener('message', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
+
   if (url.pathname.endsWith('/version.json')) {
     event.respondWith(fetch(event.request, { cache: 'no-store' }));
     return;
   }
+
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy));
+          return response;
+        })
+        .catch(() => caches.match('./index.html').then(cached => cached || caches.match('./')))
+    );
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        if (response && response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        }
         return response;
       })
-      .catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html')))
+      .catch(() => caches.match(event.request))
   );
 });
