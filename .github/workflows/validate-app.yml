@@ -1,0 +1,73 @@
+name: Validar aplicativo
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verificar sintaxe JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' arquivo; do
+            echo "Verificando $arquivo"
+            node --check "$arquivo"
+          done < <(find . -type f -name '*.js' -not -path './.git/*' -print0)
+
+      - name: Verificar arquivos carregados pelo aplicativo
+        shell: python
+        run: |
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit
+
+          class Referencias(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.arquivos=[]
+              def handle_starttag(self, tag, attrs):
+                  dados=dict(attrs)
+                  valor=dados.get('src') if tag=='script' else dados.get('href') if tag=='link' else None
+                  if valor:
+                      self.arquivos.append(valor)
+
+          raiz=Path('.')
+          parser=Referencias()
+          parser.feed((raiz/'index.html').read_text(encoding='utf-8'))
+          ausentes=[]
+          for referencia in parser.arquivos:
+              if referencia.startswith(('http://','https://','data:','#')):
+                  continue
+              caminho=urlsplit(referencia).path.lstrip('./')
+              if caminho and not (raiz/caminho).exists():
+                  ausentes.append(caminho)
+          if ausentes:
+              raise SystemExit('Arquivos ausentes no index.html: '+', '.join(sorted(set(ausentes))))
+          print('Todos os arquivos locais referenciados existem.')
+
+      - name: Validar arquivos essenciais
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s index.html
+          test -s sw.js
+          test -s manifest.json
+          test -s firebase-integration.js
+          test -s dashboard-v2.js
+          echo "Estrutura essencial válida."
