@@ -3,9 +3,14 @@
 
   const NOME_KEY='controle_vendas_nome_usuario';
   const FOTO_KEY='controle_vendas_foto_usuario';
+  const ADMIN_EMAIL='sathlersamuel@gmail.com';
 
   function usuario(){
     try{return window.firebase?.auth?.().currentUser||null;}catch{return null;}
+  }
+
+  function ehAdmin(){
+    return String(usuario()?.email||'').toLowerCase()===ADMIN_EMAIL;
   }
 
   function criar(){
@@ -30,7 +35,9 @@
 
     header.querySelector('#scpUnifiedAvatar').addEventListener('click',()=>document.getElementById('botaoFotoPerfilV2')?.click());
     header.querySelector('#scpUnifiedName').addEventListener('click',()=>document.getElementById('editarNomeV2')?.click());
-    header.querySelector('#scpUnifiedBell').addEventListener('click',()=>document.getElementById('scpNewUserBell')?.click());
+    header.querySelector('#scpUnifiedBell').addEventListener('click',()=>{
+      if(ehAdmin()) document.getElementById('scpNewUserBell')?.click();
+    });
     header.querySelector('#scpUnifiedGear').addEventListener('click',()=>document.getElementById('scpSecurityButton')?.click());
     header.querySelector('#scpUnifiedLogout').addEventListener('click',()=>document.getElementById('btnSairFirebase')?.click());
     return header;
@@ -47,10 +54,15 @@
     const nomeEl=document.getElementById('scpUnifiedName');
     const emailEl=document.getElementById('scpUnifiedEmail');
     const avatar=document.getElementById('scpUnifiedAvatar');
+    const sino=document.getElementById('scpUnifiedBell');
     if(nomeEl) nomeEl.textContent=nome;
     if(emailEl) emailEl.textContent=user.email||'';
     if(avatar){
       avatar.innerHTML=foto?`<img src="${foto}" alt="Foto do perfil">`:'<span>👤</span>';
+    }
+    if(sino){
+      sino.setAttribute('aria-label',ehAdmin()?'Gerenciar usuários pendentes':'Notificações');
+      sino.removeAttribute('title');
     }
   }
 
@@ -58,6 +70,11 @@
     const origem=document.getElementById('scpNewUserBellBadge');
     const destino=document.getElementById('scpUnifiedBadge');
     if(!destino) return;
+    if(!ehAdmin()){
+      destino.textContent='';
+      destino.style.display='none';
+      return;
+    }
     const texto=String(origem?.textContent||'').trim();
     const visivel=Boolean(origem&&getComputedStyle(origem).display!=='none'&&texto&&texto!=='0');
     destino.textContent=texto;
