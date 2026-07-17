@@ -28,6 +28,9 @@ body:not(.home-modern) input,body:not(.home-modern) select,body:not(.home-modern
 
 /* Automático e celular */
 body.modo-celular #dashboard,body.modo-automatico #dashboard{width:100%;max-width:760px;margin-inline:auto}
+@media(max-width:899px){
+  body.modo-celular .tipo-card .qtd,body.modo-automatico .tipo-card .qtd{display:block;width:100%;font-size:clamp(46px,16vw,76px);line-height:.88;letter-spacing:-3px;margin:8px 0 12px;text-align:center}
+}
 @media(max-width:430px){
   #dashboard{padding-inline:clamp(8px,3vw,13px)!important}
   .perfil-topo{gap:9px;padding:10px 11px}.perfil-topo .avatar-perfil{width:48px;height:48px;flex:0 0 48px}.nome-editavel strong{font-size:clamp(14px,4vw,17px)}.perfil-topo small{font-size:clamp(10px,3vw,12px)}
