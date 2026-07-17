@@ -6,6 +6,14 @@
   const FOTO='controle_vendas_foto_usuario';
   const OCULTAR='controle_vendas_ocultar_receber';
 
+  function corrigirFlashDeFundo(){
+    if(document.getElementById('scpNoBackgroundFlashStyle'))return;
+    const style=document.createElement('style');
+    style.id='scpNoBackgroundFlashStyle';
+    style.textContent='html,body{transition:color .2s ease!important}';
+    document.head.appendChild(style);
+  }
+
   function assinatura(){
     let email='';
     try{email=window.firebase?.auth?.().currentUser?.email||'';}catch(e){}
@@ -19,6 +27,8 @@
   }
 
   function instalar(){
+    corrigirFlashDeFundo();
+
     const atualizarOriginal=window.atualizarDashboard;
     const abrirOriginal=window.abrirTela;
     if(typeof atualizarOriginal!=='function'||typeof abrirOriginal!=='function'){
@@ -62,6 +72,12 @@
     abrirSemFlash.__trocaSemFlash=true;
     window.abrirTela=abrirSemFlash;
     ultimaAssinatura=assinatura();
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',corrigirFlashDeFundo,{once:true});
+  }else{
+    corrigirFlashDeFundo();
   }
 
   instalar();
