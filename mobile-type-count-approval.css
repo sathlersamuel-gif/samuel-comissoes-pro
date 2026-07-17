@@ -1,0 +1,22 @@
+/* Ajuste isolado para aprovação: amplia apenas os números dos cards de tipo no modo celular/automático em telas menores. */
+@media (max-width: 899px) {
+  body.modo-celular .tipos-v2 .tipo-card .qtd,
+  body.modo-automatico .tipos-v2 .tipo-card .qtd {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    min-height: 88px !important;
+    flex: 1 1 88px !important;
+    margin: 2px 0 6px !important;
+    font-size: clamp(54px, 18vw, 82px) !important;
+    line-height: .9 !important;
+    letter-spacing: -3px !important;
+    text-align: center !important;
+  }
+
+  body.modo-celular .tipos-v2 .tipo-card,
+  body.modo-automatico .tipos-v2 .tipo-card {
+    min-height: 246px !important;
+  }
+}
