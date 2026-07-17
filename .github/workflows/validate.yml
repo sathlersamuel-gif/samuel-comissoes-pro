@@ -1,0 +1,22 @@
+name: Validar aplicativo
+on:
+  pull_request:
+  push:
+    branches: [main, staging]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Verificar sintaxe JavaScript
+        run: |
+          find . -maxdepth 1 -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Verificar arquivos essenciais
+        run: |
+          test -f index.html
+          test -f script.js
+          test -f firebase-integration.js
+          test -f sw.js
