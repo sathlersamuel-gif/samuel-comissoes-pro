@@ -33,8 +33,10 @@
     const sino=document.getElementById('scpNewUserBell');
     const barra=document.getElementById('firebaseUserBar');
     const sair=document.getElementById('btnSairFirebase');
+    const ferramentas=document.getElementById('scpSecurityTools');
     if(!sino||!barra||!sair)return false;
-    if(sino.parentElement!==barra||sino.nextElementSibling!==sair)barra.insertBefore(sino,sair);
+    const referencia=ferramentas||sair;
+    if(sino.parentElement!==barra||sino.nextElementSibling!==referencia)barra.insertBefore(sino,referencia);
     return true;
   }
 
@@ -130,7 +132,7 @@
     if(!pronto())return setTimeout(iniciar,250);
     estilos();
     criarSino();
-    const reposicionar=setInterval(()=>{if(posicionarSino())clearInterval(reposicionar);},250);
+    const reposicionar=setInterval(()=>{if(posicionarSino()&&document.getElementById('scpSecurityTools'))clearInterval(reposicionar);},250);
     setTimeout(()=>clearInterval(reposicionar),5000);
     auth().onAuthStateChanged(user=>{
       if(!user){atualizarSino(0,false);return;}
