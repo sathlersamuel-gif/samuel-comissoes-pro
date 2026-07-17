@@ -2,30 +2,27 @@
 'use strict';
 const CHAVE='controle_vendas_modo_tela';
 const MODOS=['automatico','celular','computador'];
-const DADOS={automatico:{icone:'▣',titulo:'Modo automático'},celular:{icone:'▯',titulo:'Modo celular'},computador:{icone:'▭',titulo:'Modo computador'}};
 
 function modoSalvo(){const m=localStorage.getItem(CHAVE);return MODOS.includes(m)?m:'automatico'}
 function aplicar(modo){
+  const modoValido=MODOS.includes(modo)?modo:'automatico';
   document.body.classList.remove('modo-automatico','modo-celular','modo-computador');
-  document.body.classList.add('modo-'+modo);
-  document.documentElement.dataset.modoTela=modo;
-  atualizarBotao(modo);
+  document.body.classList.add('modo-'+modoValido);
+  document.documentElement.dataset.modoTela=modoValido;
 }
-function atualizarBotao(modo){
-  const b=document.getElementById('botaoModoTela');if(!b)return;
-  b.innerHTML=`<span aria-hidden="true">${DADOS[modo].icone}</span><small>${DADOS[modo].titulo}</small>`;
-  b.title=DADOS[modo].titulo+' — toque para mudar';
-  b.setAttribute('aria-label',DADOS[modo].titulo+'. Toque para mudar.');
+function selecionar(modo){
+  const modoValido=MODOS.includes(modo)?modo:'automatico';
+  localStorage.setItem(CHAVE,modoValido);
+  aplicar(modoValido);
+  document.dispatchEvent(new CustomEvent('scp:modo-visualizacao-alterado',{detail:{modo:modoValido}}));
 }
-function proximo(){const atual=modoSalvo(),novo=MODOS[(MODOS.indexOf(atual)+1)%MODOS.length];localStorage.setItem(CHAVE,novo);aplicar(novo)}
-function inserirBotao(){
-  const acoes=document.querySelector('#dashboard .perfil-acoes');
-  if(!acoes||document.getElementById('botaoModoTela'))return;
-  const b=document.createElement('button');b.type='button';b.id='botaoModoTela';b.className='botao-modo-tela';b.onclick=proximo;
-  acoes.insertBefore(b,acoes.firstChild);atualizarBotao(modoSalvo());
+function removerBotaoAntigo(){document.getElementById('botaoModoTela')?.remove()}
+function iniciar(){
+  aplicar(modoSalvo());
+  removerBotaoAntigo();
+  const d=document.getElementById('dashboard');
+  if(d)new MutationObserver(removerBotaoAntigo).observe(d,{childList:true,subtree:true});
 }
-function iniciar(){aplicar(modoSalvo());inserirBotao();
-  const d=document.getElementById('dashboard');if(d)new MutationObserver(inserirBotao).observe(d,{childList:true,subtree:true});
-}
+window.SCPModoVisualizacao={modos:[...MODOS],obter:modoSalvo,aplicar:selecionar};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar);else iniciar();
 })();
