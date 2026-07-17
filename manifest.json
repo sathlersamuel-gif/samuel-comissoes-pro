@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Controle-d-Vendas",
-  "short_name": "Controle-d-Vendas",
+  "name": "Controle de Vendas",
+  "short_name": "Controle de Vendas",
   "description": "Controle de vendas e comissões",
   "start_url": "./?source=pwa",
   "scope": "./",
