@@ -2,38 +2,51 @@
   'use strict';
 
   const MOBILE_MAX=899;
+  const PROPRIEDADES_ITEM=['min-height','display','flex-direction','align-items','justify-content'];
+  const PROPRIEDADES_VALOR=['display','align-items','justify-content','width','min-height','margin','font-size','line-height','letter-spacing','text-align','white-space'];
 
   function modoPermitido(){
     return document.body.classList.contains('modo-automatico') ||
            document.body.classList.contains('modo-celular');
   }
 
-  function aplicar(){
-    const ativo=window.innerWidth<=MOBILE_MAX && modoPermitido();
+  function limparAlteracaoErrada(){
     document.querySelectorAll('#dashboard .tipos-v2 .tipo-card').forEach(card=>{
       const numero=card.querySelector('.qtd');
-      if(!numero) return;
+      PROPRIEDADES_ITEM.forEach(p=>card.style.removeProperty(p));
+      if(numero) PROPRIEDADES_VALOR.forEach(p=>numero.style.removeProperty(p));
+    });
+  }
+
+  function aplicar(){
+    limparAlteracaoErrada();
+    const ativo=window.innerWidth<=MOBILE_MAX && modoPermitido();
+
+    document.querySelectorAll('#dashboard .resumo-v2 .resumo-item').forEach(card=>{
+      const valor=card.querySelector('strong');
+      if(!valor) return;
 
       if(ativo){
-        card.style.setProperty('min-height','246px','important');
+        card.style.setProperty('min-height','190px','important');
         card.style.setProperty('display','flex','important');
         card.style.setProperty('flex-direction','column','important');
         card.style.setProperty('align-items','center','important');
+        card.style.setProperty('justify-content','center','important');
 
-        numero.style.setProperty('display','flex','important');
-        numero.style.setProperty('align-items','center','important');
-        numero.style.setProperty('justify-content','center','important');
-        numero.style.setProperty('width','100%','important');
-        numero.style.setProperty('min-height','88px','important');
-        numero.style.setProperty('flex','1 1 88px','important');
-        numero.style.setProperty('margin','2px 0 6px','important');
-        numero.style.setProperty('font-size','clamp(54px,18vw,82px)','important');
-        numero.style.setProperty('line-height','.9','important');
-        numero.style.setProperty('letter-spacing','-3px','important');
-        numero.style.setProperty('text-align','center','important');
+        valor.style.setProperty('display','flex','important');
+        valor.style.setProperty('align-items','center','important');
+        valor.style.setProperty('justify-content','center','important');
+        valor.style.setProperty('width','100%','important');
+        valor.style.setProperty('min-height','62px','important');
+        valor.style.setProperty('margin','4px 0','important');
+        valor.style.setProperty('font-size','clamp(22px,6.8vw,34px)','important');
+        valor.style.setProperty('line-height','1.05','important');
+        valor.style.setProperty('letter-spacing','-1px','important');
+        valor.style.setProperty('text-align','center','important');
+        valor.style.setProperty('white-space','nowrap','important');
       }else{
-        ['min-height','display','flex-direction','align-items'].forEach(p=>card.style.removeProperty(p));
-        ['display','align-items','justify-content','width','min-height','flex','margin','font-size','line-height','letter-spacing','text-align'].forEach(p=>numero.style.removeProperty(p));
+        PROPRIEDADES_ITEM.forEach(p=>card.style.removeProperty(p));
+        PROPRIEDADES_VALOR.forEach(p=>valor.style.removeProperty(p));
       }
     });
   }
@@ -41,9 +54,7 @@
   function iniciar(){
     aplicar();
     const dashboard=document.getElementById('dashboard');
-    if(dashboard){
-      new MutationObserver(aplicar).observe(dashboard,{childList:true,subtree:true});
-    }
+    if(dashboard) new MutationObserver(aplicar).observe(dashboard,{childList:true,subtree:true});
     window.addEventListener('resize',aplicar,{passive:true});
     document.addEventListener('scp:modo-visualizacao-alterado',aplicar);
     setTimeout(aplicar,100);
