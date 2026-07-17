@@ -1,0 +1,53 @@
+/* Abertura e autenticação premium — Controle de Vendas */
+:root{--cv-bg:#020b1c;--cv-bg2:#061a3a;--cv-blue:#0a8cff;--cv-cyan:#19d7ff;--cv-text:#f7fbff;--cv-muted:#9fb3ca}
+#cvSplash{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle at 50% 38%,#0a2d67 0,#061a3a 34%,#020b1c 72%);color:var(--cv-text);transition:opacity .55s ease,visibility .55s ease}
+#cvSplash.cv-hide{opacity:0;visibility:hidden;pointer-events:none}
+#cvSplash::before,#firebaseAuthOverlay::before{content:"";position:absolute;inset:-20%;background:repeating-linear-gradient(118deg,transparent 0 44px,rgba(30,144,255,.07) 45px 47px,transparent 48px 98px);animation:cvDrift 11s linear infinite;pointer-events:none}
+#cvSplash::after,#firebaseAuthOverlay::after{content:"";position:absolute;left:-15%;right:-15%;bottom:-11%;height:34%;background:radial-gradient(ellipse at center,rgba(0,151,255,.28),transparent 62%);filter:blur(14px);animation:cvWave 6s ease-in-out infinite;pointer-events:none}
+.cv-splash-content{position:relative;z-index:1;width:min(88vw,430px);text-align:center;padding:30px 20px}
+.cv-logo-wrap{position:relative;width:156px;height:156px;margin:0 auto 24px;display:grid;place-items:center}
+.cv-logo-ring{position:absolute;inset:8px;border:2px solid rgba(31,190,255,.7);border-left-color:transparent;border-radius:50%;box-shadow:0 0 26px rgba(0,149,255,.65);animation:cvSpin 2.8s linear infinite}
+.cv-logo-ring::after{content:"";position:absolute;width:11px;height:11px;border-radius:50%;background:#7ae9ff;top:8px;right:21px;box-shadow:0 0 18px #20bfff}
+.cv-chart-logo{width:116px;height:94px;filter:drop-shadow(0 0 16px rgba(0,154,255,.65));animation:cvFloat 3.4s ease-in-out infinite}
+.cv-chart-bars rect{transform-origin:center bottom;animation:cvRise 1.05s cubic-bezier(.2,.8,.2,1) both}.cv-chart-bars rect:nth-child(2){animation-delay:.12s}.cv-chart-bars rect:nth-child(3){animation-delay:.24s}.cv-chart-bars rect:nth-child(4){animation-delay:.36s}
+.cv-chart-arrow{stroke-dasharray:180;stroke-dashoffset:180;animation:cvDraw .95s .35s ease forwards}
+.cv-splash-title{margin:0;font-size:clamp(30px,8vw,45px);line-height:1.02;font-weight:900;letter-spacing:-1.2px;text-transform:uppercase;text-shadow:0 0 18px rgba(0,139,255,.35)}
+.cv-splash-title span{display:block;color:#19a7ff}
+.cv-splash-sub{margin:13px 0 28px;color:#c1d3e6;font-size:15px;letter-spacing:.12em;text-transform:uppercase}
+.cv-loading{width:min(74vw,310px);height:7px;margin:0 auto;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(100,200,255,.2)}
+.cv-loading>span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#087dff,#22d5ff);box-shadow:0 0 16px #18bfff;animation:cvLoad 2.45s cubic-bezier(.2,.75,.25,1) forwards}
+.cv-loading-text{margin-top:13px;color:#a9bdd2;font-size:15px}
+
+#firebaseAuthOverlay{background:radial-gradient(circle at 50% 12%,#0a2b60 0,#061a3a 31%,#020b1c 76%)!important;padding:22px!important;overflow:auto!important;isolation:isolate}
+#firebaseAuthOverlay .cv-auth-shell{position:relative;z-index:1;width:min(440px,100%);margin:auto;padding:20px 0 26px}
+#firebaseAuthOverlay .cv-auth-brand{text-align:center;margin-bottom:18px;color:#fff}
+#firebaseAuthOverlay .cv-auth-logo{width:96px;height:78px;margin:0 auto 9px;filter:drop-shadow(0 0 13px rgba(0,155,255,.65));animation:cvFloat 4.8s ease-in-out infinite}
+#firebaseAuthOverlay .cv-auth-brand h1{margin:0;font-size:clamp(28px,8vw,38px);line-height:1;font-weight:900;text-transform:uppercase;letter-spacing:-.8px}
+#firebaseAuthOverlay .cv-auth-brand h1 span{display:block;color:#18aaff}
+#firebaseAuthOverlay .cv-auth-tagline{margin:10px 0 0;color:#b8c9dc;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+#firebaseAuthCard{position:relative!important;width:100%!important;background:linear-gradient(155deg,rgba(9,30,65,.92),rgba(3,14,35,.96))!important;border:1px solid rgba(26,167,255,.48)!important;border-radius:24px!important;padding:25px 22px 20px!important;box-shadow:0 18px 55px rgba(0,0,0,.48),0 0 26px rgba(0,133,255,.16)!important;backdrop-filter:blur(14px);overflow:hidden}
+#firebaseAuthCard::before{content:"";position:absolute;left:-25%;top:-40%;width:80%;height:70%;background:radial-gradient(circle,rgba(25,183,255,.18),transparent 68%);animation:cvGlow 6s ease-in-out infinite;pointer-events:none}
+#firebaseAuthCard h2{color:#fff!important;font-size:27px!important;margin:0 0 7px!important;position:relative}
+#firebaseAuthCard p{color:#b8c9dc!important;margin:0 0 18px!important;position:relative}
+#firebaseAuthCard input{box-sizing:border-box!important;height:56px!important;border:1px solid rgba(86,162,226,.45)!important;border-radius:14px!important;background:rgba(2,12,29,.72)!important;color:#fff!important;padding:0 16px!important;font-size:16px!important;outline:none!important;box-shadow:none!important;transition:border-color .2s,box-shadow .2s,transform .2s}
+#firebaseAuthCard input::placeholder{color:#7f94aa!important}
+#firebaseAuthCard input:focus{border-color:#18b9ff!important;box-shadow:0 0 0 3px rgba(24,185,255,.14),0 0 20px rgba(0,133,255,.12)!important;transform:translateY(-1px)}
+#firebaseAuthCard .auth-primary,#firebaseAuthCard .auth-secondary,#firebaseAuthCard .auth-link{height:54px!important;border-radius:14px!important;font-size:16px!important;transition:transform .18s,filter .18s,box-shadow .18s}
+#firebaseAuthCard .auth-primary{background:linear-gradient(90deg,#0877ff,#0a51e7)!important;box-shadow:0 8px 22px rgba(0,91,255,.32)!important}
+#firebaseAuthCard .auth-secondary{background:linear-gradient(90deg,#077d72,#07936f)!important;box-shadow:0 8px 20px rgba(0,130,107,.22)!important}
+#firebaseAuthCard .auth-link{background:rgba(255,255,255,.055)!important;color:#27aefe!important;border:1px solid rgba(39,174,254,.13)!important}
+#firebaseAuthCard button:active{transform:scale(.985)}
+#authMensagem{color:#ffb3bd!important;position:relative}
+#firebaseAuthCard .cv-approval-note{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 0;color:#75d8ff;font-size:14px;text-align:center}
+#firebaseAuthCard .cv-approval-note::before{content:"✓";display:grid;place-items:center;width:22px;height:22px;border:1px solid #20bfff;border-radius:50%;color:#20d4ff;font-weight:900}
+
+@keyframes cvSpin{to{transform:rotate(360deg)}}
+@keyframes cvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes cvRise{from{transform:scaleY(0);opacity:.2}to{transform:scaleY(1);opacity:1}}
+@keyframes cvDraw{to{stroke-dashoffset:0}}
+@keyframes cvLoad{0%{width:0}70%{width:82%}100%{width:100%}}
+@keyframes cvDrift{to{transform:translate3d(120px,-55px,0)}}
+@keyframes cvWave{0%,100%{transform:translateY(0) scaleX(1)}50%{transform:translateY(-12px) scaleX(1.08)}}
+@keyframes cvGlow{0%,100%{transform:translate(0,0)}50%{transform:translate(45%,30%)}}
+@media (max-height:690px){#firebaseAuthOverlay .cv-auth-logo{width:72px;height:58px}.cv-auth-brand{margin-bottom:10px!important}.cv-auth-tagline{display:none}#firebaseAuthCard{padding-top:20px!important}#firebaseAuthCard input{height:50px!important}.auth-primary,.auth-secondary,.auth-link{height:48px!important}}
+@media (prefers-reduced-motion:reduce){#cvSplash::before,#cvSplash::after,.cv-logo-ring,.cv-chart-logo,.cv-chart-bars rect,.cv-chart-arrow,#firebaseAuthOverlay::before,#firebaseAuthOverlay::after,#firebaseAuthOverlay .cv-auth-logo,#firebaseAuthCard::before{animation:none!important}.cv-loading>span{animation-duration:.4s!important}}
