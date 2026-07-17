@@ -1,0 +1,15 @@
+/* Comportamento isolado: barra inferior some ao rolar para baixo e volta ao rolar para cima. */
+.bottom{
+  transition:transform .24s ease, opacity .18s ease!important;
+  will-change:transform;
+}
+
+.bottom.bottom-auto-hidden{
+  transform:translateY(calc(100% + 24px + env(safe-area-inset-bottom)))!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .bottom{transition:none!important}
+}
