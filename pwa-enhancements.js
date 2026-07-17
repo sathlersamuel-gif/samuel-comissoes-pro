@@ -23,7 +23,9 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=20');
+        const registros=await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registros.map(reg=>reg.update().catch(()=>{})));
+        const registration=await navigator.serviceWorker.register('./sw.js?v=21',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
       }catch(error){
         console.error('Falha ao atualizar o aplicativo:',error);
