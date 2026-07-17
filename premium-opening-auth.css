@@ -1,5 +1,6 @@
 /* Abertura e autenticação premium — Controle de Vendas */
 :root{--cv-bg:#020b1c;--cv-bg2:#061a3a;--cv-blue:#0a8cff;--cv-cyan:#19d7ff;--cv-text:#f7fbff;--cv-muted:#9fb3ca}
+body:not(.cv-opening-mounted)::before{content:"CONTROLE DE\A VENDAS";white-space:pre;position:fixed;inset:0;z-index:21000;display:grid;place-items:center;text-align:center;background:radial-gradient(circle at 50% 38%,#0a2d67 0,#061a3a 34%,#020b1c 72%);color:#f7fbff;font-size:clamp(34px,9vw,50px);line-height:1.02;font-weight:900;letter-spacing:-1px;text-transform:uppercase;text-shadow:0 0 22px rgba(0,139,255,.55);animation:cvBootPulse 1.2s ease-in-out infinite alternate}
 #cvSplash{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle at 50% 38%,#0a2d67 0,#061a3a 34%,#020b1c 72%);color:var(--cv-text);transition:opacity .55s ease,visibility .55s ease}
 #cvSplash.cv-hide{opacity:0;visibility:hidden;pointer-events:none}
 #cvSplash::before,#firebaseAuthOverlay::before{content:"";position:absolute;inset:-20%;background:repeating-linear-gradient(118deg,transparent 0 44px,rgba(30,144,255,.07) 45px 47px,transparent 48px 98px);animation:cvDrift 11s linear infinite;pointer-events:none}
@@ -41,6 +42,7 @@
 #firebaseAuthCard .cv-approval-note{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 0;color:#75d8ff;font-size:14px;text-align:center}
 #firebaseAuthCard .cv-approval-note::before{content:"✓";display:grid;place-items:center;width:22px;height:22px;border:1px solid #20bfff;border-radius:50%;color:#20d4ff;font-weight:900}
 
+@keyframes cvBootPulse{from{opacity:.82;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
 @keyframes cvSpin{to{transform:rotate(360deg)}}
 @keyframes cvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @keyframes cvRise{from{transform:scaleY(0);opacity:.2}to{transform:scaleY(1);opacity:1}}
@@ -50,4 +52,4 @@
 @keyframes cvWave{0%,100%{transform:translateY(0) scaleX(1)}50%{transform:translateY(-12px) scaleX(1.08)}}
 @keyframes cvGlow{0%,100%{transform:translate(0,0)}50%{transform:translate(45%,30%)}}
 @media (max-height:690px){#firebaseAuthOverlay .cv-auth-logo{width:72px;height:58px}.cv-auth-brand{margin-bottom:10px!important}.cv-auth-tagline{display:none}#firebaseAuthCard{padding-top:20px!important}#firebaseAuthCard input{height:50px!important}.auth-primary,.auth-secondary,.auth-link{height:48px!important}}
-@media (prefers-reduced-motion:reduce){#cvSplash::before,#cvSplash::after,.cv-logo-ring,.cv-chart-logo,.cv-chart-bars rect,.cv-chart-arrow,#firebaseAuthOverlay::before,#firebaseAuthOverlay::after,#firebaseAuthOverlay .cv-auth-logo,#firebaseAuthCard::before{animation:none!important}.cv-loading>span{animation-duration:.4s!important}}
+@media (prefers-reduced-motion:reduce){body:not(.cv-opening-mounted)::before,#cvSplash::before,#cvSplash::after,.cv-logo-ring,.cv-chart-logo,.cv-chart-bars rect,.cv-chart-arrow,#firebaseAuthOverlay::before,#firebaseAuthOverlay::after,#firebaseAuthOverlay .cv-auth-logo,#firebaseAuthCard::before{animation:none!important}.cv-loading>span{animation-duration:.4s!important}}
