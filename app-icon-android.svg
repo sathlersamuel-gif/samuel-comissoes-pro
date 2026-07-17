@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Controle de Vendas PRO" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="bgAndroid" x1="70" y1="35" x2="450" y2="485" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#164d9d"/>
+      <stop offset="0.48" stop-color="#082656"/>
+      <stop offset="1" stop-color="#020a18"/>
+    </linearGradient>
+    <linearGradient id="barAndroid" x1="0" y1="185" x2="0" y2="35" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#176cf0"/>
+      <stop offset="1" stop-color="#56e1ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#bgAndroid)"/>
+  <rect x="11" y="11" width="490" height="490" rx="98" fill="none" stroke="#398cff" stroke-opacity="0.58" stroke-width="5"/>
+  <g transform="translate(62 55)">
+    <line x1="0" y1="185" x2="388" y2="185" stroke="#3889f5" stroke-width="6" stroke-linecap="round"/>
+    <rect x="35" y="130" width="51" height="55" rx="7" fill="url(#barAndroid)"/>
+    <rect x="113" y="103" width="51" height="82" rx="7" fill="url(#barAndroid)"/>
+    <rect x="191" y="72" width="51" height="113" rx="7" fill="url(#barAndroid)"/>
+    <rect x="269" y="41" width="51" height="144" rx="7" fill="url(#barAndroid)"/>
+    <path d="M13 162 C100 157 188 129 316 52" fill="none" stroke="#35d8ff" stroke-width="18" stroke-linecap="round"/>
+    <path d="M304 38 L359 41 L330 89 Z" fill="#35d8ff"/>
+  </g>
+  <text x="256" y="335" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="43" font-weight="900" font-style="italic" fill="#ffffff">CONTROLE</text>
+  <text x="210" y="382" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="900" font-style="italic" fill="#ff3048">DE</text>
+  <text x="286" y="382" text-anchor="start" font-family="Arial,Helvetica,sans-serif" font-size="43" font-weight="900" font-style="italic" fill="#ffffff">VENDAS</text>
+  <text x="256" y="454" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="63" font-weight="900" font-style="italic" fill="#ff3048">PRO</text>
+</svg>
