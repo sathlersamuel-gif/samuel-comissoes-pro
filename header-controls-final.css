@@ -1,9 +1,25 @@
-/* Ajuste isolado da barra superior: não altera dashboard nem funcionalidades */
-body.home-modern #dashboard .perfil-topo .perfil-acoes{display:none!important}
-body.home-modern #firebaseUserBar{display:flex!important;align-items:center!important;gap:8px!important;padding:10px 14px!important;padding-right:14px!important}
-body.home-modern #firebaseUserBar #firebaseUserEmail{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;margin-right:auto!important}
-body.home-modern #firebaseUserBar #scpNewUserBell{position:relative!important;inset:auto!important;order:1!important;flex:0 0 42px!important;width:42px!important;height:42px!important;margin:0!important}
-body.home-modern #firebaseUserBar #scpSecurityTools{position:static!important;inset:auto!important;transform:none!important;order:2!important;flex:0 0 auto!important;margin:0!important;z-index:auto!important}
-body.home-modern #firebaseUserBar #scpSecurityButton{width:42px!important;height:42px!important;border-radius:14px!important;margin:0!important}
-body.home-modern #firebaseUserBar #btnSairFirebase{order:3!important;margin:0!important;flex:0 0 auto!important}
-@media(max-width:520px){body.home-modern #firebaseUserBar{gap:6px!important;padding:8px 10px!important}body.home-modern #firebaseUserBar #scpNewUserBell,body.home-modern #firebaseUserBar #scpSecurityButton{width:40px!important;height:40px!important;flex-basis:40px!important}body.home-modern #firebaseUserBar #btnSairFirebase{padding:8px 10px!important}}
+/* Controles reais integrados ao card do perfil na tela inicial */
+body.home-modern #firebaseUserBar{display:none!important}
+body.home-modern #dashboard .perfil-topo{display:grid!important;grid-template-columns:54px minmax(0,1fr) auto!important;align-items:center!important;gap:12px!important}
+body.home-modern #dashboard .perfil-topo .perfil-identidade{min-width:0!important}
+body.home-modern #dashboard .perfil-topo .perfil-identidade strong,
+body.home-modern #dashboard .perfil-topo .perfil-identidade small{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+body.home-modern #dashboard .perfil-topo .perfil-acoes{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;margin-left:auto!important}
+body.home-modern #dashboard .perfil-topo .perfil-acoes>.icone-topo{display:none!important}
+body.home-modern #dashboard .perfil-topo #scpNewUserBell{position:relative!important;inset:auto!important;display:flex;flex:0 0 46px!important;width:46px!important;height:46px!important;margin:0!important;padding:0!important;border:1px solid #234c79!important;border-radius:14px!important;background:#081a2e!important;color:#fff!important;box-shadow:none!important;transform:none!important}
+body.home-modern #dashboard .perfil-topo #scpSecurityTools{position:static!important;inset:auto!important;transform:none!important;display:block!important;flex:0 0 46px!important;width:46px!important;height:46px!important;margin:0!important;z-index:auto!important}
+body.home-modern #dashboard .perfil-topo #scpSecurityButton{width:46px!important;height:46px!important;margin:0!important;padding:0!important;border:1px solid #234c79!important;border-radius:14px!important;background:#081a2e!important;color:#fff!important;box-shadow:none!important}
+body.home-modern #dashboard .perfil-topo #btnSairFirebase{position:static!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-width:84px!important;height:46px!important;margin:0!important;padding:0 14px!important;border:0!important;border-radius:13px!important;background:#e32636!important;color:#fff!important;font-size:16px!important;font-weight:700!important;box-shadow:none!important}
+body.home-modern #dashboard .perfil-topo #btnSairFirebase::before{content:'↪';font-size:20px;font-weight:800}
+@media(max-width:620px){
+  body.home-modern #dashboard .perfil-topo{grid-template-columns:54px minmax(0,1fr) auto!important;gap:10px!important;padding:12px!important}
+  body.home-modern #dashboard .perfil-topo .perfil-acoes{gap:6px!important}
+  body.home-modern #dashboard .perfil-topo #scpNewUserBell,
+  body.home-modern #dashboard .perfil-topo #scpSecurityTools,
+  body.home-modern #dashboard .perfil-topo #scpSecurityButton{width:44px!important;height:44px!important;flex-basis:44px!important}
+  body.home-modern #dashboard .perfil-topo #btnSairFirebase{height:44px!important;min-width:76px!important;padding:0 11px!important;font-size:15px!important}
+}
+@media(max-width:480px){
+  body.home-modern #dashboard .perfil-topo{grid-template-columns:50px minmax(0,1fr)!important;align-items:center!important}
+  body.home-modern #dashboard .perfil-topo .perfil-acoes{grid-column:1/-1!important;width:100%!important;justify-content:flex-end!important;margin-top:2px!important}
+}
