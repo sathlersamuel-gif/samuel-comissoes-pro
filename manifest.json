@@ -12,10 +12,16 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "app-icon.svg?v=12",
+      "src": "app-icon-android.svg?v=1",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "app-icon-android.svg?v=1",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }
