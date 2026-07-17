@@ -1,9 +1,9 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v23';
+const CACHE_NAME = 'samuel-comissoes-pro-v24';
 const APP_SHELL = [
   './',
   './index.html',
   './style.css?v=4',
-  './dashboard-v2.css?v=5',
+  './dashboard-v2.css?v=6',
   './pwa-enhancements.js?v=6',
   './phone-mask.js?v=3',
   './script.js?v=4',
@@ -20,7 +20,7 @@ const APP_SHELL = [
   './profile-settings.js?v=5',
   './requirements-fix.js?v=2',
   './observacao-historico.js?v=2',
-  './dashboard-v2.js?v=7',
+  './dashboard-v2.js?v=8',
   './security-update.js?v=4',
   './version.json',
   './manifest.json?v=13',
