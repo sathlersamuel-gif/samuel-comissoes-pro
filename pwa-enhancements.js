@@ -31,7 +31,7 @@
       try{
         const registros=await navigator.serviceWorker.getRegistrations();
         await Promise.all(registros.map(reg=>reg.update().catch(()=>{})));
-        const registration=await navigator.serviceWorker.register('./sw.js?v=22',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=23',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'SKIP_WAITING'});
       }catch(error){
