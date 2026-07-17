@@ -19,27 +19,49 @@
   }
 
   function instalar(){
-    const original=window.atualizarDashboard;
-    if(typeof original!=='function')return setTimeout(instalar,50);
-    if(original.__semFlash)return;
+    const atualizarOriginal=window.atualizarDashboard;
+    const abrirOriginal=window.abrirTela;
+    if(typeof atualizarOriginal!=='function'||typeof abrirOriginal!=='function'){
+      return setTimeout(instalar,50);
+    }
+    if(abrirOriginal.__trocaSemFlash)return;
 
-    let ultimaAssinatura=assinatura();
+    let ultimaAssinatura='';
+    let trocando=false;
 
-    function atualizarSemPiscar(){
+    function atualizarAntesDeMostrar(){
       const dashboard=document.getElementById('dashboard');
       const atual=assinatura();
+      if(!dashboard||dashboard.childElementCount===0||atual!==ultimaAssinatura){
+        atualizarOriginal();
+        ultimaAssinatura=assinatura();
+      }
+    }
 
-      if(dashboard&&dashboard.childElementCount>0&&atual===ultimaAssinatura){
+    function abrirSemFlash(id){
+      if(id!=='dashboard'){
+        return abrirOriginal.apply(this,arguments);
+      }
+
+      if(document.getElementById('dashboard')?.classList.contains('ativa')){
+        atualizarAntesDeMostrar();
         return;
       }
 
-      const resultado=original.apply(this,arguments);
-      ultimaAssinatura=assinatura();
-      return resultado;
+      if(trocando)return;
+      trocando=true;
+
+      atualizarAntesDeMostrar();
+
+      requestAnimationFrame(()=>{
+        abrirOriginal.call(this,'dashboard');
+        trocando=false;
+      });
     }
 
-    atualizarSemPiscar.__semFlash=true;
-    window.atualizarDashboard=atualizarSemPiscar;
+    abrirSemFlash.__trocaSemFlash=true;
+    window.abrirTela=abrirSemFlash;
+    ultimaAssinatura=assinatura();
   }
 
   instalar();
