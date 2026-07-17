@@ -1,0 +1,31 @@
+/* Ajuste visual aprovado: não altera dados, cálculos, navegação ou funcionalidades. */
+
+/* Tela inicial: substitui apenas a assinatura visual por SMS. */
+.marca-dashboard p {
+  margin-top: 2px;
+  font-size: 0 !important;
+  line-height: 1;
+}
+
+.marca-dashboard p::after {
+  content: "SMS";
+  display: inline-block;
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 30px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -2px;
+  color: #1684ff;
+  text-shadow: 0 0 12px rgba(22, 132, 255, .48);
+  transform: skewX(-8deg);
+}
+
+/* Remove somente o ícone de notificações/trevo e sua bolinha vermelha. */
+.perfil-acoes .notificacao {
+  display: none !important;
+}
+
+/* Demais páginas: remove somente o bloco com o logotipo/nome Yamaha. */
+body:not(.home-modern) .topo .marca {
+  display: none !important;
+}
