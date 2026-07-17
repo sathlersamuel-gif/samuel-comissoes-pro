@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v20';
+const CACHE_NAME = 'samuel-comissoes-pro-v21';
 const APP_SHELL = [
   './',
   './index.html',
