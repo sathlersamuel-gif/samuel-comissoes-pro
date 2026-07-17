@@ -15,13 +15,28 @@
     <link rel="stylesheet" href="bottom-layout-fix.css?v=1">
     <link rel="stylesheet" href="brand-cleanup.css?v=1">
     <link rel="stylesheet" href="responsive-layout.css?v=3">
+    <link rel="stylesheet" href="tipo-numeros-mobile.css?v=2">
     <meta name="theme-color" content="#061326">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Controle-d-Vendas">
     <meta name="format-detection" content="telephone=no">
-    <style>body:not(.home-modern) .topo{display:flex!important}body:not(.home-modern) .nova-venda-flutuante{display:none!important}</style>
+    <style>
+      body:not(.home-modern) .topo{display:flex!important}
+      body:not(.home-modern) .nova-venda-flutuante{display:none!important}
+      @media (max-width:899px){
+        body.modo-automatico #dashboard .tipos-v2 .tipo-card,
+        body.modo-celular #dashboard .tipos-v2 .tipo-card{min-height:246px!important}
+        body.modo-automatico #dashboard .tipos-v2 .tipo-card .qtd,
+        body.modo-celular #dashboard .tipos-v2 .tipo-card .qtd{
+          display:flex!important;align-items:center!important;justify-content:center!important;
+          width:100%!important;min-height:88px!important;flex:1 1 88px!important;
+          margin:2px 0 6px!important;font-size:clamp(54px,18vw,82px)!important;
+          line-height:.9!important;letter-spacing:-3px!important;text-align:center!important
+        }
+      }
+    </style>
 </head>
 <body class="home-modern modo-automatico">
 <header class="topo"><div class="marca marca-so-emblema"><img src="yamaha-emblem.svg?v=3" alt="Yamaha" class="yamaha-emblema"></div></header>
@@ -33,6 +48,6 @@
 <section id="backup" class="tela"><div class="barra"><button onclick="voltarDashboard()">←</button><h2>Backup</h2></div><p class="texto-apoio">Salve uma cópia para guardar seus dados ao trocar de aparelho ou navegador.</p><button id="exportarBackup">Exportar Backup</button><button id="importarBackup">Importar Backup</button></section>
 </main>
 <nav class="bottom"><button onclick="abrirTela('dashboard')"><span>⌂</span><small>Início</small></button><button onclick="abrirTela('novaVenda')"><span>＋</span><small>Nova Venda</small></button><button onclick="abrirTela('historico')"><span>▤</span><small>Histórico</small></button><button onclick="abrirTela('relatorios')"><span>▥</span><small>Relatórios</small></button></nav>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script><script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script><script src="pdf-alignment-fix.js?v=1"></script><script src="pdf-name-fix.js?v=2"></script><script src="pwa-enhancements.js?v=6"></script><script src="phone-mask.js?v=3"></script><script src="script.js?v=4"></script><script src="import-backup.js?v=2"></script><script src="backup-export-fix.js?v=1"></script><script src="app-upgrades.js?v=1"></script><script src="app-features.js?v=2"></script><script src="premium-ui.js?v=1"></script><script src="pdf-viewer-fix.js?v=2"></script><script src="report-options-fix.js?v=7"></script><script src="firebase-integration.js?v=7"></script><script src="admin-controls.js?v=2"></script><script src="install-guide.js?v=1"></script><script src="admin-nav-fix.js?v=1"></script><script src="profile-settings.js?v=5"></script><script src="requirements-fix.js?v=2"></script><script src="observacao-historico.js?v=2"></script><script src="dashboard-v2.js?v=9"></script><script src="security-update.js?v=3"></script><script src="gear-position-fix.js?v=1"></script><script src="responsive-layout.js?v=1"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script><script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script><script src="pdf-alignment-fix.js?v=1"></script><script src="pdf-name-fix.js?v=2"></script><script src="pwa-enhancements.js?v=9"></script><script src="phone-mask.js?v=3"></script><script src="script.js?v=4"></script><script src="import-backup.js?v=2"></script><script src="backup-export-fix.js?v=1"></script><script src="app-upgrades.js?v=1"></script><script src="app-features.js?v=2"></script><script src="premium-ui.js?v=1"></script><script src="pdf-viewer-fix.js?v=2"></script><script src="report-options-fix.js?v=7"></script><script src="firebase-integration.js?v=7"></script><script src="admin-controls.js?v=2"></script><script src="install-guide.js?v=1"></script><script src="admin-nav-fix.js?v=1"></script><script src="profile-settings.js?v=5"></script><script src="requirements-fix.js?v=2"></script><script src="observacao-historico.js?v=2"></script><script src="dashboard-v2.js?v=9"></script><script src="security-update.js?v=3"></script><script src="gear-position-fix.js?v=1"></script><script src="responsive-layout.js?v=1"></script>
 <script>(function(){const aplicar=id=>document.body.classList.toggle('home-modern',id==='dashboard');const original=window.abrirTela;if(typeof original==='function'){window.abrirTela=function(id){aplicar(id);return original.apply(this,arguments)}}const voltar=window.voltarDashboard;if(typeof voltar==='function'){window.voltarDashboard=function(){aplicar('dashboard');return voltar.apply(this,arguments)}}aplicar(document.querySelector('.tela.ativa')?.id||'dashboard')})();</script>
 </body></html>
