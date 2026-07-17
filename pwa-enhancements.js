@@ -1,6 +1,6 @@
 (function(){
   const ajusteDireto=document.createElement('script');
-  ajusteDireto.src='tipo-numeros-mobile.js?v=2';
+  ajusteDireto.src='tipo-numeros-mobile.js?v=3';
   ajusteDireto.defer=true;
   document.head.appendChild(ajusteDireto);
 
@@ -36,7 +36,7 @@
       try{
         const registros=await navigator.serviceWorker.getRegistrations();
         await Promise.all(registros.map(reg=>reg.update().catch(()=>{})));
-        const registration=await navigator.serviceWorker.register('./sw.js?v=27',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=28',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'SKIP_WAITING'});
       }catch(error){
