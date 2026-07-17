@@ -21,12 +21,19 @@
   criarSplash();
 
   if('serviceWorker' in navigator){
+    let recarregando=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(recarregando) return;
+      recarregando=true;
+      window.location.reload();
+    });
     window.addEventListener('load',async()=>{
       try{
         const registros=await navigator.serviceWorker.getRegistrations();
         await Promise.all(registros.map(reg=>reg.update().catch(()=>{})));
-        const registration=await navigator.serviceWorker.register('./sw.js?v=21',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=22',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
+        if(registration.waiting) registration.waiting.postMessage({type:'SKIP_WAITING'});
       }catch(error){
         console.error('Falha ao atualizar o aplicativo:',error);
       }
