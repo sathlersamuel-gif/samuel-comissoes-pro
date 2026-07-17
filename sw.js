@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v35';
+const CACHE_NAME = 'samuel-comissoes-pro-v36';
 const APP_SHELL = [
   './',
   './index.html',
@@ -10,6 +10,8 @@ const APP_SHELL = [
   './brand-cleanup.css?v=1',
   './responsive-layout.css?v=3',
   './tipo-numeros-mobile.js?v=3',
+  './analise-vendas.css?v=1',
+  './analise-vendas.js?v=1',
   './pwa-enhancements.js?v=9',
   './phone-mask.js?v=3',
   './script.js?v=4',
