@@ -1,9 +1,20 @@
 (function(){
+  const css=document.createElement('link');
+  css.rel='stylesheet';
+  css.href='premium-opening-auth.css?v=1';
+  document.head.appendChild(css);
+  const visual=document.createElement('script');
+  visual.src='premium-opening-auth.js?v=1';
+  visual.defer=true;
+  document.head.appendChild(visual);
+})();
+
+(function(){
   'use strict';
 
   const ADMIN_EMAIL='sathlersamuel@gmail.com';
-  const APP='Samuel Comissões PRO';
-  const VERSAO='1.0.0';
+  const APP='Controle de Vendas';
+  const VERSAO='1.0.1';
   const FILA='scp_ai_monitor_queue';
   const SESSAO=(crypto&&crypto.randomUUID)?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const MAX_FILA=80;
