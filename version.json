@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
-  "releasedAt": "2026-07-16T23:10:00Z",
-  "notes": "Correção da categoria Cartão e atualização do carregamento no iPhone."
+  "version": "1.1.2",
+  "releasedAt": "2026-07-17T12:20:00Z",
+  "notes": "Ajuste visual: assinatura SMS na tela inicial e remoção exclusiva dos elementos Yamaha solicitados, sem alterar funcionalidades."
 }
