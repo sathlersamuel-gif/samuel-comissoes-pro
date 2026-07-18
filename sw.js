@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v49';
+const CACHE_NAME = 'samuel-comissoes-pro-v50';
 const APP_SHELL = [
   './',
   './index.html',
@@ -13,9 +13,9 @@ const APP_SHELL = [
   './analise-vendas.css?v=1',
   './mobile-alignment-fix.css?v=1',
   './analise-vendas.js?v=2',
-  './pwa-enhancements.js?v=9',
+  './pwa-enhancements.js?v=10',
   './cloud-authoritative-sync.js?v=1',
-  './user-management-core.js?v=2',
+  './user-management-core.js?v=5',
   './ai-performance-accelerator.js?v=1',
   './phone-mask.js?v=3',
   './script.js?v=4',
@@ -48,19 +48,11 @@ const APP_SHELL = [
 ];
 
 self.addEventListener('install',event=>{
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache=>
-      Promise.allSettled(APP_SHELL.map(url=>cache.add(url)))
-    ).then(()=>self.skipWaiting())
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then(cache=>Promise.allSettled(APP_SHELL.map(url=>cache.add(url)))).then(()=>self.skipWaiting()));
 });
 
 self.addEventListener('activate',event=>{
-  event.waitUntil(
-    caches.keys()
-      .then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME&&!key.startsWith('scp-ai-warm')).map(key=>caches.delete(key))))
-      .then(()=>self.clients.claim())
-  );
+  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));
 });
 
 self.addEventListener('message',event=>{
@@ -69,21 +61,15 @@ self.addEventListener('message',event=>{
 
 function redePrimeiro(request){
   return fetch(request,{cache:'no-store'}).then(response=>{
-    if(response&&response.ok){
-      const copy=response.clone();
-      caches.open(CACHE_NAME).then(cache=>cache.put(request,copy));
-    }
+    if(response&&response.ok){const copy=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put(request,copy));}
     return response;
   }).catch(()=>caches.match(request));
 }
 
 function cachePrimeiro(request){
   return caches.match(request).then(cached=>{
-    const atualizar=fetch(request).then(response=>{
-      if(response&&response.ok){
-        const copy=response.clone();
-        caches.open(CACHE_NAME).then(cache=>cache.put(request,copy));
-      }
+    const atualizar=fetch(request,{cache:'no-store'}).then(response=>{
+      if(response&&response.ok){const copy=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put(request,copy));}
       return response;
     }).catch(()=>cached);
     return cached||atualizar;
@@ -100,27 +86,18 @@ self.addEventListener('fetch',event=>{
   }
 
   if(event.request.mode==='navigate'){
-    event.respondWith(
-      fetch(event.request,{cache:'no-store'})
-        .then(response=>{
-          if(response&&response.ok){
-            const copy=response.clone();
-            caches.open(CACHE_NAME).then(cache=>cache.put('./index.html',copy));
-          }
-          return response;
-        })
-        .catch(()=>caches.match('./index.html').then(cached=>cached||caches.match('./')))
-    );
+    event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{
+      if(response&&response.ok){const copy=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put('./index.html',copy));}
+      return response;
+    }).catch(()=>caches.match('./index.html').then(cached=>cached||caches.match('./'))));
     return;
   }
 
   if(url.origin===self.location.origin){
-    const arquivoDinamico = /\.(js|json)$/.test(url.pathname);
-    event.respondWith(arquivoDinamico ? redePrimeiro(event.request) : cachePrimeiro(event.request));
+    const arquivoDinamico=/\.(js|json|html)$/.test(url.pathname);
+    event.respondWith(arquivoDinamico?redePrimeiro(event.request):cachePrimeiro(event.request));
     return;
   }
 
-  event.respondWith(
-    fetch(event.request).catch(()=>caches.match(event.request))
-  );
+  event.respondWith(fetch(event.request).catch(()=>caches.match(event.request)));
 });
