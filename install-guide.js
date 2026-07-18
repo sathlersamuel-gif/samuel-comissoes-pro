@@ -2,7 +2,7 @@
     const STORAGE_KEY = "samuel_install_guide_seen_v3";
     const WHATSAPP_NUMBER = "5569984810587";
     const WHATSAPP_TEXT = "Olá Samuel, preciso de ajuda com o Comissões PRO.";
-    const APK_URL = "https://github.com/sathlersamuel-gif/samuel-comissoes-pro/releases/latest/download/Samuel-Comissoes-PRO.apk";
+    const APK_URL = "./downloads/Samuel-Comissoes-PRO.apk?v=3.9";
 
     function standalone() {
         return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
@@ -34,7 +34,14 @@
             alert("O arquivo APK funciona somente em celulares Android. No iPhone, use o Safari e escolha Adicionar à Tela de Início.");
             return;
         }
-        window.location.href = APK_URL;
+
+        const link = document.createElement("a");
+        link.href = APK_URL;
+        link.download = "Samuel-Comissoes-PRO.apk";
+        link.rel = "noopener";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
     }
 
     function estilos() {
