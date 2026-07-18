@@ -4,6 +4,11 @@
   ajusteDireto.defer=true;
   document.head.appendChild(ajusteDireto);
 
+  const acelerador=document.createElement('script');
+  acelerador.src='ai-performance-accelerator.js?v=1';
+  acelerador.defer=true;
+  document.head.appendChild(acelerador);
+
   function instalado(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
@@ -18,8 +23,8 @@
     document.head.appendChild(style);
     document.body.appendChild(splash);
     const remover=()=>{if(!splash.isConnected)return;splash.style.opacity='0';setTimeout(()=>splash.remove(),380)};
-    setTimeout(remover,900);
-    setTimeout(remover,3000);
+    setTimeout(remover,700);
+    setTimeout(remover,2500);
   }
 
   if(instalado()) document.body.classList.add('app-standalone');
@@ -28,7 +33,7 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=29',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=30',{updateViaCache:'none'});
         registration.update().catch(()=>{});
       }catch(error){
         console.error('Falha ao registrar o modo offline:',error);
