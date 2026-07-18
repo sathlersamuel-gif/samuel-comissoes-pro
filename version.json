@@ -1,5 +1,5 @@
 {
-  "version": "1.2.2",
-  "releasedAt": "2026-07-18T21:10:00Z",
-  "notes": "Firebase definido como fonte principal dos dados para manter Safari, Chrome e aplicativo com o mesmo histórico, sem misturar vendas antigas do navegador."
+  "version": "1.2.3",
+  "releasedAt": "2026-07-18T15:00:00-04:00",
+  "notes": "Força o carregamento do núcleo definitivo de exclusão de usuários, remove usuários excluídos da lista e impede o retorno da conta pelo Firebase."
 }
