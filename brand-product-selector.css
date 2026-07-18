@@ -1,0 +1,15 @@
+#seletorMarcaMoto{margin:10px 0 12px;padding:10px 12px;border:1px solid rgba(69,140,225,.45);border-radius:18px;background:rgba(5,25,51,.55)}
+#seletorMarcaMoto .marca-titulo{display:block;margin:0 0 8px;font-size:14px;color:#f3f7ff;font-weight:600}
+#seletorMarcaMoto .marca-opcoes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#seletorMarcaMoto .marca-opcao{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:46px;padding:8px 12px;border:1px solid rgba(84,135,194,.55);border-radius:13px;background:rgba(9,35,65,.72);color:#fff;font-weight:800;font-size:16px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#seletorMarcaMoto .marca-opcao .marca-check{width:22px;height:22px;border:2px solid #7f9abb;border-radius:5px;display:grid;place-items:center;font-size:15px;line-height:1;color:#061326;background:transparent;flex:0 0 22px}
+#seletorMarcaMoto .marca-opcao.ativa{border-color:#18d675;background:linear-gradient(90deg,rgba(0,80,61,.68),rgba(0,48,42,.62));box-shadow:0 0 0 1px rgba(24,214,117,.15)}
+#seletorMarcaMoto .marca-opcao.ativa .marca-check{border-color:#18d675;background:#18d675}
+#sugestoesProdutoMarca{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:1200;max-height:280px;overflow:auto;border:1px solid rgba(70,132,199,.65);border-radius:14px;background:#071b33;box-shadow:0 16px 32px rgba(0,0,0,.32)}
+#sugestoesProdutoMarca.aberto{display:block}
+#sugestoesProdutoMarca button{display:block;width:100%;padding:12px 14px;border:0;border-bottom:1px solid rgba(93,132,178,.18);background:transparent;color:#eef5ff;text-align:left;font-size:15px;cursor:pointer}
+#sugestoesProdutoMarca button:last-child{border-bottom:0}
+#sugestoesProdutoMarca button:active{background:rgba(29,102,188,.28)}
+#sugestoesProdutoMarca .sem-resultado{padding:13px 14px;color:#92a8c5;font-size:14px}
+#produtoMarcaWrapper{position:relative}
+@media(max-width:480px){#seletorMarcaMoto{padding:9px 10px;border-radius:16px}#seletorMarcaMoto .marca-opcao{min-height:42px;padding:7px 10px;font-size:14px}}
