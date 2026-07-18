@@ -2,7 +2,7 @@
   'use strict';
   const ADMIN_EMAIL='sathlersamuel@gmail.com';
   const STATUS_EXCLUIDO='excluido';
-  let db=null,auth=null,processando=false,botaoAtual=null;
+  let auth=null,db=null,processando=false;
 
   function iniciarFirebase(){
     if(!window.firebase||!firebase.apps||!firebase.apps.length)return false;
@@ -12,121 +12,95 @@
   }
 
   function ehAdmin(){
-    return String(auth.currentUser?.email||'').trim().toLowerCase()===ADMIN_EMAIL;
+    return String(auth?.currentUser?.email||'').trim().toLowerCase()===ADMIN_EMAIL;
   }
 
-  function manterPainelAberto(){
+  function painelAberto(){
     const painel=document.getElementById('painelUsuarios');
     if(painel)painel.style.display='block';
   }
 
-  function criarConfirmacao(){
-    if(document.getElementById('confirmarExclusaoUsuario'))return;
-    const modal=document.createElement('div');
-    modal.id='confirmarExclusaoUsuario';
-    modal.style.cssText='position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:18px';
-    modal.innerHTML='<div style="width:min(420px,100%);background:#fff;border-radius:20px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.3)"><h3 style="margin:0 0 8px;color:#071b3d">Excluir usuário?</h3><p id="confirmarExclusaoTexto" style="margin:0 0 18px;color:#5f6b7a;line-height:1.45"></p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button type="button" id="cancelarExclusaoUsuario" style="border:0;border-radius:12px;padding:13px;font-weight:800;background:#e9eef6;color:#33435e">Cancelar</button><button type="button" id="confirmarExclusaoUsuarioBtn" style="border:0;border-radius:12px;padding:13px;font-weight:800;background:#941f2b;color:#fff">Excluir</button></div></div>';
-    document.body.appendChild(modal);
-    document.getElementById('cancelarExclusaoUsuario').onclick=fecharConfirmacao;
-    document.getElementById('confirmarExclusaoUsuarioBtn').onclick=confirmarExclusao;
-    modal.addEventListener('click',e=>{if(e.target===modal)fecharConfirmacao();});
-  }
-
-  function abrirConfirmacao(botao){
+  async function excluirUsuario(botao){
     if(processando)return;
-    botaoAtual=botao;
-    const email=botao.dataset.email||'este usuário';
-    document.getElementById('confirmarExclusaoTexto').textContent=`${email} será removido da lista e terá o acesso bloqueado definitivamente.`;
-    const modal=document.getElementById('confirmarExclusaoUsuario');
-    modal.style.display='flex';
-    manterPainelAberto();
-  }
-
-  function fecharConfirmacao(){
-    const modal=document.getElementById('confirmarExclusaoUsuario');
-    if(modal)modal.style.display='none';
-    botaoAtual=null;
-    manterPainelAberto();
-  }
-
-  async function confirmarExclusao(){
-    const botao=botaoAtual;
-    if(!botao||processando)return;
     if(!ehAdmin())return alert('Somente o administrador pode excluir usuários.');
+    const uid=String(botao.dataset.uid||'').trim();
+    const email=String(botao.dataset.email||'este usuário').trim();
+    if(!uid)return alert('Não foi possível identificar este usuário.');
+    if(!confirm(`Tem certeza que deseja excluir ${email}?\n\nO usuário será removido da lista e terá o acesso bloqueado.`))return;
+
     processando=true;
-    const uid=String(botao.dataset.uid||'');
-    const email=String(botao.dataset.email||'').trim().toLowerCase();
-    const scrollAtual=document.getElementById('painelUsuarios')?.scrollTop||0;
-    const confirmar=document.getElementById('confirmarExclusaoUsuarioBtn');
-    if(confirmar){confirmar.disabled=true;confirmar.textContent='Excluindo...';}
+    const texto=botao.textContent;
+    botao.disabled=true;
+    botao.textContent='Excluindo...';
+    painelAberto();
 
     try{
       const ref=db.collection('usuarios').doc(uid);
-      const snap=await ref.get();
-      const dados=snap.exists?snap.data():{};
       await ref.set({
-        uid,
-        email:String(dados.email||email||'').trim().toLowerCase(),
         status:STATUS_EXCLUIDO,
-        vendas:[],
-        vendasExcluidas:[],
-        totalAcessos:0,
-        ultimoAcesso:firebase.firestore.FieldValue.delete(),
-        ultimoDispositivo:firebase.firestore.FieldValue.delete(),
-        expiraEm:firebase.firestore.FieldValue.delete(),
-        acessoIniciadoEm:firebase.firestore.FieldValue.delete(),
-        periodoQuantidade:firebase.firestore.FieldValue.delete(),
-        periodoUnidade:firebase.firestore.FieldValue.delete(),
         excluidoEm:firebase.firestore.FieldValue.serverTimestamp(),
         excluidoPor:ADMIN_EMAIL,
         atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()
       },{merge:true});
 
+      const verificacao=await ref.get();
+      if(!verificacao.exists||verificacao.data().status!==STATUS_EXCLUIDO){
+        throw new Error('O Firebase não confirmou a exclusão.');
+      }
+
       const card=botao.closest('article,.usuario-card');
       if(card)card.remove();
-      fecharConfirmacao();
-      manterPainelAberto();
-      const painel=document.getElementById('painelUsuarios');
-      if(painel)painel.scrollTop=scrollAtual;
+      painelAberto();
+      window.SCPMonitor?.registrar('acao-validada','Usuário excluído e confirmado no Firebase',{uid,email});
       alert('Usuário excluído com sucesso.');
-      if(painel)painel.scrollTop=scrollAtual;
     }catch(erro){
       console.error('Erro ao excluir usuário:',erro);
+      window.SCPMonitor?.registrar('falha-exclusao-usuario',erro?.message||String(erro),{uid,email});
       alert(`Não foi possível excluir o usuário. ${erro?.message||''}`.trim());
-      manterPainelAberto();
     }finally{
       processando=false;
-      if(confirmar){confirmar.disabled=false;confirmar.textContent='Excluir';}
+      if(document.body.contains(botao)){
+        botao.disabled=false;
+        botao.textContent=texto;
+      }
     }
   }
 
-  function filtrarExcluidosDaTela(){
+  function prepararBotoes(){
+    document.querySelectorAll('#listaUsuarios [data-acao="excluir"][data-uid]').forEach(botao=>{
+      if(botao.dataset.exclusaoCorrigida==='1')return;
+      const novo=botao.cloneNode(true);
+      novo.dataset.exclusaoCorrigida='1';
+      novo.onclick=function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        excluirUsuario(novo);
+      };
+      botao.replaceWith(novo);
+    });
+  }
+
+  async function removerExcluidosDaTela(){
     if(!ehAdmin())return;
-    db.collection('usuarios').where('status','==',STATUS_EXCLUIDO).get().then(snap=>{
-      const ids=new Set(snap.docs.map(d=>String(d.id)));
+    try{
+      const snap=await db.collection('usuarios').where('status','==',STATUS_EXCLUIDO).get();
+      const ids=new Set(snap.docs.map(doc=>String(doc.id)));
       document.querySelectorAll('#listaUsuarios [data-uid]').forEach(el=>{
         if(ids.has(String(el.dataset.uid)))el.closest('article,.usuario-card')?.remove();
       });
-    }).catch(()=>{});
+    }catch(erro){console.warn('Falha ao filtrar usuários excluídos:',erro);}
   }
 
   function instalar(){
-    criarConfirmacao();
-    document.addEventListener('click',function(e){
-      const botao=e.target.closest&&e.target.closest('#listaUsuarios [data-acao="excluir"][data-uid]');
-      if(!botao)return;
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      manterPainelAberto();
-      abrirConfirmacao(botao);
-    },true);
-
     const observar=()=>{
       const lista=document.getElementById('listaUsuarios');
-      if(!lista)return setTimeout(observar,300);
-      new MutationObserver(()=>setTimeout(filtrarExcluidosDaTela,80)).observe(lista,{childList:true,subtree:true});
-      filtrarExcluidosDaTela();
+      if(!lista)return setTimeout(observar,250);
+      prepararBotoes();
+      removerExcluidosDaTela();
+      new MutationObserver(()=>{
+        prepararBotoes();
+        removerExcluidosDaTela();
+      }).observe(lista,{childList:true,subtree:true});
     };
     observar();
 
@@ -134,7 +108,10 @@
       if(!user||String(user.email||'').toLowerCase()===ADMIN_EMAIL)return;
       try{
         const snap=await db.collection('usuarios').doc(user.uid).get();
-        if(snap.exists&&snap.data().status===STATUS_EXCLUIDO)await auth.signOut();
+        if(snap.exists&&snap.data().status===STATUS_EXCLUIDO){
+          await auth.signOut();
+          alert('Esta conta foi excluída pelo administrador.');
+        }
       }catch(erro){console.warn(erro);}
     });
   }
@@ -143,5 +120,6 @@
     if(!iniciarFirebase())return setTimeout(iniciar,300);
     instalar();
   }
+
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar);else iniciar();
 })();
