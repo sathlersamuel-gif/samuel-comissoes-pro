@@ -14,9 +14,9 @@
     const valorVenda=document.getElementById('valorVenda');
     const valorComissao=document.getElementById('comissao');
     const tipoVenda=document.getElementById('tipoVenda');
-    if(!campo||!valorVenda||!valorComissao||campo.dataset.percentualFinal==='2')return;
+    if(!campo||!valorVenda||!valorComissao||campo.dataset.percentualFinal==='3')return;
 
-    campo.dataset.percentualFinal='2';
+    campo.dataset.percentualFinal='3';
     campo.type='text';
     campo.inputMode='numeric';
     campo.autocomplete='off';
@@ -59,25 +59,10 @@
     });
 
     valorVenda.addEventListener('input',calcular,true);
-
-    if(tipoVenda){
-      tipoVenda.addEventListener('change',calcular,true);
-    }
+    if(tipoVenda)tipoVenda.addEventListener('change',calcular,true);
 
     const form=document.getElementById('formVenda');
     if(form){
-      form.addEventListener('submit',()=>{
-        const botao=form.querySelector("button[type='submit']");
-        const editando=/ALTERAÇÕES/i.test(botao?.textContent||'');
-        if(editando)return;
-        const exibido=campo.value;
-        campo.value=String(numeroBR(exibido));
-        setTimeout(()=>{
-          campo.value=exibido;
-          calcular();
-        },0);
-      },true);
-
       form.addEventListener('reset',()=>{
         setTimeout(()=>{
           campo.value='';
