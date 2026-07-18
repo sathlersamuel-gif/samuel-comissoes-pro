@@ -23,11 +23,17 @@ service cloud.firestore {
       allow update: if isAdmin() || (
         loggedIn() &&
         request.auth.uid == userId &&
+        resource.data.status != 'excluido' &&
         request.resource.data.status == resource.data.status &&
         request.resource.data.email == resource.data.email
       );
 
       allow delete: if isAdmin();
+    }
+
+    match /usuariosExcluidos/{userId} {
+      allow read: if isAdmin() || (loggedIn() && request.auth.uid == userId);
+      allow create, update, delete: if isAdmin();
     }
 
     match /mail/{mailId} {
