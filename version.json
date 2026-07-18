@@ -1,5 +1,5 @@
 {
-  "version": "1.2.7",
-  "releasedAt": "2026-07-18T17:10:00-04:00",
-  "notes": "Validação funcional do núcleo de vendas: fila offline isolada por usuário, migração segura dos dados locais da conta correta, sincronização única com Firebase, exclusão definitiva, edição sem apagar e cache renovado para Chrome, Safari e APK Android."
+  "version": "1.2.8",
+  "releasedAt": "2026-07-18T17:45:00-04:00",
+  "notes": "Corrige edição da porcentagem com vírgula, exclusão definitiva pelo Histórico e restauração completa de backups, incluindo vendas anteriormente excluídas. Cache atualizado para v58."
 }
