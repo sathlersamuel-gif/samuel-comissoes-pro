@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v43';
+const CACHE_NAME = 'samuel-comissoes-pro-v44';
 const APP_SHELL = [
   './',
   './index.html',
@@ -18,8 +18,8 @@ const APP_SHELL = [
   './phone-mask.js?v=3',
   './script.js?v=4',
   './brand-product-selector.css?v=1',
-  './brand-product-selector.js?v=1',
-  './commission-percentage-restore.js?v=1',
+  './brand-product-selector.js?v=2',
+  './commission-input-restore.js?v=1',
   './import-backup.js?v=2',
   './app-upgrades.js?v=1',
   './app-features.js?v=2',
@@ -38,6 +38,7 @@ const APP_SHELL = [
   './security-update.js?v=5',
   './gear-position-fix.js?v=1',
   './responsive-layout.js?v=1',
+  './project-guardian.json',
   './version.json',
   './manifest.json?v=14',
   './app-icon.svg?v=13'
