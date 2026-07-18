@@ -9,10 +9,10 @@
   acelerador.defer=true;
   document.head.appendChild(acelerador);
 
-  const exclusaoAtualizada=document.createElement('script');
-  exclusaoAtualizada.src='permanent-user-delete-fix.js?v=5';
-  exclusaoAtualizada.defer=true;
-  document.head.appendChild(exclusaoAtualizada);
+  const gestaoUsuarios=document.createElement('script');
+  gestaoUsuarios.src='user-management-core.js?v=1';
+  gestaoUsuarios.defer=true;
+  document.head.appendChild(gestaoUsuarios);
 
   function instalado(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -38,11 +38,15 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=33',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=34',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
-        if(registration.waiting){
-          registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
-        }
+        if(registration.waiting) registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
+        navigator.serviceWorker.addEventListener('controllerchange',()=>{
+          if(!sessionStorage.getItem('scpAtualizacaoAplicada')){
+            sessionStorage.setItem('scpAtualizacaoAplicada','1');
+            location.reload();
+          }
+        });
       }catch(error){
         console.error('Falha ao registrar o modo offline:',error);
       }
