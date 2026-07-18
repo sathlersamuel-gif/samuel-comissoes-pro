@@ -10,16 +10,35 @@ permissions:
   contents: read
 
 jobs:
-  proteger-funcoes-aprovadas:
+  proteger-projeto-completo:
     runs-on: ubuntu-latest
     steps:
-      - name: Baixar projeto
+      - name: Baixar projeto completo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Preparar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      - name: Definir comparação da mudança
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "GUARDIAN_BASE=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_ENV"
+            echo "GUARDIAN_HEAD=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
+          else
+            echo "GUARDIAN_BASE=${{ github.event.before }}" >> "$GITHUB_ENV"
+            echo "GUARDIAN_HEAD=${{ github.sha }}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Bloquear alterações fora do pedido
+        run: node tests/scope-check.mjs
+
       - name: Verificar funções protegidas
         run: node tests/guardian-check.mjs
+
+      - name: Confirmar proteção integral
+        run: echo "🛡️ IA Guardiã aprovou o escopo e as funções protegidas."
