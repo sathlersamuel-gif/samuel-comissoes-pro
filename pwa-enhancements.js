@@ -1,9 +1,4 @@
 (function(){
-  const sincronizacao=document.createElement('script');
-  sincronizacao.src='cloud-authoritative-sync.js?v=1';
-  sincronizacao.async=false;
-  document.head.appendChild(sincronizacao);
-
   const ajusteDireto=document.createElement('script');
   ajusteDireto.src='tipo-numeros-mobile.js?v=3';
   ajusteDireto.defer=true;
@@ -38,12 +33,12 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=36',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=37',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV2')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV2','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV3')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV3','1');
             location.reload();
           }
         });
