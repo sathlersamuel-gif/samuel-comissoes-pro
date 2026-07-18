@@ -9,6 +9,11 @@
   acelerador.defer=true;
   document.head.appendChild(acelerador);
 
+  const exclusaoAtualizada=document.createElement('script');
+  exclusaoAtualizada.src='permanent-user-delete-fix.js?v=4';
+  exclusaoAtualizada.defer=true;
+  document.head.appendChild(exclusaoAtualizada);
+
   function instalado(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
@@ -33,7 +38,7 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=31',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=32',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting){
           registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
