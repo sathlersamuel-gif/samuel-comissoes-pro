@@ -3,7 +3,7 @@
 const STORAGE='samuel_comissoes_pro';
 const DELETED='samuel_comissoes_pro_excluidas';
 const QUEUE='samuel_comissoes_pro_fila_sync';
-const VERSION='2026.07.18.3';
+const VERSION='2026.07.18.4';
 let user=null,saving=false,pending=false,editingId=null;
 const parse=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(x)?x:[]}catch(_){return[]}};
 const id=v=>String(v?.id??`${v?.data||''}-${v?.cliente||''}-${v?.valor||''}`);
@@ -45,12 +45,8 @@ async function reconcile(){
 }
 function save(){const list=apply(current());queue();saveCloud(true);return list}
 function numberBR(value){const s=String(value??'').replace(/R\$/g,'').trim();if(!s)return 0;if(s.includes(','))return Number(s.replace(/\./g,'').replace(',','.').replace(/[^\d.-]/g,''))||0;return Number(s.replace(/[^\d.-]/g,''))||0}
-function percent(value){const n=String(value??'').replace(/\D/g,'');if(!n)return'';return`${Number(n.slice(0,-1)||'0')},${n.slice(-1)}`}
 function installForm(){
  const form=document.getElementById('formVenda');if(!form||form.dataset.dataCore)return;form.dataset.dataCore='1';
- const pct=document.getElementById('porcentagem');
- pct?.addEventListener('input',function(){this.value=percent(this.value);try{calcularComissao?.()}catch(_){ }},true);
- document.getElementById('tipoVenda')?.addEventListener('change',()=>setTimeout(()=>{if(pct){pct.value=percent(pct.value);try{calcularComissao?.()}catch(_){ }}},0));
  form.addEventListener('submit',e=>{
   e.preventDefault();e.stopImmediatePropagation();const get=x=>document.getElementById(x),p=numberBR(get('porcentagem')?.value),v=numberBR(get('valorVenda')?.value);
   const sale={id:editingId??Date.now(),cliente:get('cliente')?.value?.trim()||'',telefone:get('telefone')?.value||'',produto:get('produto')?.value?.trim()||'',tipo:get('tipoVenda')?.value||'',valor:v,porcentagem:p,comissao:v*p/100,data:get('dataVenda')?.value||new Date().toISOString().slice(0,10),observacao:get('observacao')?.value||''};
