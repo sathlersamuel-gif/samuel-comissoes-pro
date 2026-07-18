@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v50';
+const CACHE_NAME = 'samuel-comissoes-pro-v51';
 const APP_SHELL = [
   './',
   './index.html',
@@ -29,7 +29,7 @@ const APP_SHELL = [
   './pdf-viewer-fix.js?v=2',
   './report-options-fix.js?v=7',
   './firebase-integration.js?v=7',
-  './permanent-delete-sync-fix.js?v=1',
+  './permanent-delete-sync-fix.js?v=2',
   './admin-controls.js?v=2',
   './admin-user-management.js?v=2',
   './install-guide.js?v=2',
