@@ -1,7 +1,8 @@
 (function () {
-    const STORAGE_KEY = "samuel_install_guide_seen_v2";
-    const WHATSAPP_URL = "https://wa.me/5569984810587?text=Ol%C3%A1%20Samuel%2C%20preciso%20de%20ajuda%20com%20o%20Comiss%C3%B5es%20PRO.";
-    const APK_URL = "https://raw.githubusercontent.com/sathlersamuel-gif/samuel-comissoes-pro/main/downloads/Samuel-Comissoes-PRO.apk";
+    const STORAGE_KEY = "samuel_install_guide_seen_v3";
+    const WHATSAPP_NUMBER = "5569984810587";
+    const WHATSAPP_TEXT = "Olá Samuel, preciso de ajuda com o Comissões PRO.";
+    const APK_URL = "https://github.com/sathlersamuel-gif/samuel-comissoes-pro/releases/latest/download/Samuel-Comissoes-PRO.apk";
 
     function standalone() {
         return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
@@ -13,6 +14,27 @@
         if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
         if (/Android/i.test(ua)) return "android";
         return "outro";
+    }
+
+    function abrirWhatsApp() {
+        const texto = encodeURIComponent(WHATSAPP_TEXT);
+        const appUrl = `whatsapp://send?phone=${WHATSAPP_NUMBER}&text=${texto}`;
+        const webUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${texto}`;
+        let saiuDaPagina = false;
+        const marcarSaida = () => { saiuDaPagina = true; };
+        document.addEventListener("visibilitychange", marcarSaida, { once: true });
+        window.location.href = appUrl;
+        setTimeout(() => {
+            if (!saiuDaPagina && document.visibilityState === "visible") window.location.href = webUrl;
+        }, 1200);
+    }
+
+    function baixarApk() {
+        if (plataforma() === "ios") {
+            alert("O arquivo APK funciona somente em celulares Android. No iPhone, use o Safari e escolha Adicionar à Tela de Início.");
+            return;
+        }
+        window.location.href = APK_URL;
     }
 
     function estilos() {
@@ -59,13 +81,15 @@
                 <h2>📲 Instalar Comissões PRO</h2>
                 <p>Escolha a forma de acesso para abrir como aplicativo.</p>
                 <div id="installGuideSteps">${conteudo()}</div>
-                <a id="installAndroidBtn" href="${APK_URL}" download="Samuel-Comissoes-PRO.apk">🤖 Baixar aplicativo para Android</a>
-                <a id="installWhatsBtn" href="${WHATSAPP_URL}" target="_blank" rel="noopener">💬 Falar com Samuel no WhatsApp</a>
-                <button id="installGuideClose">Continuar no sistema</button>
+                <button type="button" id="installAndroidBtn">🤖 Baixar aplicativo para Android</button>
+                <button type="button" id="installWhatsBtn">💬 Falar com Samuel no WhatsApp</button>
+                <button type="button" id="installGuideClose">Continuar no sistema</button>
                 <div class="install-note">No iPhone, adicione pela Tela de Início do Safari.</div>
             </div>`;
         document.body.appendChild(modal);
         if (plataforma() === "apk") document.getElementById("installAndroidBtn").style.display = "none";
+        document.getElementById("installAndroidBtn").onclick = baixarApk;
+        document.getElementById("installWhatsBtn").onclick = abrirWhatsApp;
         document.getElementById("installGuideClose").onclick = () => {
             localStorage.setItem(STORAGE_KEY, "1");
             modal.style.display = "none";
