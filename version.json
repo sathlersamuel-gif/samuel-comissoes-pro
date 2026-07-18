@@ -1,5 +1,5 @@
 {
-  "version": "1.2.3",
-  "releasedAt": "2026-07-18T15:00:00-04:00",
-  "notes": "Força o carregamento do núcleo definitivo de exclusão de usuários, remove usuários excluídos da lista e impede o retorno da conta pelo Firebase."
+  "version": "1.2.4",
+  "releasedAt": "2026-07-18T11:45:00-04:00",
+  "notes": "Correção definitiva da exclusão de usuários: elimina conflito entre rotinas, mantém o registro como excluído no Firebase, bloqueia recriação automática e força renovação do cache do aplicativo."
 }
