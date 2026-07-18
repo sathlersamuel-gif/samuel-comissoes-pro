@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v44';
+const CACHE_NAME = 'samuel-comissoes-pro-v45';
 const APP_SHELL = [
   './',
   './index.html',
@@ -64,6 +64,16 @@ self.addEventListener('message',event=>{
   if(event.data?.type==='ACTIVATE_TESTED_VERSION') self.skipWaiting();
 });
 
+function redePrimeiro(request){
+  return fetch(request,{cache:'no-store'}).then(response=>{
+    if(response&&response.ok){
+      const copy=response.clone();
+      caches.open(CACHE_NAME).then(cache=>cache.put(request,copy));
+    }
+    return response;
+  }).catch(()=>caches.match(request));
+}
+
 function cachePrimeiro(request){
   return caches.match(request).then(cached=>{
     const atualizar=fetch(request).then(response=>{
@@ -102,7 +112,8 @@ self.addEventListener('fetch',event=>{
   }
 
   if(url.origin===self.location.origin){
-    event.respondWith(cachePrimeiro(event.request));
+    const arquivoDinamico = /\.(js|json)$/.test(url.pathname);
+    event.respondWith(arquivoDinamico ? redePrimeiro(event.request) : cachePrimeiro(event.request));
     return;
   }
 
