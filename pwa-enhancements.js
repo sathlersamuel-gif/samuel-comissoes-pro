@@ -14,11 +14,6 @@
   acelerador.defer=true;
   document.head.appendChild(acelerador);
 
-  const gestaoUsuarios=document.createElement('script');
-  gestaoUsuarios.src='user-management-core.js?v=2';
-  gestaoUsuarios.defer=true;
-  document.head.appendChild(gestaoUsuarios);
-
   function instalado(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
@@ -43,12 +38,12 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=35',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=36',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicada')){
-            sessionStorage.setItem('scpAtualizacaoAplicada','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV2')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV2','1');
             location.reload();
           }
         });
