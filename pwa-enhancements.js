@@ -10,7 +10,7 @@
   document.head.appendChild(acelerador);
 
   const exclusaoAtualizada=document.createElement('script');
-  exclusaoAtualizada.src='permanent-user-delete-fix.js?v=4';
+  exclusaoAtualizada.src='permanent-user-delete-fix.js?v=5';
   exclusaoAtualizada.defer=true;
   document.head.appendChild(exclusaoAtualizada);
 
@@ -38,7 +38,7 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=32',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=33',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting){
           registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
