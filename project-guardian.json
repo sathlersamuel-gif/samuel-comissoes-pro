@@ -1,0 +1,15 @@
+{
+  "nome": "IA Guardiã do Samuel Comissões PRO",
+  "versao": 1,
+  "politica": "Nenhuma atualização pode ser considerada segura se quebrar uma função aprovada.",
+  "funcoesProtegidas": [
+    {"id":"comissao-percentual","descricao":"Digitação 1 → 1, e valores como 1,6; 1,8; 2,0","arquivos":["commission-input-restore.js","script.js"]},
+    {"id":"exclusao-definitiva","descricao":"Venda excluída não pode retornar pela nuvem, backup automático ou armazenamento interno","arquivos":["permanent-delete-sync-fix.js","firebase-integration.js"]},
+    {"id":"backup","descricao":"Exportar e importar backup sem restaurar dados automaticamente","arquivos":["import-backup.js","backup-export-fix.js","auto-backup.js"]},
+    {"id":"relatorios-pdf","descricao":"Relatórios mensal e anual devem continuar funcionando","arquivos":["report-options-fix.js","pdf-viewer-fix.js"]},
+    {"id":"marcas-produtos","descricao":"Seleção Honda/Yamaha, busca por modelo e digitação livre","arquivos":["brand-product-selector.js","brand-product-selector.css"]},
+    {"id":"login-sincronizacao","descricao":"Login, aprovação de usuários e sincronização com Firebase","arquivos":["firebase-integration.js","premium-opening-auth.js"]},
+    {"id":"desempenho","descricao":"Cache e acelerador inteligente sem travar o aplicativo","arquivos":["ai-performance-accelerator.js","sw.js"]},
+    {"id":"historico-dashboard","descricao":"Dashboard, histórico, edição e totais permanecem consistentes","arquivos":["app-upgrades.js","dashboard-v2.js"]}
+  ]
+}
