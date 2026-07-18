@@ -78,6 +78,18 @@
 
     const form=document.getElementById('formVenda');
     if(form){
+      form.addEventListener('submit',()=>{
+        const botao=form.querySelector("button[type='submit']");
+        const editando=/ALTERAÇÕES/i.test(botao?.textContent||'');
+        if(editando)return;
+        const exibido=campo.value;
+        campo.value=String(numeroBR(exibido));
+        setTimeout(()=>{
+          campo.value=exibido;
+          calcular();
+        },0);
+      },true);
+
       form.addEventListener('reset',()=>{
         ultimoValido='';
         valorAntesTroca='';
