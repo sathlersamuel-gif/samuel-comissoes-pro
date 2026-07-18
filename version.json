@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
-  "releasedAt": "2026-07-17T13:45:00Z",
-  "notes": "Responsividade completa para celulares e inclusão dos modos Automático, Celular e Computador, sem alterar dados ou funcionalidades."
+  "version": "1.2.1",
+  "releasedAt": "2026-07-18T20:30:00Z",
+  "notes": "Núcleo único de gerenciamento de usuários, exclusão persistente confirmada no Firebase, bloqueio de contas excluídas e atualização automática do cache."
 }
