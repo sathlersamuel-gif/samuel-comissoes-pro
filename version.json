@@ -1,5 +1,5 @@
 {
-  "version": "1.2.8",
-  "releasedAt": "2026-07-18T17:45:00-04:00",
-  "notes": "Corrige edição da porcentagem com vírgula, exclusão definitiva pelo Histórico e restauração completa de backups, incluindo vendas anteriormente excluídas. Cache atualizado para v58."
+  "version": "1.2.9",
+  "releasedAt": "2026-07-18T18:10:00-04:00",
+  "notes": "Verificação final do núcleo de vendas: corrige referência de cache no index, garante importação autoritativa de backup mesmo offline, preserva exclusões definitivas e mantém edição correta da porcentagem. Cache atualizado para v59."
 }
