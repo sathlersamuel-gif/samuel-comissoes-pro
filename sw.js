@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v54';
+const CACHE_NAME = 'samuel-comissoes-pro-v55';
 const APP_SHELL = [
   './',
   './index.html',
@@ -14,7 +14,6 @@ const APP_SHELL = [
   './mobile-alignment-fix.css?v=1',
   './analise-vendas.js?v=2',
   './pwa-enhancements.js?v=10',
-  './cloud-authoritative-sync.js?v=1',
   './user-management-core.js?v=5',
   './ai-performance-accelerator.js?v=1',
   './phone-mask.js?v=3',
@@ -29,9 +28,8 @@ const APP_SHELL = [
   './pdf-viewer-fix.js?v=2',
   './report-options-fix.js?v=7',
   './firebase-integration.js?v=7',
-  './permanent-delete-sync-fix.js?v=2',
+  './sales-data-core.js?v=1',
   './keep-history-position-fix.js?v=1',
-  './android-sales-persistence-fix.js?v=1',
   './admin-controls.js?v=2',
   './admin-user-management.js?v=2',
   './install-guide.js?v=2',
