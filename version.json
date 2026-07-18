@@ -1,5 +1,5 @@
 {
-  "version": "1.2.5",
-  "releasedAt": "2026-07-18T16:30:00-04:00",
-  "notes": "Salvamento unificado para Chrome, Safari e APK Android. Remove sincronizações concorrentes, mantém fila offline, sincroniza com Firebase, impede retorno de vendas excluídas, corrige edição sem excluir o registro e preserva corretamente a comissão decimal."
+  "version": "1.2.6",
+  "releasedAt": "2026-07-18T16:55:00-04:00",
+  "notes": "Auditoria final: autenticação separada da sincronização de vendas, isolamento completo dos dados por usuário, prevenção de mistura entre contas no mesmo aparelho, fila offline preservada, exclusões definitivas mantidas e cache renovado para Chrome, Safari e APK Android."
 }
