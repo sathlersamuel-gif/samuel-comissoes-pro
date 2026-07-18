@@ -16,6 +16,23 @@
     }catch(_){return [];}
   }
 
+  function obterVendasAtuais(){
+    try{
+      return typeof vendas!=='undefined'&&Array.isArray(vendas)?vendas:lerVendas();
+    }catch(_){
+      return lerVendas();
+    }
+  }
+
+  function substituirVendas(lista){
+    const novaLista=Array.isArray(lista)?lista:[];
+    try{
+      if(typeof vendas!=='undefined')vendas=novaLista;
+    }catch(_){}
+    localStorage.setItem(STORAGE,JSON.stringify(novaLista));
+    return novaLista;
+  }
+
   function lerExcluidas(){
     try{
       const dados=JSON.parse(localStorage.getItem(DELETED_STORAGE)||'[]');
@@ -81,14 +98,13 @@
       const excluidas=normalizarExcluidas([...lerExcluidas(),...(nuvem.vendasExcluidas||[])]);
       salvarExcluidas(excluidas);
 
-      const locais=Array.isArray(window.vendas)?window.vendas:lerVendas();
+      const locais=obterVendasAtuais();
       const mapa=new Map();
       [...(nuvem.vendas||[]),...locais].forEach(venda=>mapa.set(idDaVenda(venda),venda));
       const unificadas=filtrarExcluidas([...mapa.values()],excluidas);
 
       const haviaRetorno=[...mapa.values()].length!==unificadas.length;
-      window.vendas=unificadas;
-      localStorage.setItem(STORAGE,JSON.stringify(unificadas));
+      substituirVendas(unificadas);
       await ref.set({
         vendas:unificadas,
         vendasExcluidas:excluidas,
@@ -111,10 +127,9 @@
       const excluidas=normalizarExcluidas([...lerExcluidas(),{id:idTexto,excluidaEm:new Date().toISOString()}]);
       salvarExcluidas(excluidas);
 
-      const atuais=Array.isArray(window.vendas)?window.vendas:lerVendas();
+      const atuais=obterVendasAtuais();
       const limpas=atuais.filter(venda=>idDaVenda(venda)!==idTexto);
-      window.vendas=limpas;
-      localStorage.setItem(STORAGE,JSON.stringify(limpas));
+      substituirVendas(limpas);
       atualizarTelas();
 
       try{
