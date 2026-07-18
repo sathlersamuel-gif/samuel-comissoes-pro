@@ -11,10 +11,21 @@ const PRODUTOS={
     "Barco 6 m Fox Aquaforce","Reboque","Carta de Crédito Contemplada","Consórcio Yamaha","Outro Produto"
   ],
   honda:[
-    "Honda CG 50 Anos","Honda CG 160 Start","Honda CG 160 Fan","Honda CG 160 Titan","Honda CG 160 Cargo","Honda Pop 110i ES","Honda Biz 125","Honda Elite 125","Honda PCX","Honda ADV","Honda X-ADV",
-    "Honda CB 300F Twister","Honda CB 500 Hornet","Honda CB 650R E-Clutch","Honda CB 750 Hornet","Honda CB 1000R","Honda CB 1000R Black Edition",
-    "Honda XR 300L Tornado","Honda Tornado Special Edition","Honda NXR 160 Bros","Honda XRE 300 Sahara","Honda XRE 190","Honda NX 500","Honda NC 750X","Honda XL750 Transalp","Honda CRF1100L Africa Twin",
-    "Honda CRF 300F","Honda Linha CRF 250","Honda Linha CRF 450","Honda TRX 420FM 4x4","Honda CBR 1000RR-R Fireblade SP","Honda GL 1800 Gold Wing Tour",
+    "Honda CG 50 Anos","Honda CG 160 Start","Honda CG 160 Fan","Honda CG 160 Titan","Honda CG 160 Cargo",
+    "Honda Pop 110i ES","Honda Biz 125 ES","Honda Biz 125 EX","Honda Biz 125",
+    "Honda Elite 125","Honda PCX 160 CBS","Honda PCX 160 ABS","Honda PCX 160 DLX ABS","Honda PCX",
+    "Honda ADV 160","Honda ADV","Honda X-ADV 750","Honda X-ADV",
+    "Honda CB 300F Twister CBS","Honda CB 300F Twister ABS","Honda CB 300F Twister",
+    "Honda CB 500 Hornet","Honda CB 650R E-Clutch","Honda CB 750 Hornet","Honda CB 1000R","Honda CB 1000R Black Edition",
+    "Honda XR 300L Tornado","Honda XR 300L Tornado Special Edition","Honda Tornado Special Edition",
+    "Honda NXR 160 Bros CBS","Honda NXR 160 Bros ABS","Honda NXR 160 Bros",
+    "Honda XRE 300 Sahara Standard","Honda XRE 300 Sahara Rally","Honda XRE 300 Sahara Adventure","Honda XRE 300 Sahara",
+    "Honda XRE 190 Standard","Honda XRE 190 Adventure","Honda XRE 190",
+    "Honda NX 500","Honda NC 750X MT","Honda NC 750X DCT","Honda NC 750X",
+    "Honda XL750 Transalp","Honda CRF1100L Africa Twin MT","Honda CRF1100L Africa Twin DCT","Honda CRF1100L Africa Twin Adventure Sports","Honda CRF1100L Africa Twin",
+    "Honda CRF 300F","Honda CRF 250F","Honda CRF 250R","Honda CRF 250RX","Honda CRF 450R","Honda CRF 450RX","Honda Linha CRF 250","Honda Linha CRF 450",
+    "Honda TRX 420FM FourTrax 4x4","Honda TRX 420FM 4x4",
+    "Honda CBR 1000RR-R Fireblade SP","Honda GL 1800 Gold Wing Tour",
     "Carta de Crédito Contemplada","Outro Produto"
   ]
 };
@@ -59,8 +70,8 @@ function iniciar(){
   function listaFiltrada(){
     const termo=normalizar(produto.value.trim());
     const base=PRODUTOS[marca]||[];
-    if(!termo)return base.slice(0,14);
-    return base.filter(item=>normalizar(item).includes(termo)).slice(0,20);
+    if(!termo)return base.slice(0,18);
+    return base.filter(item=>normalizar(item).includes(termo)).slice(0,30);
   }
 
   function renderizar(){
