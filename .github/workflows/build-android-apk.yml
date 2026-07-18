@@ -5,15 +5,13 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'android-app/**'
-      - '.github/workflows/build-android-apk.yml'
 
 permissions:
   contents: write
 
 jobs:
   build:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
