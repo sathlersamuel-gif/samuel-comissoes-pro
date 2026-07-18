@@ -1,0 +1,14 @@
+{
+  "pedido": "Fortalecer a IA Guardiã para bloquear qualquer alteração fora do escopo autorizado",
+  "arquivosAutorizados": [
+    ".guardian-scope.json",
+    "tests/scope-check.mjs",
+    "tests/guardian-check.mjs",
+    ".github/workflows/ia-guardia.yml"
+  ],
+  "arquivosSemprePermitidos": [
+    ".guardian-scope.json"
+  ],
+  "bloquearArquivosNaoAutorizados": true,
+  "exigirDescricaoDoPedido": true
+}
