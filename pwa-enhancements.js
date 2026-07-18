@@ -1,4 +1,9 @@
 (function(){
+  const sincronizacao=document.createElement('script');
+  sincronizacao.src='cloud-authoritative-sync.js?v=1';
+  sincronizacao.async=false;
+  document.head.appendChild(sincronizacao);
+
   const ajusteDireto=document.createElement('script');
   ajusteDireto.src='tipo-numeros-mobile.js?v=3';
   ajusteDireto.defer=true;
@@ -10,7 +15,7 @@
   document.head.appendChild(acelerador);
 
   const gestaoUsuarios=document.createElement('script');
-  gestaoUsuarios.src='user-management-core.js?v=1';
+  gestaoUsuarios.src='user-management-core.js?v=2';
   gestaoUsuarios.defer=true;
   document.head.appendChild(gestaoUsuarios);
 
@@ -38,7 +43,7 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=34',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=35',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
