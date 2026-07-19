@@ -14,28 +14,33 @@
     const valorVenda=document.getElementById('valorVenda');
     const valorComissao=document.getElementById('comissao');
     const tipoVenda=document.getElementById('tipoVenda');
-    if(!campo||!valorVenda||!valorComissao||campo.dataset.percentualFinal==='3')return;
+    const form=document.getElementById('formVenda');
+    if(!campo||!valorVenda||!valorComissao||campo.dataset.percentualFinal==='4')return;
 
-    campo.dataset.percentualFinal='3';
+    campo.dataset.percentualFinal='4';
     campo.type='text';
     campo.inputMode='numeric';
     campo.autocomplete='off';
-    campo.setAttribute('aria-label','Comissão em porcentagem');
+    campo.maxLength=3;
+    campo.placeholder='Porcentagem (%)';
+    campo.setAttribute('aria-label','Porcentagem da comissão');
+    valorComissao.placeholder='Valor a receber';
+    valorComissao.setAttribute('aria-label','Valor a receber em reais');
 
     function calcular(){
       const valor=numeroBR(valorVenda.value);
       const percentual=numeroBR(campo.value);
-      valorComissao.value=percentual>0?moedaBR(valor*percentual/100):'';
+      valorComissao.value=moedaBR(valor*percentual/100);
     }
 
     function formatar(){
-      const digitos=String(campo.value||'').replace(/\D/g,'').slice(0,3);
+      const digitos=String(campo.value||'').replace(/\D/g,'').slice(0,2);
       if(!digitos){
         campo.value='';
       }else if(digitos.length===1){
         campo.value=digitos+',';
       }else{
-        campo.value=digitos.slice(0,-1)+','+digitos.slice(-1);
+        campo.value=digitos.charAt(0)+','+digitos.charAt(1);
       }
       calcular();
     }
@@ -54,15 +59,25 @@
     },true);
 
     campo.addEventListener('blur',()=>{
-      if(/^\d+,$/.test(campo.value))campo.value+='0';
+      if(/^\d,$/.test(campo.value))campo.value+='0';
       calcular();
     });
 
     valorVenda.addEventListener('input',calcular,true);
-    if(tipoVenda)tipoVenda.addEventListener('change',calcular,true);
 
-    const form=document.getElementById('formVenda');
+    if(tipoVenda){
+      tipoVenda.addEventListener('change',()=>{
+        calcular();
+      },true);
+    }
+
     if(form){
+      form.addEventListener('submit',()=>{
+        const percentual=numeroBR(campo.value);
+        campo.value=percentual.toFixed(1);
+        calcular();
+      },true);
+
       form.addEventListener('reset',()=>{
         setTimeout(()=>{
           campo.value='';
