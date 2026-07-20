@@ -9,6 +9,15 @@
   acelerador.defer=true;
   document.head.appendChild(acelerador);
 
+  function garantirNucleoVendas(){
+    if(window.__SCP_DATA_CORE__||document.querySelector('script[data-scp-data-core="fallback"]'))return;
+    const nucleo=document.createElement('script');
+    nucleo.src='sales-data-core.js?v=4';
+    nucleo.defer=true;
+    nucleo.dataset.scpDataCore='fallback';
+    document.head.appendChild(nucleo);
+  }
+
   function instalado(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
@@ -29,16 +38,17 @@
 
   if(instalado()) document.body.classList.add('app-standalone');
   criarSplash();
+  setTimeout(garantirNucleoVendas,500);
 
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=39',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=40',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV5')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV5','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV6')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV6','1');
             location.reload();
           }
         });
