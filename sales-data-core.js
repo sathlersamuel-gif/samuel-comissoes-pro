@@ -1,9 +1,9 @@
 (function(){
 'use strict';
-const STORAGE='samuel_comissoes_pro',DELETED='samuel_comissoes_pro_excluidas',QUEUE='samuel_comissoes_pro_fila_sync',OWNER='scp_usuario_atual',VERSION='2026.07.20.1';
+const STORAGE='samuel_comissoes_pro',DELETED='samuel_comissoes_pro_excluidas',QUEUE='samuel_comissoes_pro_fila_sync',OWNER='scp_usuario_atual',VERSION='2026.07.20.2';
 let user=null,saving=false,pending=false,lastUid='';
 const read=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(x)?x:[]}catch(_){return[]}};
-const readObject=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(_){return{}};
+const readObject=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(_){return{}}};
 const saleId=v=>String(v?.id??`${v?.data||''}-${v?.cliente||''}-${v?.valor||''}`);
 const userKey=uid=>`${STORAGE}:${uid}`,deletedKey=uid=>`${DELETED}:${uid}`,queueKey=uid=>`${QUEUE}:${uid}`;
 const current=()=>{try{return typeof vendas!=='undefined'&&Array.isArray(vendas)?vendas:read(STORAGE)}catch(_){return read(STORAGE)}};
