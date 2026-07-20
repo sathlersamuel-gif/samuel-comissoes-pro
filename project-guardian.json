@@ -1,15 +1,27 @@
 {
-  "nome": "IA Guardiã do Samuel Comissões PRO",
-  "versao": 1,
-  "politica": "Nenhuma atualização pode ser considerada segura se quebrar uma função aprovada.",
+  "nome": "Base Oficial do Samuel Comissões PRO",
+  "versao": 2,
+  "estado": "estavel",
+  "commitBase": "1bbb06e8cd4b4c5f311f747aee988a030e1a82fe",
+  "branchBackup": "backup-estavel-2026-07-20-v1",
+  "politica": "A versão estável atual é a única base oficial. Instruções antigas, duplicadas, concluídas ou substituídas não devem orientar novas alterações.",
+  "regrasAtuais": [
+    "Preservar tudo que já funciona.",
+    "Fazer uma alteração por vez.",
+    "Não remover arquivo ativo sem comprovar que não é carregado nem necessário.",
+    "A instrução mais recente substitui versões anteriores do mesmo pedido.",
+    "Criar novo ponto de restauração antes de alterações grandes.",
+    "Em caso de falha, restaurar a branch de backup estável."
+  ],
   "funcoesProtegidas": [
-    {"id":"comissao-percentual","descricao":"Digitação 1 → 1, e valores como 1,6; 1,8; 2,0","arquivos":["commission-input-restore.js","script.js"]},
-    {"id":"exclusao-definitiva","descricao":"Venda excluída não pode retornar pela nuvem, backup automático ou armazenamento interno","arquivos":["permanent-delete-sync-fix.js","firebase-integration.js"]},
-    {"id":"backup","descricao":"Exportar e importar backup sem restaurar dados automaticamente","arquivos":["import-backup.js","backup-export-fix.js","auto-backup.js"]},
-    {"id":"relatorios-pdf","descricao":"Relatórios mensal e anual devem continuar funcionando","arquivos":["report-options-fix.js","pdf-viewer-fix.js"]},
-    {"id":"marcas-produtos","descricao":"Seleção Honda/Yamaha, busca por modelo e digitação livre","arquivos":["brand-product-selector.js","brand-product-selector.css"]},
-    {"id":"login-sincronizacao","descricao":"Login, aprovação de usuários e sincronização com Firebase","arquivos":["firebase-integration.js","premium-opening-auth.js"]},
-    {"id":"desempenho","descricao":"Cache e acelerador inteligente sem travar o aplicativo","arquivos":["ai-performance-accelerator.js","sw.js"]},
-    {"id":"historico-dashboard","descricao":"Dashboard, histórico, edição e totais permanecem consistentes","arquivos":["app-upgrades.js","dashboard-v2.js"]}
-  ]
+    {"id":"vendas","descricao":"Cadastrar, editar e excluir vendas sem duplicação ou retorno indevido."},
+    {"id":"comissao","descricao":"Percentual e valor de comissão devem manter a formatação aprovada."},
+    {"id":"historico-dashboard","descricao":"Histórico, dashboard, totais e filtros devem permanecer consistentes."},
+    {"id":"backup","descricao":"Exportação e importação de backup devem continuar funcionando."},
+    {"id":"relatorios","descricao":"Relatórios mensal e anual em PDF devem continuar funcionando."},
+    {"id":"usuarios","descricao":"Login, aprovação, gerenciamento e exclusão de usuários devem permanecer estáveis."},
+    {"id":"sincronizacao","descricao":"Firebase, armazenamento local e cache não podem restaurar dados excluídos nem duplicar registros."},
+    {"id":"interface","descricao":"Layout aprovado no iPhone, PWA e APK deve ser preservado."}
+  ],
+  "observacao": "Este arquivo substitui regras antigas e duplicadas salvas anteriormente no projeto."
 }
