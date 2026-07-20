@@ -9,30 +9,40 @@ service cloud.firestore {
       return loggedIn() && request.auth.token.email == 'sathlersamuel@gmail.com';
     }
 
+    function isOwner(userId) {
+      return loggedIn() && request.auth.uid == userId;
+    }
+
     match /usuarios/{userId} {
-      allow read: if isAdmin() || (loggedIn() && request.auth.uid == userId);
+      allow read: if isAdmin() || isOwner(userId);
 
       allow create: if isAdmin() || (
-        loggedIn() &&
-        request.auth.uid == userId &&
+        isOwner(userId) &&
         request.resource.data.uid == request.auth.uid &&
         request.resource.data.email == request.auth.token.email &&
         request.resource.data.status == 'pendente'
       );
 
       allow update: if isAdmin() || (
-        loggedIn() &&
-        request.auth.uid == userId &&
+        isOwner(userId) &&
         resource.data.status != 'excluido' &&
         request.resource.data.status == resource.data.status &&
         request.resource.data.email == resource.data.email
       );
 
       allow delete: if isAdmin();
+
+      match /vendas/{saleId} {
+        allow read, create, update, delete: if isAdmin() || isOwner(userId);
+      }
+
+      match /vendasExcluidas/{saleId} {
+        allow read, create, update, delete: if isAdmin() || isOwner(userId);
+      }
     }
 
     match /usuariosExcluidos/{userId} {
-      allow read: if isAdmin() || (loggedIn() && request.auth.uid == userId);
+      allow read: if isAdmin() || isOwner(userId);
       allow create, update, delete: if isAdmin();
     }
 
