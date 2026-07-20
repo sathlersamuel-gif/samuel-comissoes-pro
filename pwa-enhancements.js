@@ -9,6 +9,11 @@
   acelerador.defer=true;
   document.head.appendChild(acelerador);
 
+  const correcaoEdicao=document.createElement('script');
+  correcaoEdicao.src='edit-sale-definitive-fix.js?v=1';
+  correcaoEdicao.defer=true;
+  document.head.appendChild(correcaoEdicao);
+
   function instalado(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
@@ -33,12 +38,12 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=41',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=42',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV7')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV7','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV8')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV8','1');
             location.reload();
           }
         });
