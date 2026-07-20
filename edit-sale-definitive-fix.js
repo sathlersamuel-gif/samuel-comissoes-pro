@@ -6,8 +6,8 @@ const ler=()=>{try{const x=JSON.parse(localStorage.getItem(STORAGE)||'[]');retur
 const numeroBR=valor=>{const s=String(valor??'').replace(/R\$/g,'').trim();if(!s)return 0;if(s.includes(','))return Number(s.replace(/\./g,'').replace(',','.').replace(/[^\d.-]/g,''))||0;return Number(s.replace(/[^\d.-]/g,''))||0};
 function instalar(){
   const form=document.getElementById('formVenda');
-  if(!form||form.dataset.editFix==='1')return;
-  form.dataset.editFix='1';
+  if(!form||document.documentElement.dataset.editFix==='3')return;
+  document.documentElement.dataset.editFix='3';
   window.editarVenda=function(id){
     const lista=ler();
     const venda=lista.find(v=>idVenda(v)===String(id));
@@ -24,7 +24,8 @@ function instalar(){
     try{if(typeof calcularComissao==='function')calcularComissao()}catch(_){ }
   };
   window.editarVendaSegura=id=>window.editarVenda(id);
-  form.addEventListener('submit',function(e){
+  document.addEventListener('submit',function(e){
+    if(e.target!==form)return;
     const editId=form.dataset.editingId;
     if(!editId)return;
     e.preventDefault();e.stopImmediatePropagation();
