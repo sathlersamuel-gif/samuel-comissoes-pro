@@ -9,6 +9,11 @@
   acelerador.defer=true;
   document.head.appendChild(acelerador);
 
+  const nucleoVendas=document.createElement('script');
+  nucleoVendas.src='sales-data-core.js?v=4';
+  nucleoVendas.defer=true;
+  document.head.appendChild(nucleoVendas);
+
   function instalado(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
@@ -33,12 +38,12 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=37',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=38',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV3')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV3','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV4')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV4','1');
             location.reload();
           }
         });
