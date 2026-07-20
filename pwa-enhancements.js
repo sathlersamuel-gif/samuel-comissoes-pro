@@ -10,7 +10,7 @@
   document.head.appendChild(acelerador);
 
   const correcaoEdicao=document.createElement('script');
-  correcaoEdicao.src='edit-sale-definitive-fix.js?v=1';
+  correcaoEdicao.src='edit-sale-definitive-fix.js?v=2';
   correcaoEdicao.defer=true;
   document.head.appendChild(correcaoEdicao);
 
@@ -38,12 +38,12 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=42',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=43',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV8')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV8','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV9')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV9','1');
             location.reload();
           }
         });
