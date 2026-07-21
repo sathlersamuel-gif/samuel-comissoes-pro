@@ -1,274 +1,40 @@
-(function () {
-  'use strict';
-
-  const ADMIN_EMAIL = 'sathlersamuel@gmail.com';
-  const COLECAO_USUARIOS = 'usuarios';
-  let db;
-  let usuarios = [];
-  let cancelarAtualizacao = null;
-  let iniciado = false;
-
-  const $ = (seletor, raiz = document) => raiz.querySelector(seletor);
-  const escapar = valor => String(valor || '').replace(/[&<>"']/g, caractere => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-  })[caractere]);
-
-  function converterData(valor) {
-    if (!valor) return null;
-    if (typeof valor.toDate === 'function') return valor.toDate();
-    const resultado = new Date(valor);
-    return Number.isNaN(resultado.getTime()) ? null : resultado;
-  }
-
-  function formatarData(valor, hora = false) {
-    const data = converterData(valor);
-    if (!data) return 'Não informado';
-    return new Intl.DateTimeFormat('pt-BR', hora ? { dateStyle: 'short', timeStyle: 'short' } : { dateStyle: 'short' }).format(data);
-  }
-
-  function diasRestantes(valor) {
-    const data = converterData(valor);
-    return data ? Math.ceil((data.getTime() - Date.now()) / 86400000) : null;
-  }
-
-  function obterStatus(usuario) {
-    const dias = diasRestantes(usuario.expiraEm);
-    if (usuario.status === 'bloqueado') return ['bloqueado', 'Bloqueado', '#b32635'];
-    if (usuario.status === 'pendente') return ['pendente', 'Pendente', '#b26a00'];
-    if (dias !== null && dias < 0) return ['vencido', 'Vencido', '#b32635'];
-    if (dias !== null && dias <= 7) return ['expirando', 'Expirando', '#b26a00'];
-    if (usuario.expiraEm) return ['teste', 'Em teste', '#1455a0'];
-    return ['ativo', 'Ativo', '#0b7a2d'];
-  }
-
-  function descricaoUso(usuario) {
-    const ultimo = converterData(usuario.ultimoAcesso);
-    if (!ultimo) return 'Ainda não utilizou';
-    const dias = Math.floor((Date.now() - ultimo.getTime()) / 86400000);
-    if (dias <= 0) return 'Usou hoje';
-    if (dias === 1) return 'Usou ontem';
-    return `Usou há ${dias} dias`;
-  }
-
-  function instalarEstilos() {
-    if ($('#umStyles')) return;
-    const estilo = document.createElement('style');
-    estilo.id = 'umStyles';
-    estilo.textContent = `
-      #painelUsuarios{display:none;position:fixed;inset:0;z-index:30000;overflow:auto;background:#f3f6fb;padding:calc(12px + env(safe-area-inset-top)) 12px calc(24px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
-      .um-shell{max-width:920px;margin:auto}.um-top{position:sticky;top:0;z-index:2;display:flex;gap:14px;align-items:center;background:rgba(243,246,251,.96);padding:8px 0 16px;backdrop-filter:blur(12px)}
-      .um-top button{border:0;border-radius:14px;background:#e2e8f2;color:#102342;padding:13px 16px;font-weight:800;min-height:48px;touch-action:manipulation}.um-top h2{margin:0;color:#071b3d;font-size:23px}.um-top p{margin:3px 0 0;color:#6c7890}
-      .um-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:5px 0 15px}.um-summary div,.um-card{background:#fff;border:1px solid #e0e7f1;border-radius:20px;box-shadow:0 8px 24px rgba(20,48,88,.07)}.um-summary div{padding:14px}.um-summary span,.um-info span{display:block;font-size:11px;color:#748197;text-transform:uppercase;font-weight:800}.um-summary strong{font-size:25px;color:#071b3d}
-      .um-filtros{display:flex;gap:8px;overflow:auto;padding-bottom:13px}.um-filtros button{white-space:nowrap;border:1px solid #d5deeb;background:#fff;color:#42506a;padding:10px 14px;border-radius:999px;font-weight:800;touch-action:manipulation}.um-filtros button.ativo{background:#083b82;color:#fff}
-      .um-card{padding:17px;margin-bottom:12px;border-left:5px solid var(--cor)}.um-head{display:flex;justify-content:space-between;gap:12px}.um-email{font-weight:900;color:#071b3d;overflow-wrap:anywhere}.um-chip{border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;background:#eef2f7}
-      .um-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.um-info{background:#f5f7fb;border-radius:13px;padding:10px}.um-info strong{display:block;color:#172b4d;font-size:13px;margin-top:4px;overflow-wrap:anywhere}
-      .um-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.um-actions button{border:0;border-radius:12px;min-height:44px;padding:10px;color:#fff;font-weight:850;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.um-actions button:disabled{opacity:.55}.um-prazo{background:#1455a0}.um-renovar{background:#6234a5}.um-status{background:#334e70}.um-aprovar{background:#0b7a2d}.um-excluir{background:#941f2b}
-      .um-loading,.um-vazio{padding:25px;text-align:center;color:#617087}.um-modal{position:fixed;inset:0;z-index:31000;background:rgba(5,15,32,.68);display:flex;align-items:center;justify-content:center;padding:16px}.um-modal-card{width:min(460px,100%);background:#fff;border-radius:22px;padding:20px}.um-modal-card label{display:block;font-weight:800;color:#516078;margin:12px 0 5px}.um-modal-card input,.um-modal-card select{width:100%;box-sizing:border-box;padding:12px;border:1px solid #ced8e6;border-radius:12px;font-size:16px}.um-modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:17px}.um-modal-actions button{border:0;border-radius:12px;padding:13px;font-weight:900}.um-salvar{background:#083b82;color:#fff}
-      @media(max-width:720px){.um-summary,.um-grid{grid-template-columns:repeat(2,1fr)}.um-actions{grid-template-columns:repeat(2,1fr)}}
-    `;
-    document.head.appendChild(estilo);
-  }
-
-  function criarPainel() {
-    const antigo = $('#painelUsuarios');
-    if (antigo) antigo.remove();
-    const painel = document.createElement('section');
-    painel.id = 'painelUsuarios';
-    painel.innerHTML = `<div class="um-shell"><header class="um-top"><button type="button" data-cmd="fechar">← Voltar</button><div><h2>Gerenciamento de Usuários</h2><p>Controle de acessos e utilização</p></div></header><div id="umConteudo"><div class="um-loading">Carregando usuários…</div></div></div>`;
-    document.body.appendChild(painel);
-  }
-
-  function resumo() {
-    let ativos = 0, vencendo = 0, semUso = 0;
-    usuarios.forEach(usuario => {
-      const status = obterStatus(usuario)[0];
-      if (['ativo', 'teste'].includes(status)) ativos++;
-      if (['expirando', 'vencido'].includes(status)) vencendo++;
-      const ultimo = converterData(usuario.ultimoAcesso);
-      if (!ultimo || Date.now() - ultimo.getTime() > 7 * 86400000) semUso++;
-    });
-    return `<div class="um-summary"><div><span>Total</span><strong>${usuarios.length}</strong></div><div><span>Ativos</span><strong>${ativos}</strong></div><div><span>Vencendo</span><strong>${vencendo}</strong></div><div><span>Sem uso</span><strong>${semUso}</strong></div></div>`;
-  }
-
-  function renderizar(filtro = 'todos') {
-    const conteudo = $('#umConteudo');
-    if (!conteudo) return;
-    const lista = usuarios.filter(usuario => {
-      const status = obterStatus(usuario)[0];
-      if (filtro === 'ativos') return ['ativo', 'teste'].includes(status);
-      if (filtro === 'vencendo') return ['expirando', 'vencido'].includes(status);
-      if (filtro === 'bloqueados') return ['bloqueado', 'pendente'].includes(status);
-      if (filtro === 'semuso') {
-        const ultimo = converterData(usuario.ultimoAcesso);
-        return !ultimo || Date.now() - ultimo.getTime() > 7 * 86400000;
-      }
-      return true;
-    });
-
-    const nomes = { todos: 'Todos', ativos: 'Ativos', vencendo: 'Vencendo', semuso: 'Sem uso', bloqueados: 'Bloqueados' };
-    const filtros = Object.keys(nomes).map(chave => `<button type="button" class="${chave === filtro ? 'ativo' : ''}" data-cmd="filtro" data-filtro="${chave}">${nomes[chave]}</button>`).join('');
-    const cards = lista.map(usuario => {
-      const [, texto, cor] = obterStatus(usuario);
-      const restantes = diasRestantes(usuario.expiraEm);
-      const prazo = usuario.expiraEm ? `${formatarData(usuario.expiraEm)}${restantes !== null ? ` (${restantes < 0 ? 'vencido' : restantes + ' dias'})` : ''}` : 'Sem vencimento';
-      const botaoAcesso = usuario.status === 'pendente'
-        ? `<button type="button" class="um-aprovar" data-cmd="aprovar" data-id="${usuario.id}">Aprovar</button>`
-        : `<button type="button" class="um-status" data-cmd="status" data-id="${usuario.id}" data-status="${usuario.status === 'bloqueado' ? 'ativo' : 'bloqueado'}">${usuario.status === 'bloqueado' ? 'Desbloquear' : 'Bloquear'}</button>`;
-      return `<article class="um-card" style="--cor:${cor}"><div class="um-head"><div><div class="um-email">${escapar(usuario.email || 'Sem e-mail')}</div><small>Cadastrado em ${formatarData(usuario.criadoEm)}</small></div><span class="um-chip">${texto}</span></div><div class="um-grid"><div class="um-info"><span>Uso</span><strong>${descricaoUso(usuario)}</strong></div><div class="um-info"><span>Último acesso</span><strong>${formatarData(usuario.ultimoAcesso, true)}</strong></div><div class="um-info"><span>Acessos</span><strong>${Number(usuario.totalAcessos || 0)}</strong></div><div class="um-info"><span>Válido até</span><strong>${prazo}</strong></div></div><div class="um-actions"><button type="button" class="um-prazo" data-cmd="prazo" data-id="${usuario.id}">Editar prazo</button><button type="button" class="um-renovar" data-cmd="renovar" data-id="${usuario.id}">Renovar</button>${botaoAcesso}<button type="button" class="um-excluir" data-cmd="excluir" data-id="${usuario.id}">Excluir</button></div></article>`;
-    }).join('');
-
-    conteudo.innerHTML = resumo() + `<div class="um-filtros">${filtros}</div>` + (cards || '<div class="um-vazio">Nenhum usuário encontrado.</div>');
-  }
-
-  function aplicarSnapshot(resultado) {
-    usuarios = resultado.docs
-      .map(documento => ({ id: documento.id, ...documento.data() }))
-      .filter(usuario => String(usuario.email || '').toLowerCase() !== ADMIN_EMAIL)
-      .sort((a, b) => String(a.email || '').localeCompare(String(b.email || ''), 'pt-BR'));
-    renderizar();
-  }
-
-  function acompanharUsuarios() {
-    if (cancelarAtualizacao) cancelarAtualizacao();
-    const conteudo = $('#umConteudo');
-    if (conteudo) conteudo.innerHTML = '<div class="um-loading">Carregando usuários…</div>';
-    cancelarAtualizacao = db.collection(COLECAO_USUARIOS).onSnapshot(aplicarSnapshot, erro => {
-      console.error('Falha ao carregar usuários:', erro);
-      if (conteudo) conteudo.innerHTML = '<div class="um-vazio">Não foi possível carregar os usuários. Verifique sua conexão e tente novamente.</div>';
-    });
-  }
-
-  async function carregar() {
-    if (!db) return;
-    try {
-      const resultado = await db.collection(COLECAO_USUARIOS).get();
-      aplicarSnapshot(resultado);
-    } catch (erro) {
-      console.error('Falha ao atualizar usuários:', erro);
-      const conteudo = $('#umConteudo');
-      if (conteudo) conteudo.innerHTML = '<div class="um-vazio">Não foi possível carregar os usuários. Verifique sua conexão e tente novamente.</div>';
-    }
-  }
-
-  function abrir() {
-    criarPainel();
-    $('#painelUsuarios').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    acompanharUsuarios();
-  }
-
-  function fechar() {
-    const painel = $('#painelUsuarios');
-    if (painel) painel.style.display = 'none';
-    document.body.style.overflow = '';
-    if (cancelarAtualizacao) {
-      cancelarAtualizacao();
-      cancelarAtualizacao = null;
-    }
-  }
-
-  function abrirModal(usuario) {
-    const modal = document.createElement('div');
-    modal.className = 'um-modal';
-    modal.innerHTML = `<div class="um-modal-card"><h3>Configurar acesso</h3><p>${escapar(usuario.email)}</p><label>Quantidade</label><input id="umQtd" type="number" min="1" value="3"><label>Período</label><select id="umUn"><option value="dias">Dias</option><option value="meses" selected>Meses</option><option value="anos">Anos</option></select><label><input id="umIlim" type="checkbox" style="width:auto"> Acesso sem vencimento</label><div class="um-modal-actions"><button type="button" data-modal="cancelar">Cancelar</button><button type="button" class="um-salvar" data-modal="salvar">Salvar</button></div></div>`;
-    document.body.appendChild(modal);
-    modal.addEventListener('click', async evento => {
-      const botao = evento.target.closest('[data-modal]');
-      if (!botao) return;
-      evento.preventDefault();
-      if (botao.dataset.modal === 'cancelar') return modal.remove();
-      botao.disabled = true;
-      const quantidade = Math.max(1, Number($('#umQtd', modal).value || 1));
-      const unidade = $('#umUn', modal).value;
-      const ilimitado = $('#umIlim', modal).checked;
-      const inicio = new Date();
-      const fim = new Date(inicio);
-      if (unidade === 'dias') fim.setDate(fim.getDate() + quantidade);
-      if (unidade === 'meses') fim.setMonth(fim.getMonth() + quantidade);
-      if (unidade === 'anos') fim.setFullYear(fim.getFullYear() + quantidade);
-      try {
-        await db.collection(COLECAO_USUARIOS).doc(usuario.id).set({
-          status: 'ativo',
-          acessoIniciadoEm: firebase.firestore.Timestamp.fromDate(inicio),
-          expiraEm: ilimitado ? firebase.firestore.FieldValue.delete() : firebase.firestore.Timestamp.fromDate(fim),
-          periodoQuantidade: ilimitado ? null : quantidade,
-          periodoUnidade: ilimitado ? 'ilimitado' : unidade,
-          atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-        modal.remove();
-      } catch (erro) {
-        console.error(erro);
-        alert('Não foi possível salvar.');
-        botao.disabled = false;
-      }
-    });
-  }
-
-  async function executar(botao) {
-    if (botao.disabled) return;
-    const comando = botao.dataset.cmd;
-    if (comando === 'fechar') return fechar();
-    if (comando === 'filtro') return renderizar(botao.dataset.filtro);
-    const usuario = usuarios.find(item => item.id === botao.dataset.id);
-    if (!usuario) return;
-    if (comando === 'prazo') return abrirModal(usuario);
-
-    botao.disabled = true;
-    try {
-      const referencia = db.collection(COLECAO_USUARIOS).doc(usuario.id);
-      if (comando === 'aprovar') {
-        await referencia.set({ status: 'ativo', aprovadoEm: firebase.firestore.FieldValue.serverTimestamp(), atualizadoEm: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-      } else if (comando === 'status') {
-        await referencia.set({ status: botao.dataset.status, atualizadoEm: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-      } else if (comando === 'renovar') {
-        const atual = converterData(usuario.expiraEm);
-        const fim = atual && atual > new Date() ? new Date(atual) : new Date();
-        const quantidade = Math.max(1, Number(usuario.periodoQuantidade || 3));
-        const unidade = usuario.periodoUnidade && usuario.periodoUnidade !== 'ilimitado' ? usuario.periodoUnidade : 'meses';
-        if (unidade === 'dias') fim.setDate(fim.getDate() + quantidade);
-        if (unidade === 'meses') fim.setMonth(fim.getMonth() + quantidade);
-        if (unidade === 'anos') fim.setFullYear(fim.getFullYear() + quantidade);
-        await referencia.set({ status: 'ativo', expiraEm: firebase.firestore.Timestamp.fromDate(fim), atualizadoEm: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-      } else if (comando === 'excluir') {
-        if (!confirm(`Excluir definitivamente ${usuario.email || 'este usuário'}?`)) {
-          botao.disabled = false;
-          return;
-        }
-        await referencia.delete();
-      }
-    } catch (erro) {
-      console.error(erro);
-      alert('Não foi possível concluir a ação.');
-      botao.disabled = false;
-    }
-  }
-
-  function iniciar() {
-    if (iniciado) return;
-    if (!window.firebase || !firebase.apps.length) return setTimeout(iniciar, 250);
-    db = window.SCPAuth?.db || firebase.firestore();
-    iniciado = true;
-    instalarEstilos();
-    criarPainel();
-    document.addEventListener('click', evento => {
-      const abrirGerenciamento = evento.target.closest('#adminUsuariosBtn');
-      if (abrirGerenciamento) {
-        evento.preventDefault();
-        evento.stopImmediatePropagation();
-        abrir();
-        return;
-      }
-      const botao = evento.target.closest('#painelUsuarios [data-cmd]');
-      if (botao) {
-        evento.preventDefault();
-        evento.stopPropagation();
-        executar(botao);
-      }
-    }, true);
-    window.carregarGerenciamentoUsuarios = carregar;
-    window.__SCP_USER_MANAGEMENT_UNIFIED__ = '1.1.0';
-  }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar, { once: true });
-  else iniciar();
+(function(){
+'use strict';
+const ADMIN_EMAIL='sathlersamuel@gmail.com';
+const COLECAO='usuarios';
+let db,usuarios=[],parar=null,iniciado=false,filtroAtual='todos',busca='',ordem='email';
+const $=(s,r=document)=>r.querySelector(s);
+const esc=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+function data(v){if(!v)return null;if(typeof v.toDate==='function')return v.toDate();const d=new Date(v);return isNaN(d)?null:d}
+function fmt(v,h=false){const d=data(v);return d?new Intl.DateTimeFormat('pt-BR',h?{dateStyle:'short',timeStyle:'short'}:{dateStyle:'short'}).format(d):'Não informado'}
+function dias(v){const d=data(v);return d?Math.ceil((d-Date.now())/86400000):null}
+function status(u){const d=dias(u.expiraEm);if(u.status==='bloqueado')return['bloqueado','Bloqueado','#ff5f66'];if(u.status==='pendente')return['pendente','Em teste','#94a3b8'];if(d!==null&&d<0)return['vencido','Vencido','#ff5f66'];if(d!==null&&d<=7)return['vencendo','Vencendo','#ffad42'];if(u.expiraEm)return['teste','Em teste','#3b82f6'];return['ativo','Ativo','#61dd72']}
+function uso(u){const d=data(u.ultimoAcesso);if(!d)return'Ainda não utilizou';const n=Math.floor((Date.now()-d)/86400000);return n<=0?'Usou hoje':n===1?'Usou ontem':`Usou há ${n} dias`}
+function inicial(u){return esc((u.nome||u.email||'?').trim().charAt(0).toUpperCase())}
+function estilos(){if($('#umStyles'))return;const s=document.createElement('style');s.id='umStyles';s.textContent=`
+#painelUsuarios{display:none;position:fixed;inset:0;z-index:30000;overflow:auto;background:#020b18;color:#f8fafc;padding:calc(14px + env(safe-area-inset-top)) 14px calc(26px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;font-family:inherit}
+.um-shell{max-width:960px;margin:auto}.um-top{display:flex;align-items:center;gap:18px;padding:8px 0 20px}.um-voltar{border:1px solid #2f80ed;background:#071426;color:#fff;border-radius:14px;padding:13px 17px;font-weight:850;min-height:50px}.um-top h2{margin:0;font-size:clamp(25px,5vw,38px);line-height:1.05}.um-top p{margin:7px 0 0;color:#9fb0c8;font-size:16px}
+.um-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.um-stat{background:linear-gradient(145deg,#0b1a2d,#081321);border:1px solid #32465f;border-radius:16px;padding:18px;text-align:center}.um-stat b{display:block;font-size:13px;color:#aebbd0;font-weight:700}.um-stat strong{display:block;font-size:34px;margin:8px 0 2px}.um-stat small{color:#8ea0b8}
+.um-toolbar{border:1px solid #30435c;border-radius:16px;padding:7px;display:flex;gap:8px;overflow:auto;background:#07111e;margin-bottom:14px}.um-toolbar button{border:0;background:transparent;color:#e5edf8;padding:12px 18px;border-radius:12px;white-space:nowrap;font-weight:800}.um-toolbar button.ativo{background:linear-gradient(135deg,#1454b8,#2563d9);box-shadow:inset 0 0 0 1px #55a0ff}
+.um-searchrow{display:grid;grid-template-columns:1fr auto;gap:12px;margin:14px 0 18px}.um-search{background:#091727;border:1px solid #30435c;border-radius:14px;color:#fff;padding:14px 16px;font-size:16px;min-width:0}.um-order{border:1px solid #2f80ed;background:#071426;color:#55a0ff;border-radius:14px;padding:0 17px;font-weight:800}
+.um-card{background:linear-gradient(145deg,#0a1728,#07111f);border:1px solid #31445d;border-left:5px solid var(--cor);border-radius:18px;padding:20px;margin-bottom:16px}.um-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.um-ident{display:flex;gap:14px;align-items:center;min-width:0}.um-avatar{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#1f64d7,#3384ef);font-size:24px;font-weight:900;flex:0 0 54px}.um-email{font-weight:900;font-size:18px;overflow-wrap:anywhere}.um-state{display:flex;gap:6px;align-items:center;color:var(--cor);font-weight:800;margin-top:6px}.um-dot{width:10px;height:10px;border-radius:50%;background:var(--cor)}.um-chip{padding:9px 12px;border-radius:999px;background:#10233c;color:#71adff;font-weight:800;font-size:12px;white-space:nowrap}
+.um-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}.um-info{background:#0e1c2e;border:1px solid #2a3c54;border-radius:13px;padding:13px}.um-info span{display:block;color:#9aabc1;font-size:12px;text-transform:uppercase;font-weight:800}.um-info strong{display:block;margin-top:6px;font-size:15px;color:#f8fafc;overflow-wrap:anywhere}
+.um-actions{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}.um-actions button{border-radius:12px;min-height:48px;padding:10px;border:1px solid transparent;color:#fff;font-weight:850}.um-aprovar{background:#153d20;border-color:#2f8c43!important}.um-prazo{background:#113767;border-color:#2869b7!important}.um-renovar{background:#3b1769;border-color:#7a38b9!important}.um-status{background:#4a2c08;border-color:#a86513!important;color:#ffb347!important}.um-excluir{background:#4a1017;border-color:#a42331!important}.um-aprovado{opacity:.62}.um-actions button:disabled{opacity:.55}
+.um-legenda{margin-top:22px;background:#071426;border:1px solid #2d4058;border-radius:16px;padding:18px;color:#a9b7ca;line-height:1.8}.um-legenda strong{color:#fff}.um-loading,.um-vazio{padding:30px;text-align:center;color:#93a4bb}.um-modal{position:fixed;inset:0;z-index:31000;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px}.um-modal-card{width:min(460px,100%);background:#0b1728;border:1px solid #334965;border-radius:20px;padding:20px;color:#fff}.um-modal-card label{display:block;margin:12px 0 5px;color:#a9b7ca;font-weight:800}.um-modal-card input,.um-modal-card select{width:100%;box-sizing:border-box;padding:12px;background:#0f2137;color:#fff;border:1px solid #3b506b;border-radius:12px;font-size:16px}.um-modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:17px}.um-modal-actions button{border:0;border-radius:12px;padding:13px;font-weight:900}.um-salvar{background:#1455a0;color:#fff}
+@media(max-width:760px){.um-summary{grid-template-columns:repeat(2,1fr)}.um-actions{grid-template-columns:repeat(2,1fr)}.um-searchrow{grid-template-columns:1fr}.um-order{min-height:48px}.um-top{align-items:flex-start}.um-voltar{padding:12px}.um-top p{font-size:14px}}
+`;document.head.appendChild(s)}
+function painel(){let p=$('#painelUsuarios');if(p)p.remove();p=document.createElement('section');p.id='painelUsuarios';p.innerHTML=`<div class="um-shell"><header class="um-top"><button class="um-voltar" data-cmd="fechar">← Voltar</button><div><h2>Gerenciamento de Usuários</h2><p>Controle de acessos e utilização</p></div></header><div id="umConteudo"><div class="um-loading">Carregando usuários…</div></div></div>`;document.body.appendChild(p)}
+function resumo(){let a=0,v=0,s=0;usuarios.forEach(u=>{const st=status(u)[0];if(['ativo','teste'].includes(st))a++;if(['vencendo','vencido'].includes(st))v++;const d=data(u.ultimoAcesso);if(!d||Date.now()-d>15*86400000)s++});return `<div class="um-summary"><div class="um-stat"><b>Total</b><strong>${usuarios.length}</strong><small>Usuários</small></div><div class="um-stat"><b>Ativos</b><strong>${a}</strong><small>Usuários</small></div><div class="um-stat"><b>Vencendo</b><strong>${v}</strong><small>Usuários</small></div><div class="um-stat"><b>Sem uso</b><strong>${s}</strong><small>Usuários</small></div></div>`}
+function render(f=filtroAtual){filtroAtual=f;const c=$('#umConteudo');if(!c)return;let lista=usuarios.filter(u=>{const st=status(u)[0],texto=`${u.nome||''} ${u.email||''}`.toLowerCase();if(busca&&!texto.includes(busca))return false;if(f==='ativos'&&!['ativo','teste'].includes(st))return false;if(f==='vencendo'&&!['vencendo','vencido'].includes(st))return false;if(f==='semuso'){const d=data(u.ultimoAcesso);if(d&&Date.now()-d<=15*86400000)return false}return true});lista.sort((a,b)=>ordem==='acesso'?((data(b.ultimoAcesso)?.getTime()||0)-(data(a.ultimoAcesso)?.getTime()||0)):String(a.email||'').localeCompare(String(b.email||''),'pt-BR'));
+const tabs=['todos','ativos','vencendo','semuso'].map(k=>`<button class="${k===f?'ativo':''}" data-cmd="filtro" data-filtro="${k}">${({todos:'Todos',ativos:'Ativos',vencendo:'Vencendo',semuso:'Sem uso'})[k]}</button>`).join('');
+const cards=lista.map(u=>{const[st,txt,cor]=status(u),r=dias(u.expiraEm),prazo=u.expiraEm?`${fmt(u.expiraEm)}${r!==null?` (${r<0?'vencido':r+' dias'})`:''}`:'Sem vencimento';const aprovado=u.status!=='pendente';return `<article class="um-card" style="--cor:${cor}"><div class="um-head"><div class="um-ident"><div class="um-avatar">${inicial(u)}</div><div><div class="um-email">${esc(u.email||'Sem e-mail')}</div><div class="um-state"><span class="um-dot"></span>${txt}</div></div></div><span class="um-chip">${st==='pendente'?'Aguardando':txt}</span></div><div class="um-grid"><div class="um-info"><span>Uso</span><strong>${uso(u)}</strong></div><div class="um-info"><span>Último acesso</span><strong>${fmt(u.ultimoAcesso,true)}</strong></div><div class="um-info"><span>Acessos</span><strong>${Number(u.totalAcessos||0)}</strong></div><div class="um-info"><span>Válido até</span><strong>${prazo}</strong></div></div><div class="um-actions"><button class="um-aprovar ${aprovado?'um-aprovado':''}" data-cmd="aprovar" data-id="${u.id}" ${aprovado?'disabled':''}>${aprovado?'✓ Aprovado':'✓ Aprovar'}</button><button class="um-prazo" data-cmd="prazo" data-id="${u.id}">Editar prazo</button><button class="um-renovar" data-cmd="renovar" data-id="${u.id}">Renovar</button><button class="um-status" data-cmd="status" data-id="${u.id}" data-status="${u.status==='bloqueado'?'ativo':'bloqueado'}">${u.status==='bloqueado'?'Desbloquear':'Bloquear'}</button><button class="um-excluir" data-cmd="excluir" data-id="${u.id}">Excluir</button></div></article>`}).join('');
+c.innerHTML=resumo()+`<div class="um-toolbar">${tabs}</div><div class="um-searchrow"><input id="umBusca" class="um-search" type="search" placeholder="Buscar por e-mail ou nome..." value="${esc(busca)}"><button class="um-order" data-cmd="ordenar">⇅ Ordenar</button></div>`+(cards||'<div class="um-vazio">Nenhum usuário encontrado.</div>')+`<div class="um-legenda"><strong>Sobre os status</strong><br>🟢 Ativo: usuário aprovado e com acesso liberado.<br>🟠 Vencendo: acesso expira em até 7 dias.<br>🔴 Sem uso: usuário não acessa há mais de 15 dias.<br>⚪ Em teste: usuário ainda não aprovado.</div>`;$('#umBusca')?.addEventListener('input',e=>{busca=e.target.value.toLowerCase().trim();render()})}
+function snapshot(s){usuarios=s.docs.map(d=>({id:d.id,...d.data()})).filter(u=>String(u.email||'').toLowerCase()!==ADMIN_EMAIL);render()}
+function acompanhar(){if(parar)parar();const c=$('#umConteudo');if(c)c.innerHTML='<div class="um-loading">Carregando usuários…</div>';parar=db.collection(COLECAO).onSnapshot(snapshot,e=>{console.error(e);if(c)c.innerHTML='<div class="um-vazio">Não foi possível carregar os usuários.</div>'})}
+function abrir(){painel();$('#painelUsuarios').style.display='block';document.body.style.overflow='hidden';acompanhar()}
+function fechar(){const p=$('#painelUsuarios');if(p)p.style.display='none';document.body.style.overflow='';if(parar){parar();parar=null}}
+function modal(u){const m=document.createElement('div');m.className='um-modal';m.innerHTML=`<div class="um-modal-card"><h3>Configurar acesso</h3><p>${esc(u.email)}</p><label>Quantidade</label><input id="umQtd" type="number" min="1" value="3"><label>Período</label><select id="umUn"><option value="dias">Dias</option><option value="meses" selected>Meses</option><option value="anos">Anos</option></select><label><input id="umIlim" type="checkbox" style="width:auto"> Acesso sem vencimento</label><div class="um-modal-actions"><button data-modal="cancelar">Cancelar</button><button class="um-salvar" data-modal="salvar">Salvar</button></div></div>`;document.body.appendChild(m);m.addEventListener('click',async e=>{const b=e.target.closest('[data-modal]');if(!b)return;if(b.dataset.modal==='cancelar')return m.remove();const q=Math.max(1,Number($('#umQtd',m).value||1)),un=$('#umUn',m).value,il=$('#umIlim',m).checked,ini=new Date(),fim=new Date();if(un==='dias')fim.setDate(fim.getDate()+q);if(un==='meses')fim.setMonth(fim.getMonth()+q);if(un==='anos')fim.setFullYear(fim.getFullYear()+q);try{await db.collection(COLECAO).doc(u.id).set({status:'ativo',acessoIniciadoEm:firebase.firestore.Timestamp.fromDate(ini),expiraEm:il?firebase.firestore.FieldValue.delete():firebase.firestore.Timestamp.fromDate(fim),periodoQuantidade:il?null:q,periodoUnidade:il?'ilimitado':un,atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});m.remove()}catch(err){console.error(err);alert('Não foi possível salvar.')}})}
+async function executar(b){if(b.disabled)return;const cmd=b.dataset.cmd;if(cmd==='fechar')return fechar();if(cmd==='filtro')return render(b.dataset.filtro);if(cmd==='ordenar'){ordem=ordem==='email'?'acesso':'email';return render()}const u=usuarios.find(x=>x.id===b.dataset.id);if(!u)return;if(cmd==='prazo')return modal(u);b.disabled=true;try{const ref=db.collection(COLECAO).doc(u.id);if(cmd==='aprovar')await ref.set({status:'ativo',aprovadoEm:firebase.firestore.FieldValue.serverTimestamp(),atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});else if(cmd==='status')await ref.set({status:b.dataset.status,atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});else if(cmd==='renovar'){const fim=data(u.expiraEm)&&data(u.expiraEm)>new Date()?new Date(data(u.expiraEm)):new Date(),q=Math.max(1,Number(u.periodoQuantidade||3)),un=u.periodoUnidade&&u.periodoUnidade!=='ilimitado'?u.periodoUnidade:'meses';if(un==='dias')fim.setDate(fim.getDate()+q);if(un==='meses')fim.setMonth(fim.getMonth()+q);if(un==='anos')fim.setFullYear(fim.getFullYear()+q);await ref.set({status:'ativo',expiraEm:firebase.firestore.Timestamp.fromDate(fim),atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}else if(cmd==='excluir'){if(!confirm(`Excluir definitivamente ${u.email||'este usuário'}?`)){b.disabled=false;return}await ref.delete()}}catch(e){console.error(e);alert('Não foi possível concluir a ação.');b.disabled=false}}
+function iniciar(){if(iniciado)return;if(!window.firebase||!firebase.apps.length)return setTimeout(iniciar,250);db=window.SCPAuth?.db||firebase.firestore();iniciado=true;estilos();painel();document.addEventListener('click',e=>{const abrirBtn=e.target.closest('#adminUsuariosBtn');if(abrirBtn){e.preventDefault();e.stopImmediatePropagation();abrir();return}const b=e.target.closest('#painelUsuarios [data-cmd]');if(b){e.preventDefault();e.stopPropagation();executar(b)}},true);window.carregarGerenciamentoUsuarios=()=>db.collection(COLECAO).get().then(snapshot);window.__SCP_USER_MANAGEMENT_UNIFIED__='2.0.0'}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar,{once:true});else iniciar();
 })();
