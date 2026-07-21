@@ -1,6 +1,6 @@
-const CACHE_NAME = 'samuel-comissoes-pro-v86';
+const CACHE_NAME = 'samuel-comissoes-pro-v87';
 const APP_SHELL = [
-  './','./index.html','./style.css?v=4','./dashboard-v2.css?v=7','./home-four-columns-fix.css?v=2','./visual-match.css?v=3','./bottom-layout-fix.css?v=1','./brand-cleanup.css?v=1','./responsive-layout.css?v=3','./tipo-numeros-mobile.js?v=3','./analise-vendas.css?v=1','./mobile-alignment-fix.css?v=1','./analise-vendas.js?v=2','./pwa-enhancements.js?v=14','./user-management-unified.js?v=4','./user-management-modern-v2.js?v=2026.07.21.6','./firebase-integration.js?v=7','./script.js?v=4','./dashboard-v2.js?v=9','./manifest.json?v=14','./app-icon.svg?v=13'
+  './','./index.html','./style.css?v=4','./dashboard-v2.css?v=7','./home-four-columns-fix.css?v=2','./visual-match.css?v=3','./bottom-layout-fix.css?v=1','./brand-cleanup.css?v=1','./responsive-layout.css?v=3','./tipo-numeros-mobile.js?v=3','./analise-vendas.css?v=1','./mobile-alignment-fix.css?v=1','./analise-vendas.js?v=2','./pwa-enhancements.js?v=14','./user-management-unified.js?v=5','./user-management-modern-v2.js?v=2026.07.21.6','./firebase-integration.js?v=7','./script.js?v=4','./dashboard-v2.js?v=9','./manifest.json?v=14','./app-icon.svg?v=13'
 ];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>Promise.allSettled(APP_SHELL.map(url=>cache.add(url)))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
