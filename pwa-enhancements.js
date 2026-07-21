@@ -1,10 +1,6 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.21.5';
-
-  function removerScripts(nomeArquivo){
-    [...document.querySelectorAll(`script[src*="${nomeArquivo}"]`)].forEach(script=>script.remove());
-  }
+  const HOTFIX='2026.07.21.6';
 
   function carregarScript(src,id){
     return new Promise((resolve,reject)=>{
@@ -23,28 +19,12 @@
   carregarScript('ai-performance-accelerator.js?v=1','scpPerformanceLoader').catch(console.error);
   carregarScript('edit-sale-definitive-fix.js?v=4','scpEditSaleLoader').catch(console.error);
 
-  async function carregarGerenciamentoModerno(){
-    try{
-      removerScripts('admin-access-settings-fix.js');
-      removerScripts('user-management-modern-v2.js');
-      await carregarScript(`admin-access-settings-fix.js?v=${HOTFIX}`,'scpAdminAccessHotfix');
-      await carregarScript(`user-management-modern-v2.js?v=${HOTFIX}`,'scpUserManagementHotfix');
-      document.documentElement.dataset.scpUserManagement=HOTFIX;
-      window.dispatchEvent(new CustomEvent('scp:user-management-modern-ready',{detail:{version:HOTFIX}}));
-    }catch(error){
-      console.error('[Gerenciamento moderno]',error);
-      document.documentElement.dataset.scpUserManagement='erro';
-    }
+  function marcarGerenciamento(){
+    document.documentElement.dataset.scpUserManagement=HOTFIX;
+    window.dispatchEvent(new CustomEvent('scp:user-management-modern-ready',{detail:{version:HOTFIX}}));
   }
-
-  function iniciarGerenciamento(){
-    if(document.readyState==='loading'){
-      document.addEventListener('DOMContentLoaded',carregarGerenciamentoModerno,{once:true});
-    }else{
-      carregarGerenciamentoModerno();
-    }
-  }
-  iniciarGerenciamento();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',marcarGerenciamento,{once:true});
+  else marcarGerenciamento();
 
   function instalado(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
@@ -84,17 +64,17 @@
     window.addEventListener('load',async()=>{
       try{
         const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=73',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=75',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV15')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV15','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV16')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV16','1');
             location.reload();
           }
         });
-        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV15')){
-          sessionStorage.setItem('scpHotfixReloadV15','1');
+        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV16')){
+          sessionStorage.setItem('scpHotfixReloadV16','1');
           setTimeout(()=>location.reload(),300);
         }
       }catch(error){
