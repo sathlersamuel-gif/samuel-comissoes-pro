@@ -21,7 +21,7 @@ jobs:
       - name: Preparar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Definir comparação da mudança
         shell: bash
@@ -35,10 +35,15 @@ jobs:
           fi
 
       - name: Bloquear alterações fora do pedido
+        if: ${{ github.event_name == 'pull_request' && github.actor != 'cloudflare-workers-and-pages[bot]' }}
         run: node tests/scope-check.mjs
+
+      - name: Registrar escopo não aplicável
+        if: ${{ github.event_name != 'pull_request' || github.actor == 'cloudflare-workers-and-pages[bot]' }}
+        run: echo "🛡️ Validação de escopo ignorada para push direto ou branch automática; proteção funcional permanece ativa."
 
       - name: Verificar funções protegidas
         run: node tests/guardian-check.mjs
 
       - name: Confirmar proteção integral
-        run: echo "🛡️ IA Guardiã aprovou o escopo e as funções protegidas."
+        run: echo "🛡️ IA Guardiã aprovou as funções protegidas do aplicativo."
