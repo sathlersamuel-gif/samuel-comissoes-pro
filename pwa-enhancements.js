@@ -1,29 +1,50 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.21.4';
+  const HOTFIX='2026.07.21.5';
 
-  function removerDuplicados(nomeArquivo){
-    const encontrados=[...document.querySelectorAll(`script[src*="${nomeArquivo}"]`)];
-    encontrados.slice(1).forEach(script=>script.remove());
+  function removerScripts(nomeArquivo){
+    [...document.querySelectorAll(`script[src*="${nomeArquivo}"]`)].forEach(script=>script.remove());
   }
 
   function carregarScript(src,id){
-    if(id&&document.getElementById(id))return;
-    const script=document.createElement('script');
-    if(id)script.id=id;
-    script.src=src;
-    script.defer=true;
-    document.head.appendChild(script);
+    return new Promise((resolve,reject)=>{
+      if(id&&document.getElementById(id))return resolve();
+      const script=document.createElement('script');
+      if(id)script.id=id;
+      script.src=src;
+      script.async=false;
+      script.onload=()=>resolve();
+      script.onerror=()=>reject(new Error(`Falha ao carregar ${src}`));
+      document.head.appendChild(script);
+    });
   }
 
-  carregarScript('tipo-numeros-mobile.js?v=3','scpTipoNumerosLoader');
-  carregarScript('ai-performance-accelerator.js?v=1','scpPerformanceLoader');
-  carregarScript('edit-sale-definitive-fix.js?v=4','scpEditSaleLoader');
+  carregarScript('tipo-numeros-mobile.js?v=3','scpTipoNumerosLoader').catch(console.error);
+  carregarScript('ai-performance-accelerator.js?v=1','scpPerformanceLoader').catch(console.error);
+  carregarScript('edit-sale-definitive-fix.js?v=4','scpEditSaleLoader').catch(console.error);
 
-  // Mantém uma única sequência do gerenciamento, mesmo em instalações antigas.
-  ['admin-access-settings-fix.js','user-management-modern-v2.js'].forEach(removerDuplicados);
-  carregarScript(`admin-access-settings-fix.js?v=${HOTFIX}`,'scpAdminAccessHotfix');
-  carregarScript(`user-management-modern-v2.js?v=${HOTFIX}`,'scpUserManagementHotfix');
+  async function carregarGerenciamentoModerno(){
+    try{
+      removerScripts('admin-access-settings-fix.js');
+      removerScripts('user-management-modern-v2.js');
+      await carregarScript(`admin-access-settings-fix.js?v=${HOTFIX}`,'scpAdminAccessHotfix');
+      await carregarScript(`user-management-modern-v2.js?v=${HOTFIX}`,'scpUserManagementHotfix');
+      document.documentElement.dataset.scpUserManagement=HOTFIX;
+      window.dispatchEvent(new CustomEvent('scp:user-management-modern-ready',{detail:{version:HOTFIX}}));
+    }catch(error){
+      console.error('[Gerenciamento moderno]',error);
+      document.documentElement.dataset.scpUserManagement='erro';
+    }
+  }
+
+  function iniciarGerenciamento(){
+    if(document.readyState==='loading'){
+      document.addEventListener('DOMContentLoaded',carregarGerenciamentoModerno,{once:true});
+    }else{
+      carregarGerenciamentoModerno();
+    }
+  }
+  iniciarGerenciamento();
 
   function instalado(){
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
@@ -63,17 +84,17 @@
     window.addEventListener('load',async()=>{
       try{
         const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=70',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=73',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV14')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV14','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV15')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV15','1');
             location.reload();
           }
         });
-        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV14')){
-          sessionStorage.setItem('scpHotfixReloadV14','1');
+        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV15')){
+          sessionStorage.setItem('scpHotfixReloadV15','1');
           setTimeout(()=>location.reload(),300);
         }
       }catch(error){
