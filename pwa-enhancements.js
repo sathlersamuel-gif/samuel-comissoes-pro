@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.21.10';
+  const HOTFIX='2026.07.21.11';
 
   function carregarScript(src,id){
     return new Promise((resolve,reject)=>{
@@ -19,6 +19,7 @@
   carregarScript('ai-performance-accelerator.js?v=1','scpPerformanceLoader').catch(console.error);
   carregarScript('edit-sale-definitive-fix.js?v=4','scpEditSaleLoader').catch(console.error);
   carregarScript('user-management-open-fix.js?v=2026.07.21.9','scpUserManagementOpenFix').catch(console.error);
+  carregarScript('user-management-single-tap-fix.js?v=2026.07.21.11','scpUserManagementSingleTapFix').catch(console.error);
 
   function marcarGerenciamento(){
     document.documentElement.dataset.scpUserManagement=HOTFIX;
@@ -63,17 +64,17 @@
     window.addEventListener('load',async()=>{
       try{
         const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=79',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=80',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV20')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV20','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV21')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV21','1');
             location.reload();
           }
         });
-        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV20')){
-          sessionStorage.setItem('scpHotfixReloadV20','1');
+        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV21')){
+          sessionStorage.setItem('scpHotfixReloadV21','1');
           setTimeout(()=>location.reload(),300);
         }
       }catch(error){console.error('Falha ao atualizar o modo offline:',error);}
