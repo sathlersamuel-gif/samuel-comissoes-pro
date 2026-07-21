@@ -43,7 +43,46 @@ jobs:
         run: echo "🛡️ Validação de escopo ignorada para push direto ou branch automática; proteção funcional permanece ativa."
 
       - name: Verificar funções protegidas
+        id: guardian
+        continue-on-error: true
         run: node tests/guardian-check.mjs
 
+      - name: Publicar resumo detalhado
+        if: always()
+        shell: bash
+        run: |
+          echo "## 🛡️ Relatório da IA Guardiã" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f guardian-report.json ]; then
+            node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          const fs = require('fs');
+          const r = JSON.parse(fs.readFileSync('guardian-report.json', 'utf8'));
+          console.log(`**Resultado:** ${r.resumo.aprovados}/${r.resumo.total} verificações aprovadas; ${r.resumo.falhas} falha(s).\n`);
+          console.log('| Status | Regra | Arquivo | Evidência | Correção recomendada |');
+          console.log('|---|---|---|---|---|');
+          for (const item of r.resultados) {
+            const limpar = v => String(v ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+            console.log(`| ${item.status === 'aprovado' ? '✅' : '❌'} | ${limpar(item.descricao)} | \`${limpar(item.arquivo)}\` | ${limpar(item.evidencia)} | ${limpar(item.recomendacao || 'Nenhuma')} |`);
+          }
+          NODE
+          else
+            echo "O relatório JSON não foi gerado; verifique a etapa de execução da Guardiã." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Salvar relatório da Guardiã
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: guardian-report-${{ github.run_id }}
+          path: guardian-report.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Aplicar resultado da auditoria
+        if: steps.guardian.outcome == 'failure'
+        run: |
+          echo "A IA Guardiã encontrou falhas. Consulte o resumo e o artefato guardian-report."
+          exit 1
+
       - name: Confirmar proteção integral
+        if: steps.guardian.outcome == 'success'
         run: echo "🛡️ IA Guardiã aprovou as funções protegidas do aplicativo."
