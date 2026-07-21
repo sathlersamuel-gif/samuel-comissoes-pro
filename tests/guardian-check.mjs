@@ -7,7 +7,7 @@ const exigir = (condicao, mensagem) => { if (!condicao) falhas.push(mensagem); }
 const index = ler('index.html');
 const script = ler('script.js');
 const comissao = ler('commission-input-restore.js');
-const exclusao = ler('permanent-delete-sync-fix.js');
+const dados = ler('sales-data-core-restore.js');
 const marcas = ler('brand-product-selector.js');
 const firebase = ler('firebase-integration.js');
 const sw = ler('sw.js');
@@ -15,8 +15,10 @@ const sw = ler('sw.js');
 exigir(index.includes('commission-input-restore.js'), 'Campo de comissão perdeu sua correção protegida.');
 exigir(comissao.includes("valor.length===1") || comissao.includes("valor.length === 1"), 'Comissão não insere vírgula após o primeiro dígito.');
 exigir(comissao.includes("replace(',', '.')") || comissao.includes('replace(",", ".")'), 'Comissão não converte vírgula corretamente para cálculo.');
-exigir(index.includes('permanent-delete-sync-fix.js'), 'Proteção de exclusão definitiva não está carregada.');
-exigir(exclusao.includes('exclu') && exclusao.includes('localStorage'), 'Registro permanente de exclusões não foi encontrado.');
+exigir(index.includes('sales-data-core-restore.js'), 'Núcleo atual de dados e exclusão definitiva não está carregado.');
+exigir(dados.includes('vendasExcluidas') && dados.includes('localStorage'), 'Registro permanente de exclusões não foi encontrado.');
+exigir(dados.includes('window.excluirVenda') && dados.includes('filterDeleted'), 'Exclusão definitiva e bloqueio de retorno não estão protegidos.');
+exigir(dados.includes('window.editarVenda') && dados.includes('editingId'), 'Edição de vendas sem duplicação não está protegida.');
 exigir(index.includes('brand-product-selector.js'), 'Seletor Honda/Yamaha não está carregado.');
 exigir(marcas.includes('yamaha:[') && marcas.includes('honda:['), 'Uma das marcas protegidas foi removida.');
 exigir(marcas.includes('Modelo não encontrado') && marcas.includes('salvar manualmente'), 'Digitação livre de modelo foi removida.');
@@ -34,4 +36,4 @@ if (falhas.length) {
   process.exit(1);
 }
 
-console.log('🛡️ IA Guardiã: todas as funções aprovadas permanecem protegidas.');
+console.log('🛡️ IA Guardiã: todas as funções aprovadas permanecem protegidas na arquitetura atual.');
