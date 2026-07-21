@@ -3,11 +3,12 @@ import fs from 'node:fs';
 const ler = caminho => fs.existsSync(caminho) ? fs.readFileSync(caminho, 'utf8') : '';
 const resultados = [];
 
-function verificar({ id, arquivo, descricao, condicao, evidencia, recomendacao }) {
+function verificar({ id, arquivo, descricao, condicao, evidencia, recomendacao, gravidade='alta' }) {
   resultados.push({
     id,
     arquivo,
     descricao,
+    gravidade,
     status: condicao ? 'aprovado' : 'falha',
     evidencia: condicao ? evidencia.aprovada : evidencia.falha,
     recomendacao: condicao ? null : recomendacao
@@ -21,6 +22,10 @@ const dados = ler('sales-data-core-restore.js');
 const marcas = ler('brand-product-selector.js');
 const firebase = ler('firebase-integration.js');
 const sw = ler('sw.js');
+const pwa = ler('pwa-enhancements.js');
+const gestor = ler('admin-user-management.js');
+const gestorVisual = ler('user-management-modern-v2.js');
+const gestorAcesso = ler('admin-access-settings-fix.js');
 
 verificar({id:'comissao-carregada',arquivo:'index.html',descricao:'Correção do campo de comissão carregada',condicao:index.includes('commission-input-restore.js'),evidencia:{aprovada:'index.html referencia commission-input-restore.js',falha:'Referência não encontrada no index.html'},recomendacao:'Restaurar o carregamento de commission-input-restore.js no index.html.'});
 verificar({id:'comissao-virgula',arquivo:'commission-input-restore.js',descricao:'Inserção automática da vírgula após o primeiro dígito',condicao:(comissao.includes('digitos.length === 1')||comissao.includes('digitos.length===1'))&&comissao.includes("campo.value = digitos + ',0'"),evidencia:{aprovada:'A função exibir usa digitos.length e formata um dígito como x,0',falha:'A regra atual de formatação x,0 não foi localizada'},recomendacao:'Manter na função exibir a condição de um dígito e a saída digitos + ",0".'});
@@ -34,13 +39,20 @@ verificar({id:'seletor-marcas',arquivo:'brand-product-selector.js',descricao:'Se
 verificar({id:'catalogo-protegido',arquivo:'brand-product-selector.js',descricao:'Itens essenciais do catálogo',condicao:marcas.includes('Honda CG 160 Start')&&marcas.includes('Honda GL 1800 Gold Wing Tour')&&marcas.includes('Motor de Popa Yamaha 450 HP'),evidencia:{aprovada:'Itens de início/fim do catálogo Honda e motor 450 HP localizados',falha:'O catálogo protegido parece incompleto'},recomendacao:'Comparar o catálogo com a base aprovada antes de publicar.'});
 verificar({id:'relatorios',arquivo:'index.html',descricao:'Arquivos de relatórios PDF carregados',condicao:index.includes('report-options-fix.js')&&index.includes('pdf-viewer-fix.js'),evidencia:{aprovada:'Arquivos de relatório localizados',falha:'Um arquivo de relatório não está carregado'},recomendacao:'Restaurar report-options-fix.js e pdf-viewer-fix.js.'});
 verificar({id:'backup',arquivo:'index.html',descricao:'Importação e exportação de backup carregadas',condicao:index.includes('import-backup.js')&&index.includes('backup-export-fix.js'),evidencia:{aprovada:'Arquivos de backup localizados',falha:'Importação ou exportação de backup ausente'},recomendacao:'Restaurar import-backup.js e backup-export-fix.js.'});
-verificar({id:'pwa-cache',arquivo:'sw.js',descricao:'Cache e atualização PWA ativos',condicao:sw.includes('cachePrimeiro')&&sw.includes('redePrimeiro')&&index.includes('pwa-enhancements.js'),evidencia:{aprovada:'Estratégias de cache e atualizador PWA localizados',falha:'Estratégia de cache ou atualizador PWA ausente'},recomendacao:'Restaurar cachePrimeiro, redePrimeiro e pwa-enhancements.js.'});
+verificar({id:'pwa-cache',arquivo:'sw.js / pwa-enhancements.js',descricao:'Cache e atualização PWA ativos',condicao:sw.includes('cachePrimeiro')&&sw.includes('redePrimeiro')&&index.includes('pwa-enhancements.js')&&pwa.includes("register('./sw.js?v=73'"),evidencia:{aprovada:'Estratégias de cache e Service Worker v73 localizados',falha:'Estratégia de cache ou versão atual do Service Worker ausente'},recomendacao:'Restaurar cachePrimeiro/redePrimeiro e registrar o Service Worker v73.'});
 verificar({id:'vendas-centrais',arquivo:'script.js',descricao:'Funções centrais de persistência de vendas',condicao:script.includes('salvarBanco')&&script.includes('excluirVenda'),evidencia:{aprovada:'salvarBanco e excluirVenda localizadas no núcleo legado protegido',falha:'Funções centrais legadas não localizadas'},recomendacao:'Confirmar se foram substituídas oficialmente; caso contrário, restaurá-las.'});
+
+verificar({id:'usuarios-nucleo',arquivo:'admin-user-management.js',descricao:'Núcleo do gerenciamento de usuários disponível',condicao:gestor.includes('carregarGerenciamento')&&gestor.includes('usuariosCache')&&gestor.includes("collection('usuarios')"),evidencia:{aprovada:'Carregamento, cache e coleção usuarios localizados',falha:'Núcleo administrativo incompleto'},recomendacao:'Restaurar carregarGerenciamento, usuariosCache e acesso à coleção usuarios.'});
+verificar({id:'usuarios-acoes',arquivo:'admin-user-management.js',descricao:'Ações administrativas protegidas',condicao:gestor.includes('salvarPrazo')&&gestor.includes('renovar')&&gestor.includes('excluir')&&gestor.includes('bloque'),evidencia:{aprovada:'Prazo, renovação, exclusão e bloqueio localizados',falha:'Uma ou mais ações administrativas não foram localizadas'},recomendacao:'Restaurar prazo, renovação, exclusão e bloqueio de usuários.'});
+verificar({id:'usuarios-visual-moderno',arquivo:'user-management-modern-v2.js',descricao:'Visual moderno do gerenciamento disponível',condicao:gestorVisual.includes('#061326')&&gestorVisual.includes('scp-gestao-toolbar')&&gestorVisual.includes('scp-gestao-busca')&&gestorVisual.includes('scp-gestao-status'),evidencia:{aprovada:'Tema escuro, busca e filtro de status localizados',falha:'Tema moderno, busca ou filtro não foram localizados'},recomendacao:'Restaurar o visual moderno, a busca e o filtro por status.'});
+verificar({id:'usuarios-ordem-carregamento',arquivo:'pwa-enhancements.js',descricao:'Gerenciamento moderno carregado em ordem determinística',condicao:pwa.includes('async function carregarGerenciamentoModerno')&&pwa.includes("await carregarScript(`admin-access-settings-fix.js")&&pwa.includes("await carregarScript(`user-management-modern-v2.js")&&pwa.indexOf('admin-access-settings-fix.js')<pwa.lastIndexOf('user-management-modern-v2.js'),evidencia:{aprovada:'Acesso administrativo é carregado antes do visual moderno, de forma sequencial',falha:'O carregamento ainda pode ocorrer fora de ordem'},recomendacao:'Carregar admin-access-settings-fix.js e depois user-management-modern-v2.js usando await.'});
+verificar({id:'usuarios-abertura',arquivo:'admin-access-settings-fix.js',descricao:'Abertura do gerenciamento aguarda o núcleo principal',condicao:gestorAcesso.includes('esperarGerenciador')&&gestorAcesso.includes('carregarGerenciamentoUsuarios')&&gestorAcesso.includes("painel.style.setProperty('display','block','important')"),evidencia:{aprovada:'A abertura espera o núcleo e exibe o painel de forma controlada',falha:'A abertura segura do painel não foi localizada'},recomendacao:'Restaurar esperarGerenciador e a abertura controlada do painel.'});
 
 const falhas = resultados.filter(item => item.status === 'falha');
 const relatorio = {
   geradoEm: new Date().toISOString(),
-  resumo: { total: resultados.length, aprovados: resultados.length - falhas.length, falhas: falhas.length },
+  versao: '2.0',
+  resumo: { total: resultados.length, aprovados: resultados.length - falhas.length, falhas: falhas.length, criticas: falhas.filter(x=>x.gravidade==='critica').length },
   resultados
 };
 fs.writeFileSync('guardian-report.json', JSON.stringify(relatorio, null, 2));
@@ -50,7 +62,7 @@ resultados.forEach(item => console.log(`${item.status === 'aprovado' ? '✅' : '
 
 if (falhas.length) {
   console.error('\n🛡️ Atualização bloqueada. Correções recomendadas:');
-  falhas.forEach(item => console.error(`- [${item.id}] ${item.recomendacao}`));
+  falhas.forEach(item => console.error(`- [${item.id}] (${item.gravidade}) ${item.recomendacao}`));
   process.exit(1);
 }
 
