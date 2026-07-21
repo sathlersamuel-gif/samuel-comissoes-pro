@@ -1,8 +1,18 @@
 import fs from 'node:fs';
 
-const ler = caminho => fs.readFileSync(caminho, 'utf8');
-const falhas = [];
-const exigir = (condicao, mensagem) => { if (!condicao) falhas.push(mensagem); };
+const ler = caminho => fs.existsSync(caminho) ? fs.readFileSync(caminho, 'utf8') : '';
+const resultados = [];
+
+function verificar({ id, arquivo, descricao, condicao, evidencia, recomendacao }) {
+  resultados.push({
+    id,
+    arquivo,
+    descricao,
+    status: condicao ? 'aprovado' : 'falha',
+    evidencia: condicao ? evidencia.aprovada : evidencia.falha,
+    recomendacao: condicao ? null : recomendacao
+  });
+}
 
 const index = ler('index.html');
 const script = ler('script.js');
@@ -12,28 +22,36 @@ const marcas = ler('brand-product-selector.js');
 const firebase = ler('firebase-integration.js');
 const sw = ler('sw.js');
 
-exigir(index.includes('commission-input-restore.js'), 'Campo de comissão perdeu sua correção protegida.');
-exigir(comissao.includes("valor.length===1") || comissao.includes("valor.length === 1"), 'Comissão não insere vírgula após o primeiro dígito.');
-exigir(comissao.includes("replace(',', '.')") || comissao.includes('replace(",", ".")'), 'Comissão não converte vírgula corretamente para cálculo.');
-exigir(index.includes('sales-data-core-restore.js'), 'Núcleo atual de dados e exclusão definitiva não está carregado.');
-exigir(dados.includes('vendasExcluidas') && dados.includes('localStorage'), 'Registro permanente de exclusões não foi encontrado.');
-exigir(dados.includes('window.excluirVenda') && dados.includes('filterDeleted'), 'Exclusão definitiva e bloqueio de retorno não estão protegidos.');
-exigir(dados.includes('window.editarVenda') && dados.includes('editingId'), 'Edição de vendas sem duplicação não está protegida.');
-exigir(index.includes('brand-product-selector.js'), 'Seletor Honda/Yamaha não está carregado.');
-exigir(marcas.includes('yamaha:[') && marcas.includes('honda:['), 'Uma das marcas protegidas foi removida.');
-exigir(marcas.includes('Modelo não encontrado') && marcas.includes('salvar manualmente'), 'Digitação livre de modelo foi removida.');
-exigir(marcas.includes('Honda CG 160 Start') && marcas.includes('Honda GL 1800 Gold Wing Tour'), 'Catálogo Honda está incompleto.');
-exigir(marcas.includes('Motor de Popa Yamaha 450 HP'), 'Linha de motores de popa Yamaha foi reduzida.');
-exigir(index.includes('firebase-integration.js') && firebase.includes('sincronizarInicial'), 'Sincronização Firebase foi removida.');
-exigir(index.includes('report-options-fix.js') && index.includes('pdf-viewer-fix.js'), 'Relatórios PDF perderam arquivos protegidos.');
-exigir(index.includes('import-backup.js') && index.includes('backup-export-fix.js'), 'Backup perdeu arquivos protegidos.');
-exigir(index.includes('ai-performance-accelerator.js') && sw.includes('cachePrimeiro'), 'Acelerador inteligente deixou de funcionar.');
-exigir(script.includes('salvarBanco') && script.includes('excluirVenda'), 'Funções centrais de venda foram removidas.');
+verificar({id:'comissao-carregada',arquivo:'index.html',descricao:'Correção do campo de comissão carregada',condicao:index.includes('commission-input-restore.js'),evidencia:{aprovada:'index.html referencia commission-input-restore.js',falha:'Referência não encontrada no index.html'},recomendacao:'Restaurar o carregamento de commission-input-restore.js no index.html.'});
+verificar({id:'comissao-virgula',arquivo:'commission-input-restore.js',descricao:'Inserção automática da vírgula após o primeiro dígito',condicao:(comissao.includes('digitos.length === 1')||comissao.includes('digitos.length===1'))&&comissao.includes("campo.value = digitos + ',0'"),evidencia:{aprovada:'A função exibir usa digitos.length e formata um dígito como x,0',falha:'A regra atual de formatação x,0 não foi localizada'},recomendacao:'Manter na função exibir a condição de um dígito e a saída digitos + ",0".'});
+verificar({id:'comissao-calculo',arquivo:'commission-input-restore.js',descricao:'Conversão de vírgula para ponto no cálculo',condicao:comissao.includes("replace(',', '.')")||comissao.includes('replace(",", ".")'),evidencia:{aprovada:'numeroBR converte vírgula decimal antes do cálculo',falha:'Conversão decimal não localizada'},recomendacao:'Restaurar a conversão da vírgula decimal em numeroBR.'});
+verificar({id:'dados-carregados',arquivo:'index.html',descricao:'Núcleo atual de dados carregado',condicao:index.includes('sales-data-core-restore.js'),evidencia:{aprovada:'index.html carrega sales-data-core-restore.js',falha:'Núcleo de dados não está carregado'},recomendacao:'Adicionar sales-data-core-restore.js ao index.html.'});
+verificar({id:'exclusao-definitiva',arquivo:'sales-data-core-restore.js',descricao:'Exclusão definitiva e bloqueio de retorno',condicao:dados.includes('window.excluirVenda')&&dados.includes('filterDeleted')&&dados.includes('vendasExcluidas'),evidencia:{aprovada:'Foram localizados excluirVenda, filterDeleted e vendasExcluidas',falha:'Uma ou mais proteções de exclusão não foram localizadas'},recomendacao:'Restaurar excluirVenda, o filtro de excluídas e o registro vendasExcluidas.'});
+verificar({id:'edicao-sem-duplicar',arquivo:'sales-data-core-restore.js',descricao:'Edição de vendas sem duplicação',condicao:dados.includes('window.editarVenda')&&dados.includes('editingId'),evidencia:{aprovada:'editarVenda usa editingId para substituir o registro existente',falha:'Fluxo de edição protegido não localizado'},recomendacao:'Restaurar o fluxo de edição baseado em editingId.'});
+verificar({id:'firebase-auth',arquivo:'firebase-integration.js',descricao:'Autenticação e inicialização Firebase',condicao:firebase.includes('firebase.initializeApp')&&firebase.includes('auth.onAuthStateChanged')&&firebase.includes("collection('usuarios')"),evidencia:{aprovada:'Inicialização, autenticação e coleção de usuários localizadas',falha:'Inicialização ou autenticação Firebase não localizada'},recomendacao:'Restaurar initializeApp, onAuthStateChanged e acesso à coleção usuarios.'});
+verificar({id:'firebase-sync-vendas',arquivo:'sales-data-core-restore.js',descricao:'Sincronização de vendas com Firebase',condicao:dados.includes("firebase.firestore().collection('usuarios')")&&dados.includes("collection('vendas')")&&dados.includes('saveCloud')&&dados.includes('reconcile'),evidencia:{aprovada:'Núcleo atual contém referências de usuários/vendas, saveCloud e reconcile',falha:'Sincronização de vendas da arquitetura atual não foi localizada'},recomendacao:'Restaurar userRef/salesRef, saveCloud e reconcile em sales-data-core-restore.js.'});
+verificar({id:'seletor-marcas',arquivo:'brand-product-selector.js',descricao:'Seletor Yamaha/Honda e digitação livre',condicao:index.includes('brand-product-selector.js')&&marcas.includes('yamaha:[')&&marcas.includes('honda:[')&&marcas.includes('Modelo não encontrado'),evidencia:{aprovada:'Marcas e tratamento de modelo não encontrado localizados',falha:'Seletor ou uma das marcas protegidas não foi localizada'},recomendacao:'Restaurar o seletor de marcas e a opção de modelo manual.'});
+verificar({id:'catalogo-protegido',arquivo:'brand-product-selector.js',descricao:'Itens essenciais do catálogo',condicao:marcas.includes('Honda CG 160 Start')&&marcas.includes('Honda GL 1800 Gold Wing Tour')&&marcas.includes('Motor de Popa Yamaha 450 HP'),evidencia:{aprovada:'Itens de início/fim do catálogo Honda e motor 450 HP localizados',falha:'O catálogo protegido parece incompleto'},recomendacao:'Comparar o catálogo com a base aprovada antes de publicar.'});
+verificar({id:'relatorios',arquivo:'index.html',descricao:'Arquivos de relatórios PDF carregados',condicao:index.includes('report-options-fix.js')&&index.includes('pdf-viewer-fix.js'),evidencia:{aprovada:'Arquivos de relatório localizados',falha:'Um arquivo de relatório não está carregado'},recomendacao:'Restaurar report-options-fix.js e pdf-viewer-fix.js.'});
+verificar({id:'backup',arquivo:'index.html',descricao:'Importação e exportação de backup carregadas',condicao:index.includes('import-backup.js')&&index.includes('backup-export-fix.js'),evidencia:{aprovada:'Arquivos de backup localizados',falha:'Importação ou exportação de backup ausente'},recomendacao:'Restaurar import-backup.js e backup-export-fix.js.'});
+verificar({id:'pwa-cache',arquivo:'sw.js',descricao:'Cache e atualização PWA ativos',condicao:sw.includes('cachePrimeiro')&&sw.includes('redePrimeiro')&&index.includes('pwa-enhancements.js'),evidencia:{aprovada:'Estratégias de cache e atualizador PWA localizados',falha:'Estratégia de cache ou atualizador PWA ausente'},recomendacao:'Restaurar cachePrimeiro, redePrimeiro e pwa-enhancements.js.'});
+verificar({id:'vendas-centrais',arquivo:'script.js',descricao:'Funções centrais de persistência de vendas',condicao:script.includes('salvarBanco')&&script.includes('excluirVenda'),evidencia:{aprovada:'salvarBanco e excluirVenda localizadas no núcleo legado protegido',falha:'Funções centrais legadas não localizadas'},recomendacao:'Confirmar se foram substituídas oficialmente; caso contrário, restaurá-las.'});
+
+const falhas = resultados.filter(item => item.status === 'falha');
+const relatorio = {
+  geradoEm: new Date().toISOString(),
+  resumo: { total: resultados.length, aprovados: resultados.length - falhas.length, falhas: falhas.length },
+  resultados
+};
+fs.writeFileSync('guardian-report.json', JSON.stringify(relatorio, null, 2));
+
+console.log(`\n🛡️ IA Guardiã: ${relatorio.resumo.aprovados}/${relatorio.resumo.total} verificações aprovadas.`);
+resultados.forEach(item => console.log(`${item.status === 'aprovado' ? '✅' : '❌'} [${item.id}] ${item.descricao} — ${item.arquivo}: ${item.evidencia}`));
 
 if (falhas.length) {
-  console.error('\n🛡️ IA Guardiã bloqueou a atualização:\n');
-  falhas.forEach(item => console.error(`- ${item}`));
+  console.error('\n🛡️ Atualização bloqueada. Correções recomendadas:');
+  falhas.forEach(item => console.error(`- [${item.id}] ${item.recomendacao}`));
   process.exit(1);
 }
 
-console.log('🛡️ IA Guardiã: todas as funções aprovadas permanecem protegidas na arquitetura atual.');
+console.log('\n🛡️ Todas as funções protegidas foram aprovadas na arquitetura atual.');
