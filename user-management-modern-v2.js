@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  const VERSION='2026.07.21.1';
+  const VERSION='2026.07.21.5';
   let termo='';
   let status='todos';
   let aplicando=false;
