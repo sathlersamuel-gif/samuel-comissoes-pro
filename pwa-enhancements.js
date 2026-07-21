@@ -38,12 +38,12 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=45',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=46',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting) registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV11')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV11','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV12')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV12','1');
             location.reload();
           }
         });
