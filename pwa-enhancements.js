@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.21.8';
+  const HOTFIX='2026.07.21.9';
 
   function carregarScript(src,id){
     return new Promise((resolve,reject)=>{
@@ -55,31 +55,27 @@
       await Promise.all(nomes.filter(nome=>nome.startsWith('samuel-comissoes-pro-')).map(nome=>caches.delete(nome)));
       localStorage.setItem(chave,'1');
       return true;
-    }catch(_){
-      return false;
-    }
+    }catch(_){return false;}
   }
 
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
         const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=77',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=78',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV18')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV18','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV19')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV19','1');
             location.reload();
           }
         });
-        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV18')){
-          sessionStorage.setItem('scpHotfixReloadV18','1');
+        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV19')){
+          sessionStorage.setItem('scpHotfixReloadV19','1');
           setTimeout(()=>location.reload(),300);
         }
-      }catch(error){
-        console.error('Falha ao atualizar o modo offline:',error);
-      }
+      }catch(error){console.error('Falha ao atualizar o modo offline:',error);}
     });
   }
 
