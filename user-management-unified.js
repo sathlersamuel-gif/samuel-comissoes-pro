@@ -2,8 +2,11 @@
   'use strict';
 
   const ADMIN_EMAIL = 'sathlersamuel@gmail.com';
+  const COLECAO_USUARIOS = 'usuarios';
   let db;
   let usuarios = [];
+  let cancelarAtualizacao = null;
+  let iniciado = false;
 
   const $ = (seletor, raiz = document) => raiz.querySelector(seletor);
   const escapar = valor => String(valor || '').replace(/[&<>"']/g, caractere => ({
@@ -20,9 +23,7 @@
   function formatarData(valor, hora = false) {
     const data = converterData(valor);
     if (!data) return 'Não informado';
-    return new Intl.DateTimeFormat('pt-BR', hora ? {
-      dateStyle: 'short', timeStyle: 'short'
-    } : { dateStyle: 'short' }).format(data);
+    return new Intl.DateTimeFormat('pt-BR', hora ? { dateStyle: 'short', timeStyle: 'short' } : { dateStyle: 'short' }).format(data);
   }
 
   function diasRestantes(valor) {
@@ -61,7 +62,7 @@
       .um-filtros{display:flex;gap:8px;overflow:auto;padding-bottom:13px}.um-filtros button{white-space:nowrap;border:1px solid #d5deeb;background:#fff;color:#42506a;padding:10px 14px;border-radius:999px;font-weight:800;touch-action:manipulation}.um-filtros button.ativo{background:#083b82;color:#fff}
       .um-card{padding:17px;margin-bottom:12px;border-left:5px solid var(--cor)}.um-head{display:flex;justify-content:space-between;gap:12px}.um-email{font-weight:900;color:#071b3d;overflow-wrap:anywhere}.um-chip{border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;background:#eef2f7}
       .um-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.um-info{background:#f5f7fb;border-radius:13px;padding:10px}.um-info strong{display:block;color:#172b4d;font-size:13px;margin-top:4px;overflow-wrap:anywhere}
-      .um-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.um-actions button{border:0;border-radius:12px;min-height:44px;padding:10px;color:#fff;font-weight:850;touch-action:manipulation}.um-actions button:disabled{opacity:.55}.um-prazo{background:#1455a0}.um-renovar{background:#6234a5}.um-status{background:#334e70}.um-excluir{background:#941f2b}
+      .um-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.um-actions button{border:0;border-radius:12px;min-height:44px;padding:10px;color:#fff;font-weight:850;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.um-actions button:disabled{opacity:.55}.um-prazo{background:#1455a0}.um-renovar{background:#6234a5}.um-status{background:#334e70}.um-aprovar{background:#0b7a2d}.um-excluir{background:#941f2b}
       .um-loading,.um-vazio{padding:25px;text-align:center;color:#617087}.um-modal{position:fixed;inset:0;z-index:31000;background:rgba(5,15,32,.68);display:flex;align-items:center;justify-content:center;padding:16px}.um-modal-card{width:min(460px,100%);background:#fff;border-radius:22px;padding:20px}.um-modal-card label{display:block;font-weight:800;color:#516078;margin:12px 0 5px}.um-modal-card input,.um-modal-card select{width:100%;box-sizing:border-box;padding:12px;border:1px solid #ced8e6;border-radius:12px;font-size:16px}.um-modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:17px}.um-modal-actions button{border:0;border-radius:12px;padding:13px;font-weight:900}.um-salvar{background:#083b82;color:#fff}
       @media(max-width:720px){.um-summary,.um-grid{grid-template-columns:repeat(2,1fr)}.um-actions{grid-template-columns:repeat(2,1fr)}}
     `;
@@ -90,6 +91,8 @@
   }
 
   function renderizar(filtro = 'todos') {
+    const conteudo = $('#umConteudo');
+    if (!conteudo) return;
     const lista = usuarios.filter(usuario => {
       const status = obterStatus(usuario)[0];
       if (filtro === 'ativos') return ['ativo', 'teste'].includes(status);
@@ -105,25 +108,45 @@
     const nomes = { todos: 'Todos', ativos: 'Ativos', vencendo: 'Vencendo', semuso: 'Sem uso', bloqueados: 'Bloqueados' };
     const filtros = Object.keys(nomes).map(chave => `<button type="button" class="${chave === filtro ? 'ativo' : ''}" data-cmd="filtro" data-filtro="${chave}">${nomes[chave]}</button>`).join('');
     const cards = lista.map(usuario => {
-      const [chave, texto, cor] = obterStatus(usuario);
+      const [, texto, cor] = obterStatus(usuario);
       const restantes = diasRestantes(usuario.expiraEm);
       const prazo = usuario.expiraEm ? `${formatarData(usuario.expiraEm)}${restantes !== null ? ` (${restantes < 0 ? 'vencido' : restantes + ' dias'})` : ''}` : 'Sem vencimento';
-      return `<article class="um-card" style="--cor:${cor}"><div class="um-head"><div><div class="um-email">${escapar(usuario.email || 'Sem e-mail')}</div><small>Cadastrado em ${formatarData(usuario.criadoEm)}</small></div><span class="um-chip">${texto}</span></div><div class="um-grid"><div class="um-info"><span>Uso</span><strong>${descricaoUso(usuario)}</strong></div><div class="um-info"><span>Último acesso</span><strong>${formatarData(usuario.ultimoAcesso, true)}</strong></div><div class="um-info"><span>Acessos</span><strong>${Number(usuario.totalAcessos || 0)}</strong></div><div class="um-info"><span>Válido até</span><strong>${prazo}</strong></div></div><div class="um-actions"><button type="button" class="um-prazo" data-cmd="prazo" data-id="${usuario.id}">Editar prazo</button><button type="button" class="um-renovar" data-cmd="renovar" data-id="${usuario.id}">Renovar</button><button type="button" class="um-status" data-cmd="status" data-id="${usuario.id}" data-status="${usuario.status === 'bloqueado' ? 'ativo' : 'bloqueado'}">${usuario.status === 'bloqueado' ? 'Desbloquear' : 'Bloquear'}</button><button type="button" class="um-excluir" data-cmd="excluir" data-id="${usuario.id}">Excluir</button></div></article>`;
+      const botaoAcesso = usuario.status === 'pendente'
+        ? `<button type="button" class="um-aprovar" data-cmd="aprovar" data-id="${usuario.id}">Aprovar</button>`
+        : `<button type="button" class="um-status" data-cmd="status" data-id="${usuario.id}" data-status="${usuario.status === 'bloqueado' ? 'ativo' : 'bloqueado'}">${usuario.status === 'bloqueado' ? 'Desbloquear' : 'Bloquear'}</button>`;
+      return `<article class="um-card" style="--cor:${cor}"><div class="um-head"><div><div class="um-email">${escapar(usuario.email || 'Sem e-mail')}</div><small>Cadastrado em ${formatarData(usuario.criadoEm)}</small></div><span class="um-chip">${texto}</span></div><div class="um-grid"><div class="um-info"><span>Uso</span><strong>${descricaoUso(usuario)}</strong></div><div class="um-info"><span>Último acesso</span><strong>${formatarData(usuario.ultimoAcesso, true)}</strong></div><div class="um-info"><span>Acessos</span><strong>${Number(usuario.totalAcessos || 0)}</strong></div><div class="um-info"><span>Válido até</span><strong>${prazo}</strong></div></div><div class="um-actions"><button type="button" class="um-prazo" data-cmd="prazo" data-id="${usuario.id}">Editar prazo</button><button type="button" class="um-renovar" data-cmd="renovar" data-id="${usuario.id}">Renovar</button>${botaoAcesso}<button type="button" class="um-excluir" data-cmd="excluir" data-id="${usuario.id}">Excluir</button></div></article>`;
     }).join('');
 
-    $('#umConteudo').innerHTML = resumo() + `<div class="um-filtros">${filtros}</div>` + (cards || '<div class="um-vazio">Nenhum usuário encontrado.</div>');
+    conteudo.innerHTML = resumo() + `<div class="um-filtros">${filtros}</div>` + (cards || '<div class="um-vazio">Nenhum usuário encontrado.</div>');
+  }
+
+  function aplicarSnapshot(resultado) {
+    usuarios = resultado.docs
+      .map(documento => ({ id: documento.id, ...documento.data() }))
+      .filter(usuario => String(usuario.email || '').toLowerCase() !== ADMIN_EMAIL)
+      .sort((a, b) => String(a.email || '').localeCompare(String(b.email || ''), 'pt-BR'));
+    renderizar();
+  }
+
+  function acompanharUsuarios() {
+    if (cancelarAtualizacao) cancelarAtualizacao();
+    const conteudo = $('#umConteudo');
+    if (conteudo) conteudo.innerHTML = '<div class="um-loading">Carregando usuários…</div>';
+    cancelarAtualizacao = db.collection(COLECAO_USUARIOS).onSnapshot(aplicarSnapshot, erro => {
+      console.error('Falha ao carregar usuários:', erro);
+      if (conteudo) conteudo.innerHTML = '<div class="um-vazio">Não foi possível carregar os usuários. Verifique sua conexão e tente novamente.</div>';
+    });
   }
 
   async function carregar() {
-    const conteudo = $('#umConteudo');
-    if (conteudo) conteudo.innerHTML = '<div class="um-loading">Carregando usuários…</div>';
+    if (!db) return;
     try {
-      const resultado = await db.collection('usuarios').orderBy('email').get();
-      usuarios = resultado.docs.map(documento => ({ id: documento.id, ...documento.data() })).filter(usuario => String(usuario.email || '').toLowerCase() !== ADMIN_EMAIL);
-      renderizar();
+      const resultado = await db.collection(COLECAO_USUARIOS).get();
+      aplicarSnapshot(resultado);
     } catch (erro) {
-      console.error(erro);
-      if (conteudo) conteudo.innerHTML = '<div class="um-vazio">Não foi possível carregar os usuários.</div>';
+      console.error('Falha ao atualizar usuários:', erro);
+      const conteudo = $('#umConteudo');
+      if (conteudo) conteudo.innerHTML = '<div class="um-vazio">Não foi possível carregar os usuários. Verifique sua conexão e tente novamente.</div>';
     }
   }
 
@@ -131,13 +154,17 @@
     criarPainel();
     $('#painelUsuarios').style.display = 'block';
     document.body.style.overflow = 'hidden';
-    carregar();
+    acompanharUsuarios();
   }
 
   function fechar() {
     const painel = $('#painelUsuarios');
     if (painel) painel.style.display = 'none';
     document.body.style.overflow = '';
+    if (cancelarAtualizacao) {
+      cancelarAtualizacao();
+      cancelarAtualizacao = null;
+    }
   }
 
   function abrirModal(usuario) {
@@ -145,14 +172,11 @@
     modal.className = 'um-modal';
     modal.innerHTML = `<div class="um-modal-card"><h3>Configurar acesso</h3><p>${escapar(usuario.email)}</p><label>Quantidade</label><input id="umQtd" type="number" min="1" value="3"><label>Período</label><select id="umUn"><option value="dias">Dias</option><option value="meses" selected>Meses</option><option value="anos">Anos</option></select><label><input id="umIlim" type="checkbox" style="width:auto"> Acesso sem vencimento</label><div class="um-modal-actions"><button type="button" data-modal="cancelar">Cancelar</button><button type="button" class="um-salvar" data-modal="salvar">Salvar</button></div></div>`;
     document.body.appendChild(modal);
-
     modal.addEventListener('click', async evento => {
       const botao = evento.target.closest('[data-modal]');
       if (!botao) return;
-      if (botao.dataset.modal === 'cancelar') {
-        modal.remove();
-        return;
-      }
+      evento.preventDefault();
+      if (botao.dataset.modal === 'cancelar') return modal.remove();
       botao.disabled = true;
       const quantidade = Math.max(1, Number($('#umQtd', modal).value || 1));
       const unidade = $('#umUn', modal).value;
@@ -163,7 +187,7 @@
       if (unidade === 'meses') fim.setMonth(fim.getMonth() + quantidade);
       if (unidade === 'anos') fim.setFullYear(fim.getFullYear() + quantidade);
       try {
-        await db.collection('usuarios').doc(usuario.id).set({
+        await db.collection(COLECAO_USUARIOS).doc(usuario.id).set({
           status: 'ativo',
           acessoIniciadoEm: firebase.firestore.Timestamp.fromDate(inicio),
           expiraEm: ilimitado ? firebase.firestore.FieldValue.delete() : firebase.firestore.Timestamp.fromDate(fim),
@@ -172,7 +196,6 @@
           atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
         modal.remove();
-        await carregar();
       } catch (erro) {
         console.error(erro);
         alert('Não foi possível salvar.');
@@ -192,10 +215,12 @@
 
     botao.disabled = true;
     try {
-      if (comando === 'status') {
-        await db.collection('usuarios').doc(usuario.id).set({ status: botao.dataset.status, atualizadoEm: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-      }
-      if (comando === 'renovar') {
+      const referencia = db.collection(COLECAO_USUARIOS).doc(usuario.id);
+      if (comando === 'aprovar') {
+        await referencia.set({ status: 'ativo', aprovadoEm: firebase.firestore.FieldValue.serverTimestamp(), atualizadoEm: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      } else if (comando === 'status') {
+        await referencia.set({ status: botao.dataset.status, atualizadoEm: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      } else if (comando === 'renovar') {
         const atual = converterData(usuario.expiraEm);
         const fim = atual && atual > new Date() ? new Date(atual) : new Date();
         const quantidade = Math.max(1, Number(usuario.periodoQuantidade || 3));
@@ -203,16 +228,14 @@
         if (unidade === 'dias') fim.setDate(fim.getDate() + quantidade);
         if (unidade === 'meses') fim.setMonth(fim.getMonth() + quantidade);
         if (unidade === 'anos') fim.setFullYear(fim.getFullYear() + quantidade);
-        await db.collection('usuarios').doc(usuario.id).set({ status: 'ativo', expiraEm: firebase.firestore.Timestamp.fromDate(fim), atualizadoEm: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-      }
-      if (comando === 'excluir') {
+        await referencia.set({ status: 'ativo', expiraEm: firebase.firestore.Timestamp.fromDate(fim), atualizadoEm: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      } else if (comando === 'excluir') {
         if (!confirm(`Excluir definitivamente ${usuario.email || 'este usuário'}?`)) {
           botao.disabled = false;
           return;
         }
-        await db.collection('usuarios').doc(usuario.id).delete();
+        await referencia.delete();
       }
-      await carregar();
     } catch (erro) {
       console.error(erro);
       alert('Não foi possível concluir a ação.');
@@ -221,11 +244,10 @@
   }
 
   function iniciar() {
-    if (!window.firebase || !firebase.apps.length) {
-      setTimeout(iniciar, 300);
-      return;
-    }
-    db = firebase.firestore();
+    if (iniciado) return;
+    if (!window.firebase || !firebase.apps.length) return setTimeout(iniciar, 250);
+    db = window.SCPAuth?.db || firebase.firestore();
+    iniciado = true;
     instalarEstilos();
     criarPainel();
     document.addEventListener('click', evento => {
@@ -239,11 +261,12 @@
       const botao = evento.target.closest('#painelUsuarios [data-cmd]');
       if (botao) {
         evento.preventDefault();
+        evento.stopPropagation();
         executar(botao);
       }
     }, true);
     window.carregarGerenciamentoUsuarios = carregar;
-    window.__SCP_USER_MANAGEMENT_UNIFIED__ = '1.0.1';
+    window.__SCP_USER_MANAGEMENT_UNIFIED__ = '1.1.0';
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar, { once: true });
