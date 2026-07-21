@@ -2,11 +2,15 @@
   'use strict';
 
   const ADMIN_EMAIL='sathlersamuel@gmail.com';
-  const VERSION='2026.07.21.6';
+  const VERSION='2026.07.21.7';
   let usuarioAtual=null;
 
+  function usuarioFirebase(){
+    try{return window.firebase?.auth?.().currentUser||null;}catch(_){return null;}
+  }
+
   function usuarioEhAdmin(){
-    const email=String(usuarioAtual?.email||window.firebase?.auth?.().currentUser?.email||'').trim().toLowerCase();
+    const email=String(usuarioAtual?.email||usuarioFirebase()?.email||'').trim().toLowerCase();
     return email===ADMIN_EMAIL;
   }
 
@@ -29,13 +33,32 @@
     });
   }
 
+  function esperarUsuarioAdmin(limiteMs=10000){
+    return new Promise((resolve,reject)=>{
+      const inicio=Date.now();
+      const verificar=()=>{
+        const atual=usuarioFirebase();
+        if(atual){
+          usuarioAtual=atual;
+          if(String(atual.email||'').trim().toLowerCase()===ADMIN_EMAIL)return resolve(atual);
+          return reject(new Error('Este usuário não possui acesso administrativo.'));
+        }
+        if(Date.now()-inicio>=limiteMs)return reject(new Error('Não foi possível confirmar o login administrativo.'));
+        setTimeout(verificar,150);
+      };
+      verificar();
+    });
+  }
+
+  function mostrarFalhaNoPainel(mensagem){
+    const lista=document.getElementById('listaUsuarios');
+    if(lista)lista.innerHTML=`<div class="usuario-card"><p>${String(mensagem||'Não foi possível carregar os usuários.')}</p><button type="button" id="scpTentarUsuariosNovamente">Tentar novamente</button></div>`;
+    document.getElementById('scpTentarUsuariosNovamente')?.addEventListener('click',abrirGerenciamento,{once:true});
+  }
+
   async function abrirGerenciamento(evento){
     evento?.preventDefault?.();
     evento?.stopPropagation?.();
-    if(!usuarioEhAdmin()){
-      ocultarAcessoNaoAdmin();
-      return;
-    }
 
     const botao=evento?.currentTarget||document.getElementById('scpManageUsers');
     const textoOriginal=botao?.dataset?.textoOriginal||botao?.textContent||'👥 Gerenciar acessos';
@@ -46,16 +69,22 @@
     }
 
     try{
+      await esperarUsuarioAdmin();
       const carregar=await esperarGerenciador();
       const painel=document.getElementById('painelUsuarios');
       if(!painel)throw new Error('O painel de usuários não está disponível.');
       painel.style.setProperty('display','block','important');
-      await carregar();
+      const lista=document.getElementById('listaUsuarios');
+      if(lista)lista.innerHTML='<p>Carregando informações de uso...</p>';
+      await Promise.race([
+        Promise.resolve(carregar()),
+        new Promise((_,reject)=>setTimeout(()=>reject(new Error('A consulta de usuários demorou mais que o esperado.')),15000))
+      ]);
       document.getElementById('scpSecurityPanel')?.remove();
       window.scrollTo({top:0,behavior:'instant'});
     }catch(erro){
       console.error('[Gerenciar usuários]',erro);
-      alert(`${erro.message||'Não foi possível abrir o gerenciamento.'} Tente novamente.`);
+      mostrarFalhaNoPainel(erro.message);
     }finally{
       if(botao&&document.body.contains(botao)){
         botao.disabled=false;
@@ -83,6 +112,7 @@
 
   function conectarFirebase(){
     if(!window.firebase||!firebase.apps.length)return setTimeout(conectarFirebase,250);
+    usuarioAtual=firebase.auth().currentUser||usuarioAtual;
     firebase.auth().onAuthStateChanged(user=>{
       usuarioAtual=user;
       ocultarAcessoNaoAdmin();
