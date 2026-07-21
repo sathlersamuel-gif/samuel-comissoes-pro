@@ -3,12 +3,11 @@
 
   const ADMIN_EMAIL='sathlersamuel@gmail.com';
   const STATUS_EXCLUIDO='excluido';
-  const CORE_VERSION='2026.07.18.2';
+  const CORE_VERSION='2026.07.21.1';
   const COLECAO_BLOQUEIOS='usuariosExcluidos';
   let auth=null;
   let db=null;
   let processandoUid='';
-  let ultimoAcionamento=0;
 
   function iniciarFirebase(){
     if(!window.firebase||!firebase.apps||!firebase.apps.length)return false;
@@ -43,9 +42,6 @@
   }
 
   async function excluirUsuario(botao){
-    const agora=Date.now();
-    if(agora-ultimoAcionamento<700)return;
-    ultimoAcionamento=agora;
     const uid=String(botao?.dataset?.uid||'').trim();
     const email=String(botao?.dataset?.email||'este usuário').trim().toLowerCase();
     if(!uid)return alert('Não foi possível identificar este usuário.');
@@ -124,7 +120,7 @@
     }catch(erro){registrar('erro','Falha ao filtrar usuários excluídos',{erro:erro?.message||String(erro)});}
   }
 
-  function interceptar(evento){
+  function interceptarClique(evento){
     const botao=botaoExcluir(evento.target);
     if(!botao)return;
     evento.preventDefault();
@@ -134,9 +130,7 @@
   }
 
   function instalarEventos(){
-    document.addEventListener('pointerup',interceptar,true);
-    document.addEventListener('click',interceptar,true);
-    document.addEventListener('touchend',interceptar,{capture:true,passive:false});
+    document.addEventListener('click',interceptarClique,true);
     document.addEventListener('click',evento=>{
       if(evento.target?.closest?.('#adminUsuariosBtn')){
         setTimeout(()=>{marcarVersao();filtrarExcluidos();},100);
