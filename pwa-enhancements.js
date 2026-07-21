@@ -1,6 +1,11 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.21.3';
+  const HOTFIX='2026.07.21.4';
+
+  function removerDuplicados(nomeArquivo){
+    const encontrados=[...document.querySelectorAll(`script[src*="${nomeArquivo}"]`)];
+    encontrados.slice(1).forEach(script=>script.remove());
+  }
 
   function carregarScript(src,id){
     if(id&&document.getElementById(id))return;
@@ -15,8 +20,8 @@
   carregarScript('ai-performance-accelerator.js?v=1','scpPerformanceLoader');
   carregarScript('edit-sale-definitive-fix.js?v=4','scpEditSaleLoader');
 
-  // Estes dois arquivos também são carregados aqui para alcançar instalações
-  // antigas cujo index.html ficou preso no cache do iPhone.
+  // Mantém uma única sequência do gerenciamento, mesmo em instalações antigas.
+  ['admin-access-settings-fix.js','user-management-modern-v2.js'].forEach(removerDuplicados);
   carregarScript(`admin-access-settings-fix.js?v=${HOTFIX}`,'scpAdminAccessHotfix');
   carregarScript(`user-management-modern-v2.js?v=${HOTFIX}`,'scpUserManagementHotfix');
 
@@ -42,7 +47,7 @@
   criarSplash();
 
   async function limparCachesAntigos(){
-    const chave='scp-cache-hotfix-20260721-3';
+    const chave=`scp-cache-hotfix-${HOTFIX}`;
     if(localStorage.getItem(chave))return false;
     try{
       const nomes=await caches.keys();
@@ -58,18 +63,18 @@
     window.addEventListener('load',async()=>{
       try{
         const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=47',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=70',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV13')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV13','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV14')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV14','1');
             location.reload();
           }
         });
-        if(limpou&&!navigator.serviceWorker.controller&&!sessionStorage.getItem('scpHotfixReloadV13')){
-          sessionStorage.setItem('scpHotfixReloadV13','1');
-          setTimeout(()=>location.reload(),250);
+        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV14')){
+          sessionStorage.setItem('scpHotfixReloadV14','1');
+          setTimeout(()=>location.reload(),300);
         }
       }catch(error){
         console.error('Falha ao atualizar o modo offline:',error);
