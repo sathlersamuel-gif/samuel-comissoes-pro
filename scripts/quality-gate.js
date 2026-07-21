@@ -66,6 +66,26 @@ if (!/O Firebase não confirmou a exclusão/.test(read(deletionFile))) {
   ok('A exclusão só pode informar sucesso após confirmação do Firebase.');
 }
 
+// 7) Garante que o gerenciamento moderno seja carregado diretamente e por último.
+const corePos = index.indexOf('user-management-core.js?v=6');
+const accessMatch = index.match(/admin-access-settings-fix\.js\?v=([^"']+)/);
+const modernMatch = index.match(/user-management-modern-v2\.js\?v=([^"']+)/);
+const modernPos = index.indexOf('user-management-modern-v2.js');
+if (corePos < 0) fail('Núcleo do gerenciamento de usuários não está carregado no index.html.');
+if (!accessMatch) fail('Ajustes modernos de acesso não estão carregados diretamente no index.html.');
+if (!modernMatch) fail('Visual moderno do gerenciamento não está carregado diretamente no index.html.');
+if (corePos >= 0 && modernPos >= 0 && modernPos < corePos) fail('O visual moderno está carregando antes do núcleo de usuários.');
+if (accessMatch && modernMatch && accessMatch[1] !== modernMatch[1]) fail('Arquivos modernos do gerenciamento usam versões diferentes.');
+if (modernMatch && !sw.includes(`user-management-modern-v2.js?v=${modernMatch[1]}`)) fail('Service Worker não contém a mesma versão do gerenciamento moderno.');
+if (accessMatch && !sw.includes(`admin-access-settings-fix.js?v=${accessMatch[1]}`)) fail('Service Worker não contém a mesma versão dos ajustes de acesso.');
+if (corePos >= 0 && accessMatch && modernMatch && modernPos > corePos) ok(`Gerenciamento moderno ${modernMatch[1]} carregado após o núcleo e alinhado ao cache.`);
+
+// 8) Garante que o carregador PWA use a mesma versão no HTML e no cache.
+const pwaMatch = index.match(/pwa-enhancements\.js\?v=(\d+)/);
+if (!pwaMatch) fail('Carregador PWA não está versionado no index.html.');
+else if (!sw.includes(`pwa-enhancements.js?v=${pwaMatch[1]}`)) fail('Versão do carregador PWA diverge entre index.html e sw.js.');
+else ok(`Carregador PWA v${pwaMatch[1]} alinhado entre HTML e Service Worker.`);
+
 if (process.exitCode) {
   console.error('\n⛔ VISTORIA REPROVADA. A versão não deve ser considerada pronta.');
   process.exit(process.exitCode);
