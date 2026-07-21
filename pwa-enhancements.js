@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.21.6';
+  const HOTFIX='2026.07.21.7';
 
   function carregarScript(src,id){
     return new Promise((resolve,reject)=>{
@@ -18,6 +18,7 @@
   carregarScript('tipo-numeros-mobile.js?v=3','scpTipoNumerosLoader').catch(console.error);
   carregarScript('ai-performance-accelerator.js?v=1','scpPerformanceLoader').catch(console.error);
   carregarScript('edit-sale-definitive-fix.js?v=4','scpEditSaleLoader').catch(console.error);
+  carregarScript(`user-management-iphone-fix.js?v=${HOTFIX}`,'scpIphoneUserManagementFix').catch(console.error);
 
   function marcarGerenciamento(){
     document.documentElement.dataset.scpUserManagement=HOTFIX;
@@ -64,17 +65,17 @@
     window.addEventListener('load',async()=>{
       try{
         const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=75',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=76',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV16')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV16','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV17')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV17','1');
             location.reload();
           }
         });
-        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV16')){
-          sessionStorage.setItem('scpHotfixReloadV16','1');
+        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV17')){
+          sessionStorage.setItem('scpHotfixReloadV17','1');
           setTimeout(()=>location.reload(),300);
         }
       }catch(error){
