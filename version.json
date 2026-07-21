@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
-  "releasedAt": "2026-07-19T16:00:00-04:00",
-  "notes": "Corrige o campo de porcentagem no cadastro da venda: mantém valores como 1,0 e 1,6 ao trocar o tipo de negociação, limita a duas casas numéricas, remove a aparência de comissão duplicada e exibe abaixo apenas o valor a receber. Cache atualizado para v60."
+  "version": "1.3.1",
+  "releasedAt": "2026-07-21T16:00:00-04:00",
+  "notes": "Corrige o carregamento do novo gerenciamento de usuários, elimina conflito com a tela antiga e força atualização segura do PWA e do cache no iPhone."
 }
