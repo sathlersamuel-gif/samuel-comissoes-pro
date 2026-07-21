@@ -1,25 +1,31 @@
 (function(){
-  const ajusteDireto=document.createElement('script');
-  ajusteDireto.src='tipo-numeros-mobile.js?v=3';
-  ajusteDireto.defer=true;
-  document.head.appendChild(ajusteDireto);
+  'use strict';
+  const HOTFIX='2026.07.21.3';
 
-  const acelerador=document.createElement('script');
-  acelerador.src='ai-performance-accelerator.js?v=1';
-  acelerador.defer=true;
-  document.head.appendChild(acelerador);
+  function carregarScript(src,id){
+    if(id&&document.getElementById(id))return;
+    const script=document.createElement('script');
+    if(id)script.id=id;
+    script.src=src;
+    script.defer=true;
+    document.head.appendChild(script);
+  }
 
-  const correcaoEdicao=document.createElement('script');
-  correcaoEdicao.src='edit-sale-definitive-fix.js?v=4';
-  correcaoEdicao.defer=true;
-  document.head.appendChild(correcaoEdicao);
+  carregarScript('tipo-numeros-mobile.js?v=3','scpTipoNumerosLoader');
+  carregarScript('ai-performance-accelerator.js?v=1','scpPerformanceLoader');
+  carregarScript('edit-sale-definitive-fix.js?v=4','scpEditSaleLoader');
+
+  // Estes dois arquivos também são carregados aqui para alcançar instalações
+  // antigas cujo index.html ficou preso no cache do iPhone.
+  carregarScript(`admin-access-settings-fix.js?v=${HOTFIX}`,'scpAdminAccessHotfix');
+  carregarScript(`user-management-modern-v2.js?v=${HOTFIX}`,'scpUserManagementHotfix');
 
   function instalado(){
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
   }
 
   function criarSplash(){
-    if(document.getElementById('appSplash')) return;
+    if(document.getElementById('appSplash'))return;
     const splash=document.createElement('div');
     splash.id='appSplash';
     splash.innerHTML='<div class="splash-logo">S</div><h1>Samuel Comissões PRO</h1><p>Carregando seu painel...</p>';
@@ -32,24 +38,44 @@
     setTimeout(remover,2500);
   }
 
-  if(instalado()) document.body.classList.add('app-standalone');
+  if(instalado())document.body.classList.add('app-standalone');
   criarSplash();
+
+  async function limparCachesAntigos(){
+    const chave='scp-cache-hotfix-20260721-3';
+    if(localStorage.getItem(chave))return false;
+    try{
+      const nomes=await caches.keys();
+      await Promise.all(nomes.filter(nome=>nome.startsWith('samuel-comissoes-pro-')).map(nome=>caches.delete(nome)));
+      localStorage.setItem(chave,'1');
+      return true;
+    }catch(_){
+      return false;
+    }
+  }
 
   if('serviceWorker' in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const registration=await navigator.serviceWorker.register('./sw.js?v=46',{updateViaCache:'none'});
+        const limpou=await limparCachesAntigos();
+        const registration=await navigator.serviceWorker.register('./sw.js?v=47',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
-        if(registration.waiting) registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
+        if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV12')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV12','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV13')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV13','1');
             location.reload();
           }
         });
+        if(limpou&&!navigator.serviceWorker.controller&&!sessionStorage.getItem('scpHotfixReloadV13')){
+          sessionStorage.setItem('scpHotfixReloadV13','1');
+          setTimeout(()=>location.reload(),250);
+        }
       }catch(error){
-        console.error('Falha ao registrar o modo offline:',error);
+        console.error('Falha ao atualizar o modo offline:',error);
       }
     });
   }
+
+  window.__SCP_PWA_HOTFIX__=HOTFIX;
 })();
