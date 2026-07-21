@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.21.12';
+  const HOTFIX='2026.07.21.13';
 
   function carregarScript(src,id){
     return new Promise((resolve,reject)=>{
@@ -19,7 +19,7 @@
   carregarScript('ai-performance-accelerator.js?v=1','scpPerformanceLoader').catch(console.error);
   carregarScript('edit-sale-definitive-fix.js?v=4','scpEditSaleLoader').catch(console.error);
   carregarScript('user-management-open-fix.js?v=2026.07.21.9','scpUserManagementOpenFix').catch(console.error);
-  carregarScript('user-management-single-tap-fix.js?v=2026.07.21.12','scpUserManagementSingleTapFix').catch(console.error);
+  carregarScript('user-management-direct-touch-fix.js?v=2026.07.21.13','scpUserManagementDirectTouchFix').catch(console.error);
 
   function marcarGerenciamento(){
     document.documentElement.dataset.scpUserManagement=HOTFIX;
@@ -64,17 +64,17 @@
     window.addEventListener('load',async()=>{
       try{
         const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=81',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=82',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV22')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV22','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV23')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV23','1');
             location.reload();
           }
         });
-        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV22')){
-          sessionStorage.setItem('scpHotfixReloadV22','1');
+        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV23')){
+          sessionStorage.setItem('scpHotfixReloadV23','1');
           setTimeout(()=>location.reload(),300);
         }
       }catch(error){console.error('Falha ao atualizar o modo offline:',error);}
