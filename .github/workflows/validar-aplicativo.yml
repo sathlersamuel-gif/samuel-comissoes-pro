@@ -1,0 +1,125 @@
+name: Validar aplicativo
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validar-aplicativo-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validar:
+    name: Auditoria completa do aplicativo
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validar sintaxe dos arquivos JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' arquivos < <(find . -type f -name '*.js' -not -path './node_modules/*' -print0)
+          if [ ${#arquivos[@]} -eq 0 ]; then
+            echo 'Nenhum arquivo JavaScript encontrado.'
+            exit 1
+          fi
+          for arquivo in "${arquivos[@]}"; do
+            echo "Validando $arquivo"
+            node --check "$arquivo"
+          done
+
+      - name: Validar arquivos obrigatórios
+        shell: bash
+        run: |
+          set -euo pipefail
+          obrigatorios=(
+            index.html
+            pwa-enhancements.js
+            sw.js
+            admin-user-management.js
+            user-management-core.js
+            user-management-modern-v2.js
+            user-management-open-fix.js
+            user-management-direct-touch-fix.js
+          )
+          faltando=0
+          for arquivo in "${obrigatorios[@]}"; do
+            if [ ! -f "$arquivo" ]; then
+              echo "::error file=$arquivo::Arquivo obrigatório não encontrado"
+              faltando=1
+            fi
+          done
+          exit "$faltando"
+
+      - name: Validar referências do Service Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const texto = fs.readFileSync('sw.js', 'utf8');
+          const urls = [...texto.matchAll(/['"]\.\/([^'"?]+)(?:\?[^'"]*)?['"]/g)].map(m => m[1]);
+          const ausentes = [...new Set(urls)].filter(p => p && !fs.existsSync(p));
+          if (ausentes.length) {
+            for (const arquivo of ausentes) console.error(`::error file=sw.js::Referência inexistente: ${arquivo}`);
+            process.exit(1);
+          }
+          console.log(`Referências validadas: ${new Set(urls).size}`);
+          NODE
+
+      - name: Validar carregamento das correções do gerenciador
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "user-management-direct-touch-fix.js" pwa-enhancements.js
+          grep -q "user-management-direct-touch-fix.js" sw.js
+          if grep -q "user-management-single-tap-fix.js" pwa-enhancements.js; then
+            echo '::error file=pwa-enhancements.js::Correção antiga de toque ainda está sendo carregada'
+            exit 1
+          fi
+
+      - name: Gerar relatório da IA Guardiã
+        if: always()
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const relatorio = {
+            workflow: 'Validar aplicativo',
+            commit: process.env.GITHUB_SHA,
+            executadoEm: new Date().toISOString(),
+            status: process.env.GITHUB_JOB ? 'auditoria-executada' : 'desconhecido',
+            verificacoes: [
+              'sintaxe JavaScript',
+              'arquivos obrigatórios',
+              'referências do Service Worker',
+              'carregamento das correções do gerenciador'
+            ]
+          };
+          fs.writeFileSync('guardian-report.json', JSON.stringify(relatorio, null, 2));
+          NODE
+
+      - name: Publicar relatório da Guardiã
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: guardian-report
+          path: guardian-report.json
+          if-no-files-found: error
