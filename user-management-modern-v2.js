@@ -13,7 +13,7 @@
     link=document.createElement('link');
     link.id='scpUserManagementReferenceCss';
     link.rel='stylesheet';
-    link.href='user-management-reference.css?v=1';
+    link.href='user-management-reference.css?v=2';
     document.head.appendChild(link);
   }
   function carregar(){
@@ -22,7 +22,7 @@
     if(window.__SCP_USER_MANAGEMENT_UNIFIED__)return;
     if(document.querySelector('script[data-scp-user-management="1"]'))return;
     const script=document.createElement('script');
-    script.src='user-management-unified.js?v=6';
+    script.src='user-management-unified.js?v=7';
     script.async=false;script.dataset.scpUserManagement='1';
     script.onerror=function(){const conteudo=document.getElementById('listaUsuarios')||document.getElementById('umConteudo');if(conteudo)conteudo.innerHTML='<p>Não foi possível carregar o Gerenciamento de Usuários.</p>'};
     document.body.appendChild(script);
