@@ -1,7 +1,7 @@
 {
   "app": "Samuel Comissões PRO",
-  "generatedAt": "2026-07-24T21:59:40.195Z",
-  "commit": "7ff952b252c09889ad45a9b93f408bba360b016b",
+  "generatedAt": "2026-07-24T22:03:10.619Z",
+  "commit": "ea435de57683bf309035e8bcfe1a036539a6c2fb",
   "files": [
     {
       "path": ".github/workflows/build-android-apk.yml",
@@ -893,6 +893,7 @@
     "corrigida",
     "corrigirFlashDeFundo",
     "count",
+    "counts",
     "covers",
     "cp",
     "credential",
@@ -1487,6 +1488,7 @@
     "relatorio",
     "rememberError",
     "removeFalsePositives",
+    "removeLegacyDuplicates",
     "removePrematureBackupPrompt",
     "removeUser",
     "remover",
@@ -1838,6 +1840,7 @@
     "guardianOccurrencesStyle",
     "guardianOccurrencesSummary",
     "guardianRequestFix",
+    "guardianSafeActions",
     "guardianSafeCount",
     "guardianSafeDeleteAll",
     "guardianSafeToggle",
@@ -1967,8 +1970,8 @@
   ],
   "summary": {
     "files": 141,
-    "symbols": 1191,
-    "domIds": 167,
+    "symbols": 1193,
+    "domIds": 168,
     "storageKeys": 15,
     "firestoreCollections": 10,
     "assets": 4
