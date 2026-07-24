@@ -88,5 +88,34 @@
     };
   }
 
+  function abrirGuardia(){
+    if(window.SCPGuardian&&typeof window.SCPGuardian.open==='function')window.SCPGuardian.open();
+    else alert('A IA Guardiã ainda está carregando. Aguarde um instante e tente novamente.');
+  }
+
+  function garantirAcessosGuardia(){
+    const barra=document.querySelector('.bottom');
+    if(barra&&!barra.querySelector('.guardia-nav-btn')){
+      const botao=document.createElement('button');
+      botao.type='button';
+      botao.className='guardia-nav-btn';
+      botao.innerHTML='<span>✦</span><small>IA</small><em class="guardia-badge">0</em>';
+      botao.addEventListener('click',abrirGuardia);
+      barra.appendChild(botao);
+    }
+
+    const painel=document.getElementById('dashboard');
+    if(painel&&!painel.querySelector('.guardia-lancador')){
+      const cartao=document.createElement('div');
+      cartao.className='guardia-lancador';
+      cartao.innerHTML='<div><b>IA Guardiã 24h</b><small>Monitore aparelhos, erros e sincronização.</small></div><button type="button">Abrir</button>';
+      cartao.querySelector('button').addEventListener('click',abrirGuardia);
+      painel.appendChild(cartao);
+    }
+  }
+
   mostrar();
+  setTimeout(garantirAcessosGuardia,300);
+  setTimeout(garantirAcessosGuardia,1500);
+  new MutationObserver(garantirAcessosGuardia).observe(document.body,{childList:true,subtree:true});
 })();
