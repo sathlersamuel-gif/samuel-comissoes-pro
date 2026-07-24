@@ -1,10 +1,11 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.21.15';
+  const HOTFIX='2026.07.24.1';
 
   function carregarScript(src,id){
     return new Promise((resolve,reject)=>{
       if(id&&document.getElementById(id))return resolve();
+      if(src.includes('ai-performance-accelerator')&&window.__SCP_ACCELERATOR_LOADING__)return resolve();
       const script=document.createElement('script');
       if(id)script.id=id;
       script.src=src;
@@ -16,39 +17,28 @@
   }
 
   carregarScript('tipo-numeros-mobile.js?v=3','scpTipoNumerosLoader').catch(console.error);
-  carregarScript('ai-performance-accelerator.js?v=1','scpPerformanceLoader').catch(console.error);
+  carregarScript('ai-performance-accelerator.js?v=2','scpPerformanceLoader').catch(console.error);
   carregarScript('edit-sale-definitive-fix.js?v=4','scpEditSaleLoader').catch(console.error);
   carregarScript('user-management-unified.js?v=2','scpUserManagementUnified').catch(console.error);
 
-  function instalado(){
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
-  }
+  function instalado(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}
 
   function restaurarTelaInicial(){
     if(document.getElementById('scpStandaloneLayout'))return;
-    const style=document.createElement('style');
-    style.id='scpStandaloneLayout';
-    style.textContent=`
-      #appSplash{position:fixed;inset:0;z-index:20000;background:linear-gradient(160deg,#061326,#0b2a5a);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;transition:opacity .35s ease}
-      .splash-logo{width:96px;height:96px;border-radius:28px;background:#d90429;display:grid;place-items:center;font-size:54px;font-weight:800;box-shadow:0 18px 45px rgba(0,0,0,.35)}
-      #appSplash h1{font-size:25px;margin:22px 0 8px;text-align:center}
-      #appSplash p{opacity:.72}
-      body.app-standalone{padding-top:env(safe-area-inset-top);padding-bottom:calc(74px + env(safe-area-inset-bottom))}
-      body.app-standalone .bottom{padding-bottom:env(safe-area-inset-bottom)}
-    `;
+    const style=document.createElement('style');style.id='scpStandaloneLayout';
+    style.textContent=`#appSplash{position:fixed;inset:0;z-index:20000;background:linear-gradient(160deg,#061326,#0b2a5a);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;transition:opacity .18s ease;transform:translateZ(0)}.splash-logo{width:96px;height:96px;border-radius:28px;background:#d90429;display:grid;place-items:center;font-size:54px;font-weight:800;box-shadow:0 18px 45px rgba(0,0,0,.28)}#appSplash h1{font-size:25px;margin:22px 0 8px;text-align:center}#appSplash p{opacity:.72}body.app-standalone{padding-top:env(safe-area-inset-top);padding-bottom:calc(74px + env(safe-area-inset-bottom))}body.app-standalone .bottom{padding-bottom:env(safe-area-inset-bottom)}`;
     document.head.appendChild(style);
     if(instalado())document.body.classList.add('app-standalone');
   }
 
   function criarSplash(){
     if(document.getElementById('appSplash'))return;
-    const splash=document.createElement('div');
-    splash.id='appSplash';
+    const splash=document.createElement('div');splash.id='appSplash';
     splash.innerHTML='<div class="splash-logo">S</div><h1>Samuel Comissões PRO</h1><p>Carregando seu painel...</p>';
     document.body.appendChild(splash);
-    const remover=()=>{if(!splash.isConnected)return;splash.style.opacity='0';setTimeout(()=>splash.remove(),380)};
-    setTimeout(remover,700);
-    setTimeout(remover,2500);
+    const remover=()=>{if(!splash.isConnected)return;splash.style.opacity='0';splash.style.pointerEvents='none';setTimeout(()=>splash.remove(),200)};
+    requestAnimationFrame(()=>setTimeout(remover,420));
+    setTimeout(remover,1800);
   }
 
   restaurarTelaInicial();
@@ -59,28 +49,28 @@
     if(localStorage.getItem(chave))return false;
     try{
       const nomes=await caches.keys();
-      await Promise.all(nomes.filter(nome=>nome.startsWith('samuel-comissoes-pro-')).map(nome=>caches.delete(nome)));
+      await Promise.all(nomes.filter(nome=>nome.startsWith('samuel-comissoes-pro-')||nome.startsWith('scp-ai-warm-')).map(nome=>caches.delete(nome)));
       localStorage.setItem(chave,'1');
       return true;
     }catch(_){return false;}
   }
 
-  if('serviceWorker' in navigator){
+  if('serviceWorker'in navigator){
     window.addEventListener('load',async()=>{
       try{
         const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=84',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=108',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV25')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV25','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV108')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV108','1');
             location.reload();
           }
         });
-        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV25')){
-          sessionStorage.setItem('scpHotfixReloadV25','1');
-          setTimeout(()=>location.reload(),300);
+        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV108')){
+          sessionStorage.setItem('scpHotfixReloadV108','1');
+          setTimeout(()=>location.reload(),250);
         }
       }catch(error){console.error('Falha ao atualizar o modo offline:',error);}
     });
