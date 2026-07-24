@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.24.2';
+  const HOTFIX='2026.07.24.3';
 
   function carregarScript(src,id){
     return new Promise((resolve,reject)=>{
@@ -27,6 +27,7 @@
     ['guardian-gear-integration.js?v=3','scpGuardianGearIntegration'],
     ['guardian-audit-upgrade.js?v=2','scpGuardianAuditUpgrade'],
     ['guardian-offline-filter.js?v=1','scpGuardianOfflineFilter'],
+    ['safari-indexeddb-transaction-fix.js?v=1','scpSafariIndexedDbFix'],
     ['guardian-deep-audit.js?v=3','scpGuardianDeepAudit'],
     ['guardian-autofix.js?v=3','scpGuardianAutofix'],
     ['guardian-retention.js?v=1','scpGuardianRetention'],
@@ -84,17 +85,17 @@
     window.addEventListener('load',async()=>{
       try{
         const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=112',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=113',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV112')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV112','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV113')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV113','1');
             location.reload();
           }
         });
-        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV112')){
-          sessionStorage.setItem('scpHotfixReloadV112','1');
+        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV113')){
+          sessionStorage.setItem('scpHotfixReloadV113','1');
           setTimeout(()=>location.reload(),250);
         }
       }catch(error){console.error('Falha ao atualizar o modo offline:',error);}
