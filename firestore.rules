@@ -52,5 +52,27 @@ service cloud.firestore {
         && request.resource.data.to == 'sathlersamuel@gmail.com';
       allow read, update, delete: if isAdmin();
     }
+
+    match /configuracoes/{configId} {
+      allow read: if loggedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /monitor_dispositivos/{deviceId} {
+      allow read: if isAdmin() || (loggedIn() && resource.data.uid == request.auth.uid);
+      allow create: if loggedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if isAdmin() || (
+        loggedIn() &&
+        resource.data.uid == request.auth.uid &&
+        request.resource.data.uid == request.auth.uid
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /monitor_erros/{errorId} {
+      allow read: if isAdmin() || (loggedIn() && resource.data.uid == request.auth.uid);
+      allow create: if loggedIn() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
   }
 }
