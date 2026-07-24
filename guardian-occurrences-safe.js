@@ -32,30 +32,47 @@
     return {box,panel};
   }
 
+  function removeLegacyDuplicates(panel){
+    panel?.querySelectorAll('.guardian-occ-head,.guardian-occ-actions,#guardianOccurrencesSummary').forEach(el=>el.remove());
+    document.querySelectorAll('#guardianToggleOccurrences,#guardianDeleteAll').forEach(el=>el.remove());
+    const actions=[...panel.querySelectorAll('.guardian-safe-actions')];
+    actions.slice(1).forEach(el=>el.remove());
+    const counts=[...panel.querySelectorAll('#guardianSafeCount')];
+    counts.slice(1).forEach(el=>el.remove());
+  }
+
   function installUI(){
-    if(initialized)return true;
     const {box,panel}=getHost();
     if(!box||!panel)return false;
     ensureStyles();
+    removeLegacyDuplicates(panel);
 
     const head=panel.querySelector('.guardia-painel-cabeca');
     if(!head)return false;
 
-    const actions=document.createElement('div');
-    actions.className='guardian-safe-actions';
-    actions.innerHTML='<button type="button" id="guardianSafeToggle">Ver registros</button><button type="button" id="guardianSafeDeleteAll" class="danger">Apagar todos</button>';
-    head.insertAdjacentElement('afterend',actions);
+    let actions=document.getElementById('guardianSafeActions');
+    if(!actions){
+      actions=document.createElement('div');
+      actions.id='guardianSafeActions';
+      actions.className='guardian-safe-actions';
+      actions.innerHTML='<button type="button" id="guardianSafeToggle">Ver registros</button><button type="button" id="guardianSafeDeleteAll" class="danger">Apagar todos</button>';
+      head.insertAdjacentElement('afterend',actions);
+    }
 
-    const count=document.createElement('div');
-    count.id='guardianSafeCount';
-    count.className='guardian-safe-count';
-    actions.insertAdjacentElement('afterend',count);
+    let count=document.getElementById('guardianSafeCount');
+    if(!count){
+      count=document.createElement('div');
+      count.id='guardianSafeCount';
+      count.className='guardian-safe-count';
+      actions.insertAdjacentElement('afterend',count);
+    }
 
-    document.getElementById('guardianSafeToggle').onclick=()=>{opened=!opened;render();};
-    document.getElementById('guardianSafeDeleteAll').onclick=deleteAll;
+    const toggle=document.getElementById('guardianSafeToggle');
+    const del=document.getElementById('guardianSafeDeleteAll');
+    if(toggle&&!toggle.dataset.bound){toggle.dataset.bound='1';toggle.onclick=()=>{opened=!opened;render();};}
+    if(del&&!del.dataset.bound){del.dataset.bound='1';del.onclick=deleteAll;}
 
     initialized=true;
-    render();
     return true;
   }
 
@@ -70,11 +87,11 @@
     count.textContent=docs.length?`${docs.length} registro(s). Exclusão automática após 24 horas.`:'Nenhum registro armazenado.';
     toggle.textContent=opened?`Ocultar registros (${docs.length})`:`Ver registros (${docs.length})`;
     delAll.disabled=!docs.length||!isAdmin();
+    box.classList.remove('guardian-collapsed');
     box.classList.toggle('guardian-safe-collapsed',!opened);
-    if(!opened)return;
+    if(!opened){box.innerHTML='';return;}
 
     box.innerHTML=docs.length?docs.map(({id,data:e})=>`<article class="guardia-alerta ${esc(e.gravidade||'atencao')}"><div><strong>${esc(e.tipo||'Ocorrência')}</strong><div>${esc(e.mensagem||'Sem descrição')}</div><small>${esc(e.email||e.usuario||'Usuário não identificado')} • ${fmt(e.criadoEm||e.criadoEmLocal)}</small></div>${isAdmin()?`<button type="button" class="guardian-safe-delete" data-id="${esc(id)}" aria-label="Apagar registro">×</button>`:''}</article>`).join(''):'<div class="guardia-vazio">Nenhuma ocorrência encontrada.</div>';
-
     box.querySelectorAll('.guardian-safe-delete').forEach(btn=>btn.onclick=()=>deleteOne(btn.dataset.id));
   }
 
@@ -124,7 +141,7 @@
 
   function init(){
     let tries=0;
-    const uiTimer=setInterval(()=>{tries++;if(installUI()||tries>40)clearInterval(uiTimer);},250);
+    const uiTimer=setInterval(()=>{tries++;if(installUI()){render();}if(initialized||tries>40)clearInterval(uiTimer);},250);
     const fbTimer=setInterval(()=>{
       if(!window.firebase||!firebase.apps?.length)return;
       clearInterval(fbTimer);
@@ -135,5 +152,6 @@
     setTimeout(()=>clearInterval(fbTimer),20000);
   }
 
+  window.addEventListener('scp-guardian-modules-ready',()=>setTimeout(()=>{installUI();render();},100));
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
