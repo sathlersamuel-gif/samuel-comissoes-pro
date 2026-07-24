@@ -74,5 +74,12 @@ service cloud.firestore {
       allow create: if loggedIn() && request.resource.data.uid == request.auth.uid;
       allow update, delete: if isAdmin();
     }
+
+    match /notificacoes_admin/{notificationId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if loggedIn()
+        && request.resource.data.usuario == request.auth.token.email
+        && request.resource.data.gravidade == 'critico';
+    }
   }
 }
