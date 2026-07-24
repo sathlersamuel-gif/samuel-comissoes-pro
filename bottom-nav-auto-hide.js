@@ -71,4 +71,12 @@
     script.defer=true;
     document.head.appendChild(script);
   }
+
+  if(!document.querySelector('script[data-guardian-audit]')){
+    const audit=document.createElement('script');
+    audit.src='guardian-audit-upgrade.js?v=1';
+    audit.dataset.guardianAudit='1';
+    audit.defer=true;
+    document.head.appendChild(audit);
+  }
 })();
