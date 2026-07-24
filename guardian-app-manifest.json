@@ -1,7 +1,7 @@
 {
   "app": "Samuel Comissões PRO",
-  "generatedAt": "2026-07-24T21:53:20.486Z",
-  "commit": "c4240d13c20d76e9f17dfa8d7ff6868d97260335",
+  "generatedAt": "2026-07-24T21:58:48.435Z",
+  "commit": "c9ec6ae7e2fd0eb7a3cfa9b81f7863fae8ddf5bc",
   "files": [
     {
       "path": ".github/workflows/build-android-apk.yml",
@@ -452,6 +452,10 @@
       "type": ".js"
     },
     {
+      "path": "safari-indexeddb-transaction-fix.js",
+      "type": ".js"
+    },
+    {
       "path": "sales-data-core-restore.js",
       "type": ".js"
     },
@@ -624,6 +628,7 @@
     "OCULTAR",
     "OWNER",
     "Original",
+    "PATTERN",
     "PDFComNome",
     "PRODUTOS",
     "QUEUE",
@@ -855,6 +860,7 @@
     "checks",
     "clean",
     "cleanReports",
+    "cleanStoredErrors",
     "cleanupExpired",
     "clearOldCaches",
     "cloud",
@@ -1176,6 +1182,7 @@
     "isAdmin",
     "isAndroid",
     "isFresh",
+    "isKnownSafariIndexedDbError",
     "isSuccessful",
     "item",
     "items",
@@ -1959,8 +1966,8 @@
     "yamaha-emblem.svg"
   ],
   "summary": {
-    "files": 140,
-    "symbols": 1188,
+    "files": 141,
+    "symbols": 1191,
     "domIds": 167,
     "storageKeys": 15,
     "firestoreCollections": 10,
