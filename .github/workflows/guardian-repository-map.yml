@@ -1,0 +1,49 @@
+name: Atualizar conhecimento da IA Guardiã
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - guardian-app-manifest.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  mapear:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Gerar mapa integral
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const cp=require('child_process');
+          const files=cp.execSync('git ls-files',{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean).filter(p=>p!=='guardian-app-manifest.json'&&!p.startsWith('.git/'));
+          const symbols=new Set(),domIds=new Set(),storageKeys=new Set(),collections=new Set(),assets=new Set();
+          const textExt=/\.(html?|css|js|mjs|json|yml|yaml|md)$/i;
+          for(const path of files){
+            if(!textExt.test(path))continue;
+            let text='';try{text=fs.readFileSync(path,'utf8')}catch{continue}
+            for(const m of text.matchAll(/(?:function\s+|class\s+|(?:const|let|var)\s+)([A-Za-z_$][\w$]*)/g))symbols.add(m[1]);
+            for(const m of text.matchAll(/\bid=["']([^"']+)["']/g))domIds.add(m[1]);
+            for(const m of text.matchAll(/(?:localStorage|sessionStorage)\.(?:getItem|setItem|removeItem)\(["'`]([^"'`]+)["'`]/g))storageKeys.add(m[1]);
+            for(const m of text.matchAll(/\.collection\(["'`]([^"'`]+)["'`]\)/g))collections.add(m[1]);
+            for(const m of text.matchAll(/["'`]([^"'`]+\.(?:svg|png|jpe?g|webp|ico|woff2?|mp3|mp4))(?:\?[^"'`]*)?["'`]/gi))assets.add(m[1]);
+          }
+          const manifest={app:'Samuel Comissões PRO',generatedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA||'',files:files.map(path=>({path,type:path.includes('.')?'.'+path.split('.').pop():''})),symbols:[...symbols].sort(),domIds:[...domIds].sort(),storageKeys:[...storageKeys].sort(),firestoreCollections:[...collections].sort(),assets:[...assets].sort(),summary:{files:files.length,symbols:symbols.size,domIds:domIds.size,storageKeys:storageKeys.size,firestoreCollections:collections.size,assets:assets.size},bootstrap:false,note:'Mapa integral gerado automaticamente pelo GitHub Actions.'};
+          fs.writeFileSync('guardian-app-manifest.json',JSON.stringify(manifest,null,2)+'\n');
+          NODE
+      - name: Publicar mapa atualizado
+        run: |
+          git config user.name "IA Guardiã"
+          git config user.email "actions@github.com"
+          git add guardian-app-manifest.json
+          git diff --cached --quiet || git commit -m "Atualiza mapa integral da IA Guardiã"
+          git push
