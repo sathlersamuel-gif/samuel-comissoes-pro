@@ -1,0 +1,16 @@
+{
+  "app": "Samuel Comissões PRO",
+  "generatedAt": "2026-07-24T00:00:00.000Z",
+  "commit": "bootstrap",
+  "files": [
+    {"path":"index.html","type":".html"},{"path":"style.css","type":".css"},{"path":"script.js","type":".js"},{"path":"firebase-integration.js","type":".js"},{"path":"dashboard-v2.js","type":".js"},{"path":"dashboard-v2.css","type":".css"},{"path":"pwa-enhancements.js","type":".js"},{"path":"sw.js","type":".js"},{"path":"manifest.json","type":".json"},{"path":"ia-guardia-24h.js","type":".js"},{"path":"ia-guardia-24h.css","type":".css"},{"path":"guardian-firestore-bridge.js","type":".js"},{"path":"guardian-gear-integration.js","type":".js"},{"path":"guardian-audit-upgrade.js","type":".js"},{"path":"guardian-autofix.js","type":".js"},{"path":"guardian-retention.js","type":".js"},{"path":"guardian-occurrences-safe.js","type":".js"},{"path":"guardian-actions-organizer.js","type":".js"},{"path":"guardian-repository-knowledge.js","type":".js"},{"path":"bottom-nav-auto-hide.js","type":".js"},{"path":"report-options-fix.js","type":".js"},{"path":"user-management-modern-v2.js","type":".js"},{"path":"user-management-unified.js","type":".js"},{"path":"analise-vendas.js","type":".js"},{"path":"analise-vendas.css","type":".css"},{"path":"responsive-layout.css","type":".css"}
+  ],
+  "symbols": [],
+  "domIds": [],
+  "storageKeys": [],
+  "firestoreCollections": ["usuarios","mail","configuracoes","monitor_dispositivos","monitor_erros","notificacoes_admin","guardian_fix_requests"],
+  "assets": [],
+  "summary": {"files":26,"symbols":0,"domIds":0,"storageKeys":0,"firestoreCollections":7,"assets":0},
+  "bootstrap": true,
+  "note": "Mapa inicial. O workflow da IA Guardiã substitui automaticamente este arquivo pelo inventário integral do repositório."
+}
