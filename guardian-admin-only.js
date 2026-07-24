@@ -15,7 +15,12 @@
 
   function hideGuardianForNonAdmin(){
     if(!authResolved||isAdmin())return;
-    document.getElementById('scpGuardianGearSection')?.remove();
+    const gear=document.getElementById('scpGuardianGearSection');
+    if(gear){
+      gear.style.setProperty('display','none','important');
+      gear.setAttribute('aria-hidden','true');
+      gear.dataset.guardianHidden='1';
+    }
     document.querySelectorAll('.guardia-nav-btn,.guardia-lancador,[data-guardian-admin-only]').forEach(el=>el.remove());
     const screen=document.getElementById('iaGuardia');
     if(screen){
@@ -27,6 +32,12 @@
 
   function restoreGuardianForAdmin(){
     if(!authResolved||!isAdmin())return;
+    const gear=document.getElementById('scpGuardianGearSection');
+    if(gear){
+      gear.style.removeProperty('display');
+      gear.removeAttribute('aria-hidden');
+      delete gear.dataset.guardianHidden;
+    }
     const screen=document.getElementById('iaGuardia');
     if(screen){
       screen.style.removeProperty('display');
@@ -54,8 +65,14 @@
     setTimeout(()=>clearInterval(timer),20000);
   }
 
+  let applying=false;
   const observer=new MutationObserver(()=>{
-    if(authResolved)applyVisibility();
+    if(!authResolved||applying)return;
+    applying=true;
+    requestAnimationFrame(()=>{
+      applyVisibility();
+      applying=false;
+    });
   });
   observer.observe(document.documentElement,{childList:true,subtree:true});
 
