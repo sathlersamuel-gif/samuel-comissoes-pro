@@ -81,5 +81,13 @@ service cloud.firestore {
         && request.resource.data.usuario == request.auth.token.email
         && request.resource.data.gravidade == 'critico';
     }
+
+    match /guardian_fix_requests/{requestId} {
+      allow create: if loggedIn()
+        && request.resource.data.userUid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email;
+      allow read: if isAdmin() || (loggedIn() && resource.data.userUid == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
   }
 }
