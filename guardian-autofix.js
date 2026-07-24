@@ -66,11 +66,33 @@
 
   async function flushGuardian(){
     try{await window.SCPGuardian?.heartbeat?.();}catch(_){}
-    try{window.SCPMonitor?.registrar?.('autocorrecao','IA Guardiã executou manutenção segura',{pagina:location.pathname});}catch(_){}
+    try{window.SCPMonitor?.registrar?.('correcao-autorizada','IA Guardiã executou manutenção autorizada pelo administrador',{pagina:location.pathname});}catch(_){}
     return {ok:true,detail:'Filas e monitoramento acionados'};
   }
 
-  async function safeRepair(){
+  function correctionPlan(report){
+    const failures=report?.failed||[];
+    const lines=failures.length
+      ? failures.slice(0,8).map(item=>`• ${item.item}: ${item.detail}`)
+      : ['• Nenhuma falha detectada'];
+    return [
+      `A IA encontrou ${failures.length} falha(s).`,
+      '',
+      ...lines,
+      failures.length>8?`• E mais ${failures.length-8} falha(s).`:'',
+      '',
+      'A correção autorizada poderá:',
+      '• atualizar o Service Worker;',
+      '• limpar somente caches antigos;',
+      '• reenviar filas de sincronização;',
+      '• reativar o monitoramento local.',
+      '',
+      'Autoriza esta correção agora?'
+    ].filter(Boolean).join('\n');
+  }
+
+  async function safeRepair(authorized=false){
+    if(!authorized)return {cancelled:true,message:'Correção não autorizada.'};
     const before=await fullAudit();
     const actions=[];
     actions.push(await clearOldCaches());
@@ -80,7 +102,7 @@
     document.dispatchEvent(new Event('visibilitychange'));
     window.dispatchEvent(new Event('online'));
     const after=await fullAudit();
-    return {before,after,actions,fixed:before.failed.length-after.failed.length};
+    return {before,after,actions,fixed:before.failed.length-after.failed.length,cancelled:false};
   }
 
   async function requestCorrection(report){
@@ -107,17 +129,44 @@
     try{await navigator.clipboard.writeText(text);return true;}catch(_){return false;}
   }
 
+  async function askAndRepair(button){
+    if(!isAdmin()){
+      alert('Somente o administrador pode autorizar correções.');
+      return;
+    }
+    button.disabled=true;
+    button.textContent='Analisando falhas...';
+    const report=await fullAudit();
+    button.disabled=false;
+    button.textContent='Revisar e autorizar correção';
+    if(!report.failed.length){
+      alert('A IA não encontrou falhas que possam ser corrigidas neste aparelho. Nenhuma alteração foi feita.');
+      return;
+    }
+    const authorized=window.confirm(correctionPlan(report));
+    if(!authorized){
+      alert('Correção cancelada. Nenhuma alteração foi feita.');
+      return;
+    }
+    button.disabled=true;
+    button.textContent='Executando correção autorizada...';
+    const result=await safeRepair(true);
+    alert(result.after.failed.length?`Correção autorizada concluída. Restam ${result.after.failed.length} falha(s) que exigem alteração no código.`:'Correção autorizada concluída. Nenhuma falha detectável permaneceu.');
+    button.disabled=false;
+    button.textContent='Revisar e autorizar correção';
+  }
+
   function ensureButtons(){
     const host=document.querySelector('#iaGuardia .guardia-acoes');
     if(!host||document.getElementById('guardianAutoFix'))return;
     const audit=document.createElement('button');audit.type='button';audit.id='guardianFullAudit';audit.className='secundario';audit.textContent='Verificar aplicativo completo';
-    const fix=document.createElement('button');fix.type='button';fix.id='guardianAutoFix';fix.className='principal';fix.textContent='Corrigir automaticamente';
+    const fix=document.createElement('button');fix.type='button';fix.id='guardianAutoFix';fix.className='principal';fix.textContent='Revisar e autorizar correção';
     const request=document.createElement('button');request.type='button';request.id='guardianRequestFix';request.className='secundario';request.textContent='Solicitar correção do código';
     const copy=document.createElement('button');copy.type='button';copy.id='guardianCopyReport';copy.className='secundario';copy.textContent='Copiar diagnóstico';
     host.append(audit,fix,request,copy);
 
-    audit.onclick=async()=>{audit.disabled=true;audit.textContent='Verificando tudo...';const r=await fullAudit();alert(r.failed.length?`A IA encontrou ${r.failed.length} falha(s).`:'Aplicativo validado sem falhas detectáveis.');audit.disabled=false;audit.textContent='Verificar aplicativo completo';};
-    fix.onclick=async()=>{fix.disabled=true;fix.textContent='Corrigindo...';const r=await safeRepair();alert(r.after.failed.length?`Correção segura concluída. Restam ${r.after.failed.length} falha(s) que exigem código.`:'Correção concluída. Nenhuma falha detectável permaneceu.');fix.disabled=false;fix.textContent='Corrigir automaticamente';};
+    audit.onclick=async()=>{audit.disabled=true;audit.textContent='Verificando tudo...';const r=await fullAudit();alert(r.failed.length?`A IA encontrou ${r.failed.length} falha(s). Nenhuma correção foi feita.`:'Aplicativo validado sem falhas detectáveis.');audit.disabled=false;audit.textContent='Verificar aplicativo completo';};
+    fix.onclick=()=>askAndRepair(fix);
     request.onclick=async()=>{const r=lastReport||await fullAudit();request.disabled=true;const result=await requestCorrection(r);alert(result.message);request.disabled=false;};
     copy.onclick=async()=>{const r=lastReport||await fullAudit();alert(await copyReport(r)?'Diagnóstico copiado. Cole nesta conversa para eu corrigir o código.':'Não foi possível copiar automaticamente.');};
   }
@@ -127,7 +176,17 @@
     observer.observe(document.documentElement,{childList:true,subtree:true});
     ensureButtons();
     setInterval(()=>{if(localStorage.getItem('scp_guardian_active_cache')==='1')fullAudit().catch(()=>{});},10*60*1000);
-    window.SCPGuardianAutoFix={audit:fullAudit,repair:safeRepair,request:async()=>requestCorrection(lastReport||await fullAudit()),get report(){return lastReport;}};
+    window.SCPGuardianAutoFix={
+      audit:fullAudit,
+      repair:async()=>{
+        const report=lastReport||await fullAudit();
+        if(!report.failed.length)return {cancelled:true,message:'Nenhuma falha detectada.'};
+        const authorized=window.confirm(correctionPlan(report));
+        return authorized?safeRepair(true):{cancelled:true,message:'Correção cancelada pelo administrador.'};
+      },
+      request:async()=>requestCorrection(lastReport||await fullAudit()),
+      get report(){return lastReport;}
+    };
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
