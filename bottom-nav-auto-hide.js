@@ -103,4 +103,12 @@
     occurrences.defer=true;
     document.head.appendChild(occurrences);
   }
+
+  if(!document.querySelector('script[data-guardian-actions-organizer]')){
+    const organizer=document.createElement('script');
+    organizer.src='guardian-actions-organizer.js?v=1';
+    organizer.dataset.guardianActionsOrganizer='1';
+    organizer.defer=true;
+    document.head.appendChild(organizer);
+  }
 })();
