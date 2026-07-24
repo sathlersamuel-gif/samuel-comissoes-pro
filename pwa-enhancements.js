@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.24.1';
+  const HOTFIX='2026.07.24.2';
 
   function carregarScript(src,id){
     return new Promise((resolve,reject)=>{
@@ -19,7 +19,32 @@
   carregarScript('tipo-numeros-mobile.js?v=3','scpTipoNumerosLoader').catch(console.error);
   carregarScript('ai-performance-accelerator.js?v=2','scpPerformanceLoader').catch(console.error);
   carregarScript('edit-sale-definitive-fix.js?v=4','scpEditSaleLoader').catch(console.error);
-  carregarScript('user-management-unified.js?v=2','scpUserManagementUnified').catch(console.error);
+  carregarScript('user-management-unified.js?v=7','scpUserManagementUnified').catch(console.error);
+
+  const modulosGuardia=[
+    ['guardian-admin-only.js?v=3','scpGuardianAdminOnly'],
+    ['guardian-firestore-bridge.js?v=1','scpGuardianFirestoreBridge'],
+    ['guardian-gear-integration.js?v=3','scpGuardianGearIntegration'],
+    ['guardian-audit-upgrade.js?v=2','scpGuardianAuditUpgrade'],
+    ['guardian-offline-filter.js?v=1','scpGuardianOfflineFilter'],
+    ['guardian-deep-audit.js?v=3','scpGuardianDeepAudit'],
+    ['guardian-autofix.js?v=3','scpGuardianAutofix'],
+    ['guardian-retention.js?v=1','scpGuardianRetention'],
+    ['guardian-occurrences-safe.js?v=1','scpGuardianOccurrencesSafe'],
+    ['guardian-actions-organizer.js?v=1','scpGuardianActionsOrganizer'],
+    ['guardian-repository-knowledge.js?v=1','scpGuardianRepositoryKnowledge'],
+    ['guardian-actions-functional.js?v=1','scpGuardianActionsFunctional']
+  ];
+
+  modulosGuardia.reduce(
+    (fila,[src,id])=>fila.then(()=>carregarScript(src,id)),
+    Promise.resolve()
+  ).then(()=>{
+    window.dispatchEvent(new CustomEvent('scp-guardian-modules-ready'));
+  }).catch(error=>{
+    console.error('Falha ao carregar a auditoria completa da IA Guardiã:',error);
+    window.SCPMonitor?.registrar?.('guardian-loader',error.message,{arquivo:error.stack||''});
+  });
 
   function instalado(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}
 
@@ -59,17 +84,17 @@
     window.addEventListener('load',async()=>{
       try{
         const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=108',{updateViaCache:'none'});
+        const registration=await navigator.serviceWorker.register('./sw.js?v=112',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV108')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV108','1');
+          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV112')){
+            sessionStorage.setItem('scpAtualizacaoAplicadaV112','1');
             location.reload();
           }
         });
-        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV108')){
-          sessionStorage.setItem('scpHotfixReloadV108','1');
+        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV112')){
+          sessionStorage.setItem('scpHotfixReloadV112','1');
           setTimeout(()=>location.reload(),250);
         }
       }catch(error){console.error('Falha ao atualizar o modo offline:',error);}
