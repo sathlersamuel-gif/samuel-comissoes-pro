@@ -2,6 +2,7 @@
   'use strict';
 
   const ADMIN='sathlersamuel@gmail.com';
+  const CURRENT_CACHE='samuel-comissoes-pro-v96';
   const REQUIRED_ELEMENTS=['dashboard','formVenda','listaMeses','resultadoRelatorio'];
   const REQUIRED_FUNCTIONS=['abrirTela','voltarDashboard'];
   const REQUIRED_ASSETS=['script.js','firebase-integration.js','ai-monitor.js','ia-guardia-24h.js','dashboard-v2.js','report-options-fix.js','user-management-modern-v2.js'];
@@ -52,8 +53,9 @@
   async function clearOldCaches(){
     if(!('caches' in window))return {ok:false,detail:'Cache API indisponível'};
     const keys=await caches.keys();
-    await Promise.all(keys.filter(k=>!k.includes('v94')).map(k=>caches.delete(k)));
-    return {ok:true,detail:`${keys.length} cache(s) verificado(s)`};
+    const antigos=keys.filter(k=>k!==CURRENT_CACHE);
+    await Promise.all(antigos.map(k=>caches.delete(k)));
+    return {ok:true,detail:`${antigos.length} cache(s) antigo(s) removido(s); cache atual preservado`};
   }
 
   async function repairServiceWorker(){
