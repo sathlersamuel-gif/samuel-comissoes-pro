@@ -1,0 +1,49 @@
+name: Atualizar conhecimento da IA Guardiã
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - guardian-app-manifest.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  mapear-aplicativo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Gerar mapa completo
+        run: node scripts/generate-guardian-knowledge.mjs
+
+      - name: Validar sintaxe dos JavaScript
+        shell: bash
+        run: |
+          set -e
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(find . -type f -name '*.js' -not -path './node_modules/*' -not -path './.git/*' -print0)
+
+      - name: Publicar mapa atualizado
+        shell: bash
+        run: |
+          if git diff --quiet guardian-app-manifest.json; then
+            echo 'Mapa já está atualizado.'
+            exit 0
+          fi
+          git config user.name 'IA Guardiã'
+          git config user.email 'actions@github.com'
+          git add guardian-app-manifest.json
+          git commit -m 'Atualizar mapa completo da IA Guardiã [skip ci]'
+          git push
