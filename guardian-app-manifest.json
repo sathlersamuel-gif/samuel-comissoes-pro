@@ -1,7 +1,7 @@
 {
   "app": "Samuel Comissões PRO",
-  "generatedAt": "2026-07-24T22:04:04.487Z",
-  "commit": "bcdcc660790933e8da0208af1b4cc1977a54e711",
+  "generatedAt": "2026-07-24T22:42:05.150Z",
+  "commit": "2940c6ec123d41720c39c713c6da96dd43fc523b",
   "files": [
     {
       "path": ".github/workflows/build-android-apk.yml",
@@ -337,6 +337,10 @@
     },
     {
       "path": "ia-guardia-24h.js",
+      "type": ".js"
+    },
+    {
+      "path": "ia-guardia-autocorrecao.js",
       "type": ".js"
     },
     {
@@ -732,6 +736,7 @@
     "aplicarVendas",
     "appUrl",
     "apply",
+    "applyStyles",
     "applyVisibility",
     "applying",
     "aprimorarListaUsuarios",
@@ -751,6 +756,8 @@
     "ativarMascaraTelefone",
     "ativo",
     "ativos",
+    "attempt",
+    "attemptRepair",
     "attempts",
     "atuais",
     "atual",
@@ -780,6 +787,7 @@
     "authRun",
     "authUser",
     "authenticated",
+    "authorizeAndRepair",
     "authorized",
     "autoTableOriginal",
     "autorizados",
@@ -912,6 +920,7 @@
     "criticos",
     "css",
     "current",
+    "currentCheck",
     "currentFilter",
     "currentUser",
     "cutoff",
@@ -953,6 +962,7 @@
     "desbloquear",
     "desc",
     "descarregarFila",
+    "description",
     "destino",
     "detail",
     "details",
@@ -1047,6 +1057,8 @@
     "fadeTime",
     "fail",
     "failed",
+    "failedChecks",
+    "failure",
     "failures",
     "falhar",
     "falhas",
@@ -1076,6 +1088,7 @@
     "firebasePronto",
     "firestore",
     "fix",
+    "fixed",
     "flushGuardian",
     "fmt",
     "fn",
@@ -1083,6 +1096,7 @@
     "foraDoEscopo",
     "forcarCarregamento",
     "form",
+    "formatDate",
     "formatar",
     "formatarData",
     "formatarDataHora",
@@ -1496,6 +1510,7 @@
     "render",
     "renderDevices",
     "renderErrors",
+    "renderPending",
     "renderStatus",
     "renderizar",
     "repair",
@@ -1610,6 +1625,7 @@
     "st",
     "standalone",
     "start",
+    "startListener",
     "stat",
     "status",
     "statusAnterior",
@@ -1676,6 +1692,7 @@
     "trocando",
     "ts",
     "tudo",
+    "type",
     "u",
     "ua",
     "uiTimer",
@@ -1818,6 +1835,7 @@
     "gOnline",
     "gSaude",
     "guardiaAtualizar",
+    "guardiaAutoFixStyles",
     "guardiaDescricao",
     "guardiaDevices",
     "guardiaDiagnostico",
@@ -1967,9 +1985,9 @@
     "yamaha-emblem.svg"
   ],
   "summary": {
-    "files": 141,
-    "symbols": 1192,
-    "domIds": 168,
+    "files": 142,
+    "symbols": 1205,
+    "domIds": 169,
     "storageKeys": 14,
     "firestoreCollections": 10,
     "assets": 4
