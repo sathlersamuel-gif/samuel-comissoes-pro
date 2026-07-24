@@ -82,7 +82,7 @@
 
   if(!document.querySelector('script[data-guardian-autofix]')){
     const autofix=document.createElement('script');
-    autofix.src='guardian-autofix.js?v=2';
+    autofix.src='guardian-autofix.js?v=3';
     autofix.dataset.guardianAutofix='1';
     autofix.defer=true;
     document.head.appendChild(autofix);
