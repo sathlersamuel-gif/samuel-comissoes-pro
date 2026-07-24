@@ -3,9 +3,15 @@
 
   const ADMIN='sathlersamuel@gmail.com';
   let observer=null;
+  let alterando=false;
+
+  function firebaseAtual(){
+    return window.firebase||null;
+  }
 
   function usuarioAdmin(){
-    const email=String(window.SCPAuth?.getUser?.()?.email||firebase?.auth?.()?.currentUser?.email||'').toLowerCase();
+    const fb=firebaseAtual();
+    const email=String(window.SCPAuth?.getUser?.()?.email||fb?.auth?.()?.currentUser?.email||'').toLowerCase();
     return email===ADMIN;
   }
 
@@ -21,20 +27,42 @@
     const input=document.getElementById('scpGuardianGearToggle');
     const status=document.getElementById('scpGuardianGearStatus');
     const ativo=estadoAtual();
-    if(input){input.checked=ativo;input.disabled=!usuarioAdmin();}
-    if(status)status.textContent=ativo?'Monitoramento ativo':'Monitoramento desativado';
+    if(input){input.checked=ativo;input.disabled=!usuarioAdmin()||alterando;}
+    if(status)status.textContent=alterando?'Aplicando alteração...':ativo?'Monitoramento ativo':'Monitoramento desativado';
   }
 
-  function alternarPeloModulo(desejado){
-    const toggle=document.getElementById('guardiaToggle');
+  function aguardarModuloPronto(limiteMs=12000){
+    return new Promise(resolve=>{
+      const inicio=Date.now();
+      const verificar=()=>{
+        const fb=firebaseAtual();
+        const toggle=document.getElementById('guardiaToggle');
+        const pronto=Boolean(toggle&&window.SCPGuardian&&fb?.apps?.length&&fb?.auth?.()?.currentUser);
+        if(pronto)return resolve(toggle);
+        if(Date.now()-inicio>=limiteMs)return resolve(null);
+        setTimeout(verificar,250);
+      };
+      verificar();
+    });
+  }
+
+  async function alternarPeloModulo(desejado){
+    if(alterando)return;
+    alterando=true;
+    atualizarVisual();
+    const toggle=await aguardarModuloPronto();
     if(!toggle){
-      alert('A IA Guardiã ainda está carregando. Feche a engrenagem e tente novamente em alguns segundos.');
+      alterando=false;
       atualizarVisual();
+      alert('A IA Guardiã ainda está carregando. Aguarde alguns segundos e tente novamente.');
       return;
     }
     toggle.checked=Boolean(desejado);
     toggle.dispatchEvent(new Event('change',{bubbles:true}));
-    setTimeout(atualizarVisual,500);
+    setTimeout(()=>{
+      alterando=false;
+      atualizarVisual();
+    },1200);
   }
 
   function abrirRelatorios(){
@@ -54,9 +82,9 @@
     section.innerHTML=`
       <h3>IA Guardiã 24h</h3>
       <p id="scpGuardianGearStatus" style="margin:0 0 10px">Monitoramento desativado</p>
-      <label class="scp-view-option" style="justify-content:space-between">
-        <span>Ativar monitoramento dos aparelhos</span>
-        <input id="scpGuardianGearToggle" type="checkbox" style="width:22px;height:22px">
+      <label class="scp-view-option" style="display:grid;grid-template-columns:minmax(0,1fr) 30px;align-items:center;gap:14px;width:100%;justify-content:initial">
+        <span style="min-width:0;white-space:normal;word-break:normal;overflow-wrap:normal;line-height:1.35">Ativar monitoramento dos aparelhos</span>
+        <input id="scpGuardianGearToggle" type="checkbox" style="width:22px;height:22px;margin:0;justify-self:end;flex:none">
       </label>
       <button type="button" id="scpGuardianGearReports" class="secundario">✦ Abrir relatórios da IA</button>
     `;
