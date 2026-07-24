@@ -59,7 +59,7 @@
 
   if(!document.querySelector('script[data-guardian-gear]')){
     const script=document.createElement('script');
-    script.src='guardian-gear-integration.js?v=1';
+    script.src='guardian-gear-integration.js?v=2';
     script.dataset.guardianGear='1';
     script.defer=true;
     document.head.appendChild(script);
