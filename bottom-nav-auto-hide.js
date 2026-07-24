@@ -57,6 +57,13 @@
   mostrar();
   document.querySelectorAll('.guardia-nav-btn,.guardia-lancador').forEach(el=>el.remove());
 
+  if(!document.querySelector('script[data-guardian-bridge]')){
+    const bridge=document.createElement('script');
+    bridge.src='guardian-firestore-bridge.js?v=1';
+    bridge.dataset.guardianBridge='1';
+    document.head.appendChild(bridge);
+  }
+
   if(!document.querySelector('script[data-guardian-gear]')){
     const script=document.createElement('script');
     script.src='guardian-gear-integration.js?v=3';
