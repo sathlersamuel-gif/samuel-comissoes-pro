@@ -57,58 +57,21 @@
   mostrar();
   document.querySelectorAll('.guardia-nav-btn,.guardia-lancador').forEach(el=>el.remove());
 
-  if(!document.querySelector('script[data-guardian-bridge]')){
-    const bridge=document.createElement('script');
-    bridge.src='guardian-firestore-bridge.js?v=1';
-    bridge.dataset.guardianBridge='1';
-    document.head.appendChild(bridge);
-  }
-
-  if(!document.querySelector('script[data-guardian-gear]')){
+  function loadOnce(selector,src,datasetKey){
+    if(document.querySelector(selector))return;
     const script=document.createElement('script');
-    script.src='guardian-gear-integration.js?v=3';
-    script.dataset.guardianGear='1';
+    script.src=src;
+    script.dataset[datasetKey]='1';
     script.defer=true;
     document.head.appendChild(script);
   }
 
-  if(!document.querySelector('script[data-guardian-audit]')){
-    const audit=document.createElement('script');
-    audit.src='guardian-audit-upgrade.js?v=1';
-    audit.dataset.guardianAudit='1';
-    audit.defer=true;
-    document.head.appendChild(audit);
-  }
-
-  if(!document.querySelector('script[data-guardian-autofix]')){
-    const autofix=document.createElement('script');
-    autofix.src='guardian-autofix.js?v=3';
-    autofix.dataset.guardianAutofix='1';
-    autofix.defer=true;
-    document.head.appendChild(autofix);
-  }
-
-  if(!document.querySelector('script[data-guardian-retention]')){
-    const retention=document.createElement('script');
-    retention.src='guardian-retention.js?v=1';
-    retention.dataset.guardianRetention='1';
-    retention.defer=true;
-    document.head.appendChild(retention);
-  }
-
-  if(!document.querySelector('script[data-guardian-occurrences-safe]')){
-    const occurrences=document.createElement('script');
-    occurrences.src='guardian-occurrences-safe.js?v=1';
-    occurrences.dataset.guardianOccurrencesSafe='1';
-    occurrences.defer=true;
-    document.head.appendChild(occurrences);
-  }
-
-  if(!document.querySelector('script[data-guardian-actions-organizer]')){
-    const organizer=document.createElement('script');
-    organizer.src='guardian-actions-organizer.js?v=1';
-    organizer.dataset.guardianActionsOrganizer='1';
-    organizer.defer=true;
-    document.head.appendChild(organizer);
-  }
+  loadOnce('script[data-guardian-bridge]','guardian-firestore-bridge.js?v=1','guardianBridge');
+  loadOnce('script[data-guardian-gear]','guardian-gear-integration.js?v=3','guardianGear');
+  loadOnce('script[data-guardian-audit]','guardian-audit-upgrade.js?v=1','guardianAudit');
+  loadOnce('script[data-guardian-autofix]','guardian-autofix.js?v=3','guardianAutofix');
+  loadOnce('script[data-guardian-retention]','guardian-retention.js?v=1','guardianRetention');
+  loadOnce('script[data-guardian-occurrences-safe]','guardian-occurrences-safe.js?v=1','guardianOccurrencesSafe');
+  loadOnce('script[data-guardian-actions-organizer]','guardian-actions-organizer.js?v=1','guardianActionsOrganizer');
+  loadOnce('script[data-guardian-repository-knowledge]','guardian-repository-knowledge.js?v=1','guardianRepositoryKnowledge');
 })();
