@@ -95,4 +95,12 @@
     retention.defer=true;
     document.head.appendChild(retention);
   }
+
+  if(!document.querySelector('script[data-guardian-occurrences]')){
+    const occurrences=document.createElement('script');
+    occurrences.src='guardian-occurrences-ui.js?v=1';
+    occurrences.dataset.guardianOccurrences='1';
+    occurrences.defer=true;
+    document.head.appendChild(occurrences);
+  }
 })();
