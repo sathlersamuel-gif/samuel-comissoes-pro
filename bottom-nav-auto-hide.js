@@ -87,4 +87,12 @@
     autofix.defer=true;
     document.head.appendChild(autofix);
   }
+
+  if(!document.querySelector('script[data-guardian-retention]')){
+    const retention=document.createElement('script');
+    retention.src='guardian-retention.js?v=1';
+    retention.dataset.guardianRetention='1';
+    retention.defer=true;
+    document.head.appendChild(retention);
+  }
 })();
