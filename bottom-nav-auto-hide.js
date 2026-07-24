@@ -11,28 +11,16 @@
   let toqueY=null;
   let rafPendente=false;
 
-  function mostrar(){
-    nav.classList.remove('bottom-auto-hidden');
-  }
-
-  function esconder(){
-    nav.classList.add('bottom-auto-hidden');
-  }
+  function mostrar(){nav.classList.remove('bottom-auto-hidden');}
+  function esconder(){nav.classList.add('bottom-auto-hidden');}
 
   function aplicarDirecao(delta){
     if(Math.abs(delta)<1)return;
     const direcao=delta>0?1:-1;
-
-    if(direcao!==ultimaDirecao){
-      acumulado=0;
-      ultimaDirecao=direcao;
-    }
-
+    if(direcao!==ultimaDirecao){acumulado=0;ultimaDirecao=direcao;}
     acumulado+=Math.abs(delta);
     if(acumulado<LIMIAR)return;
-
-    if(direcao>0)esconder();
-    else mostrar();
+    if(direcao>0)esconder();else mostrar();
     acumulado=0;
   }
 
@@ -41,8 +29,7 @@
     rafPendente=true;
     requestAnimationFrame(function(){
       const atual=window.scrollY||document.documentElement.scrollTop||0;
-      if(atual<=4)mostrar();
-      else aplicarDirecao(atual-ultimaPosicao);
+      if(atual<=4)mostrar();else aplicarDirecao(atual-ultimaPosicao);
       ultimaPosicao=Math.max(0,atual);
       rafPendente=false;
     });
@@ -50,72 +37,31 @@
 
   window.addEventListener('scroll',tratarRolagem,{passive:true});
   window.addEventListener('wheel',function(e){aplicarDirecao(e.deltaY)},{passive:true});
-
-  document.addEventListener('touchstart',function(e){
-    if(e.touches&&e.touches.length)toqueY=e.touches[0].clientY;
-  },{passive:true});
-
-  document.addEventListener('touchmove',function(e){
-    if(toqueY===null||!e.touches||!e.touches.length)return;
-    const y=e.touches[0].clientY;
-    aplicarDirecao(toqueY-y);
-    toqueY=y;
-  },{passive:true});
-
+  document.addEventListener('touchstart',function(e){if(e.touches&&e.touches.length)toqueY=e.touches[0].clientY;},{passive:true});
+  document.addEventListener('touchmove',function(e){if(toqueY===null||!e.touches||!e.touches.length)return;const y=e.touches[0].clientY;aplicarDirecao(toqueY-y);toqueY=y;},{passive:true});
   document.addEventListener('touchend',function(){toqueY=null},{passive:true});
   document.addEventListener('touchcancel',function(){toqueY=null},{passive:true});
-
   nav.addEventListener('click',mostrar);
-  document.addEventListener('focusin',function(e){
-    if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))mostrar();
-  });
+  document.addEventListener('focusin',function(e){if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))mostrar();});
 
   const abrirTelaOriginal=window.abrirTela;
   if(typeof abrirTelaOriginal==='function'){
-    window.abrirTela=function(){
-      mostrar();
-      ultimaPosicao=0;
-      return abrirTelaOriginal.apply(this,arguments);
-    };
+    window.abrirTela=function(){mostrar();ultimaPosicao=0;return abrirTelaOriginal.apply(this,arguments);};
   }
 
   const voltarOriginal=window.voltarDashboard;
   if(typeof voltarOriginal==='function'){
-    window.voltarDashboard=function(){
-      mostrar();
-      ultimaPosicao=0;
-      return voltarOriginal.apply(this,arguments);
-    };
-  }
-
-  function abrirGuardia(){
-    if(window.SCPGuardian&&typeof window.SCPGuardian.open==='function')window.SCPGuardian.open();
-    else alert('A IA Guardiã ainda está carregando. Aguarde um instante e tente novamente.');
-  }
-
-  function garantirAcessosGuardia(){
-    const barra=document.querySelector('.bottom');
-    if(barra&&!barra.querySelector('.guardia-nav-btn')){
-      const botao=document.createElement('button');
-      botao.type='button';
-      botao.className='guardia-nav-btn';
-      botao.innerHTML='<span>✦</span><small>IA</small><em class="guardia-badge">0</em>';
-      botao.addEventListener('click',abrirGuardia);
-      barra.appendChild(botao);
-    }
-
-    const painel=document.getElementById('dashboard');
-    if(painel&&!painel.querySelector('.guardia-lancador')){
-      const cartao=document.createElement('div');
-      cartao.className='guardia-lancador';
-      cartao.innerHTML='<div><b>IA Guardiã 24h</b><small>Monitore aparelhos, erros e sincronização.</small></div><button type="button">Abrir</button>';
-      cartao.querySelector('button').addEventListener('click',abrirGuardia);
-      painel.appendChild(cartao);
-    }
+    window.voltarDashboard=function(){mostrar();ultimaPosicao=0;return voltarOriginal.apply(this,arguments);};
   }
 
   mostrar();
-  setTimeout(garantirAcessosGuardia,300);
-  setTimeout(garantirAcessosGuardia,1500);
-  new MutationObserver(garantirAcessosGuardia).observe(document.body,{childList:true,subtree:true});
+  document.querySelectorAll('.guardia-nav-btn,.guardia-lancador').forEach(el=>el.remove());
+
+  if(!document.querySelector('script[data-guardian-gear]')){
+    const script=document.createElement('script');
+    script.src='guardian-gear-integration.js?v=1';
+    script.dataset.guardianGear='1';
+    script.defer=true;
+    document.head.appendChild(script);
+  }
 })();
