@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const HOTFIX='2026.07.24.3';
+  const HOTFIX='2026.07.24.4';
 
   function carregarScript(src,id){
     return new Promise((resolve,reject)=>{
@@ -31,7 +31,7 @@
     ['guardian-deep-audit.js?v=3','scpGuardianDeepAudit'],
     ['guardian-autofix.js?v=3','scpGuardianAutofix'],
     ['guardian-retention.js?v=1','scpGuardianRetention'],
-    ['guardian-occurrences-safe.js?v=1','scpGuardianOccurrencesSafe'],
+    ['guardian-occurrences-safe.js?v=2','scpGuardianOccurrencesSafe'],
     ['guardian-actions-organizer.js?v=1','scpGuardianActionsOrganizer'],
     ['guardian-repository-knowledge.js?v=1','scpGuardianRepositoryKnowledge'],
     ['guardian-actions-functional.js?v=1','scpGuardianActionsFunctional']
@@ -72,34 +72,26 @@
 
   async function limparCachesAntigos(){
     const chave=`scp-cache-hotfix-${HOTFIX}`;
-    if(localStorage.getItem(chave))return false;
+    if(localStorage.getItem(chave))return;
     try{
       const nomes=await caches.keys();
       await Promise.all(nomes.filter(nome=>nome.startsWith('samuel-comissoes-pro-')||nome.startsWith('scp-ai-warm-')).map(nome=>caches.delete(nome)));
       localStorage.setItem(chave,'1');
-      return true;
-    }catch(_){return false;}
+    }catch(_){}
   }
 
   if('serviceWorker'in navigator){
     window.addEventListener('load',async()=>{
       try{
-        const limpou=await limparCachesAntigos();
-        const registration=await navigator.serviceWorker.register('./sw.js?v=113',{updateViaCache:'none'});
+        await limparCachesAntigos();
+        const registration=await navigator.serviceWorker.register('./sw.js?v=114',{updateViaCache:'none'});
         await registration.update().catch(()=>{});
         if(registration.waiting)registration.waiting.postMessage({type:'ACTIVATE_TESTED_VERSION'});
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-          if(!sessionStorage.getItem('scpAtualizacaoAplicadaV113')){
-            sessionStorage.setItem('scpAtualizacaoAplicadaV113','1');
-            location.reload();
-          }
+          sessionStorage.setItem('scpAtualizacaoDisponivelV114','1');
         });
-        if(limpou&&!sessionStorage.getItem('scpHotfixReloadV113')){
-          sessionStorage.setItem('scpHotfixReloadV113','1');
-          setTimeout(()=>location.reload(),250);
-        }
       }catch(error){console.error('Falha ao atualizar o modo offline:',error);}
-    });
+    },{once:true});
   }
 
   window.__SCP_PWA_HOTFIX__=HOTFIX;
