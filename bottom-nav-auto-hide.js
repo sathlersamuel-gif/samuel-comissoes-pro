@@ -66,6 +66,7 @@
     document.head.appendChild(script);
   }
 
+  loadOnce('script[data-guardian-admin-only]','guardian-admin-only.js?v=1','guardianAdminOnly');
   loadOnce('script[data-guardian-bridge]','guardian-firestore-bridge.js?v=1','guardianBridge');
   loadOnce('script[data-guardian-gear]','guardian-gear-integration.js?v=3','guardianGear');
   loadOnce('script[data-guardian-audit]','guardian-audit-upgrade.js?v=1','guardianAudit');
