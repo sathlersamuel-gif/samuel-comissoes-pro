@@ -1,7 +1,7 @@
 {
   "app": "Samuel Comissões PRO",
-  "generatedAt": "2026-07-24T22:03:10.619Z",
-  "commit": "ea435de57683bf309035e8bcfe1a036539a6c2fb",
+  "generatedAt": "2026-07-24T22:03:42.943Z",
+  "commit": "191fa866c554605f5afc26f92e626ec623b9b4ff",
   "files": [
     {
       "path": ".github/workflows/build-android-apk.yml",
@@ -1231,7 +1231,6 @@
     "limparMensagem",
     "limparSessaoLocal",
     "limpas",
-    "limpou",
     "lineOriginal",
     "lines",
     "linha",
@@ -1936,8 +1935,7 @@
   "storageKeys": [
     "${STORAGE}:${uid}",
     "samuel_comissoes_pro",
-    "scpAtualizacaoAplicadaV113",
-    "scpHotfixReloadV113",
+    "scpAtualizacaoDisponivelV114",
     "scp_guardian_active_cache",
     "scp_guardian_deep_audit_result",
     "scp_guardian_device_id",
@@ -1970,9 +1968,9 @@
   ],
   "summary": {
     "files": 141,
-    "symbols": 1193,
+    "symbols": 1192,
     "domIds": 168,
-    "storageKeys": 15,
+    "storageKeys": 14,
     "firestoreCollections": 10,
     "assets": 4
   },
