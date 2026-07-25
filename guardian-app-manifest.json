@@ -1,7 +1,7 @@
 {
   "app": "Samuel Comissões PRO",
-  "generatedAt": "2026-07-25T00:19:08.064Z",
-  "commit": "e4549fae3870c9a7961a1ead2e231236a59b9e15",
+  "generatedAt": "2026-07-25T00:19:51.516Z",
+  "commit": "22961057ae0ff97a6e942e37e3218fe60cc613ee",
   "files": [
     {
       "path": ".github/workflows/build-android-apk.yml",
@@ -861,6 +861,7 @@
     "cards",
     "carregando",
     "carregar",
+    "carregarCorrecaoFoto",
     "carregarHistorico",
     "carregarHistoricoOriginal",
     "carregarScript",
@@ -1969,7 +1970,7 @@
   ],
   "summary": {
     "files": 143,
-    "symbols": 1184,
+    "symbols": 1185,
     "domIds": 169,
     "storageKeys": 14,
     "firestoreCollections": 10,
