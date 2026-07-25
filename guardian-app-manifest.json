@@ -1,7 +1,7 @@
 {
   "app": "Samuel Comissões PRO",
-  "generatedAt": "2026-07-24T22:48:51.642Z",
-  "commit": "8b90a63c06ba6f3d4889d886d9ea191310bff45b",
+  "generatedAt": "2026-07-25T00:19:08.064Z",
+  "commit": "e4549fae3870c9a7961a1ead2e231236a59b9e15",
   "files": [
     {
       "path": ".github/workflows/build-android-apk.yml",
@@ -424,6 +424,10 @@
       "type": ".js"
     },
     {
+      "path": "profile-photo-menu-fix.js",
+      "type": ".js"
+    },
+    {
       "path": "profile-settings.js",
       "type": ".js"
     },
@@ -652,6 +656,7 @@
     "STORAGE_KEY",
     "STORAGE_VENDAS",
     "STORE_NAME",
+    "STYLE_ID",
     "SUCCESS_TTL",
     "SUCCESS_TYPES",
     "SYNC_VERSION",
@@ -765,6 +770,7 @@
     "atualizado",
     "atualizar",
     "atualizarAntesDeMostrar",
+    "atualizarAvatares",
     "atualizarBadge",
     "atualizarBotoes",
     "atualizarDashboard",
@@ -839,6 +845,7 @@
     "cachePrimeiro",
     "cadastrar",
     "cadastrarFaceId",
+    "caixa",
     "calcular",
     "calcularComissao",
     "campo",
@@ -846,6 +853,7 @@
     "campoPorcentagem",
     "campoValor",
     "campos",
+    "cancelar",
     "cancelarEscuta",
     "canvas",
     "capturar",
@@ -1319,6 +1327,7 @@
     "mostrarCadastro",
     "mostrarErro",
     "mostrarLogin",
+    "mostrarMenu",
     "motivo",
     "moverControles",
     "msg",
@@ -1423,6 +1432,7 @@
     "preparar",
     "prepararAtualizacoes",
     "prepararCampoComissao",
+    "prepararMenu",
     "prepararRelatorios",
     "prepararWhatsappBloqueado",
     "previous",
@@ -1958,8 +1968,8 @@
     "yamaha-emblem.svg"
   ],
   "summary": {
-    "files": 142,
-    "symbols": 1178,
+    "files": 143,
+    "symbols": 1184,
     "domIds": 169,
     "storageKeys": 14,
     "firestoreCollections": 10,
