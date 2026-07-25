@@ -19,7 +19,8 @@
     document.head.appendChild(style);
   }
 
-  function atualizarAvatares(){
+  function atualizarAvatares(menu){
+    if(menu?.isConnected) menu.remove();
     try{
       if(typeof window.atualizarDashboardV2==='function') window.atualizarDashboardV2();
       window.dispatchEvent(new StorageEvent('storage',{key:FOTO_KEY,newValue:localStorage.getItem(FOTO_KEY)}));
@@ -47,15 +48,22 @@
         }
         if(!confirm('Apagar a foto atual do perfil?')) return;
         localStorage.removeItem(FOTO_KEY);
-        menu.hidden=true;
-        atualizarAvatares();
+        atualizarAvatares(menu);
       });
       caixa.insertBefore(remover,cancelar||null);
     }
   }
 
+  function limparDuplicados(){
+    const menus=[...document.querySelectorAll('#menuFotoV2')];
+    if(menus.length<2) return menus[0]||null;
+    const atual=menus.find(menu=>menu.closest('#dashboard'))||menus[menus.length-1];
+    menus.forEach(menu=>{if(menu!==atual) menu.remove();});
+    return atual;
+  }
+
   function mostrarMenu(){
-    const menu=document.getElementById('menuFotoV2');
+    const menu=limparDuplicados()||document.getElementById('menuFotoV2');
     if(!menu) return;
     prepararMenu(menu);
     if(menu.parentElement!==document.body) document.body.appendChild(menu);
@@ -69,14 +77,14 @@
   },true);
 
   const observer=new MutationObserver(function(){
-    const menu=document.getElementById('menuFotoV2');
+    const menu=limparDuplicados();
     if(menu) prepararMenu(menu);
   });
 
   function iniciar(){
     garantirEstilo();
     observer.observe(document.body,{childList:true,subtree:true});
-    const menu=document.getElementById('menuFotoV2');
+    const menu=limparDuplicados()||document.getElementById('menuFotoV2');
     if(menu) prepararMenu(menu);
   }
 
