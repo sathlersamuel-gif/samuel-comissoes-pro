@@ -74,11 +74,20 @@
     ultimaAssinatura=assinatura();
   }
 
+  function carregarCorrecaoFoto(){
+    if(document.querySelector('script[data-scp-photo-fix]'))return;
+    const script=document.createElement('script');
+    script.src='profile-photo-menu-fix.js?v=2026.07.24.1';
+    script.dataset.scpPhotoFix='1';
+    document.head.appendChild(script);
+  }
+
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',corrigirFlashDeFundo,{once:true});
   }else{
     corrigirFlashDeFundo();
   }
 
+  carregarCorrecaoFoto();
   instalar();
 })();
