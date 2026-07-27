@@ -12,13 +12,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "app-icon-android.svg?v=1",
+      "src": "app-icon.svg?v=14",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "app-icon-android.svg?v=1",
+      "src": "app-icon.svg?v=14",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"
