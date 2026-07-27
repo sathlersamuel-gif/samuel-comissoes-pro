@@ -1,7 +1,7 @@
 {
   "app": "Samuel Comissões PRO",
-  "generatedAt": "2026-07-27T21:22:54.917Z",
-  "commit": "f27cb398e558f0daca14d229b5a6b95da0de5050",
+  "generatedAt": "2026-07-27T21:36:21.349Z",
+  "commit": "714929bdf39e1912200485c4b3ba992215c4cb32",
   "files": [
     {
       "path": ".github/workflows/build-android-apk.yml",
@@ -366,6 +366,10 @@
     {
       "path": "install-guide.js",
       "type": ".js"
+    },
+    {
+      "path": "internal-overscroll-fix.css",
+      "type": ".css"
     },
     {
       "path": "ios-historico-valor-fix.css",
@@ -1982,7 +1986,7 @@
     "yamaha-emblem.svg"
   ],
   "summary": {
-    "files": 144,
+    "files": 145,
     "symbols": 1192,
     "domIds": 169,
     "storageKeys": 14,
