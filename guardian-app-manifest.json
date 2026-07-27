@@ -1,7 +1,7 @@
 {
   "app": "Samuel Comissões PRO",
-  "generatedAt": "2026-07-27T21:10:27.128Z",
-  "commit": "eaea113050bca2093aea61f222867b360161ae29",
+  "generatedAt": "2026-07-27T21:22:54.917Z",
+  "commit": "f27cb398e558f0daca14d229b5a6b95da0de5050",
   "files": [
     {
       "path": ".github/workflows/build-android-apk.yml",
@@ -762,6 +762,7 @@
     "assinatura",
     "ativa",
     "ativarMascaraTelefone",
+    "atividade",
     "ativo",
     "ativos",
     "attempt",
@@ -1195,6 +1196,7 @@
     "intercept",
     "interfaceChecks",
     "interno",
+    "intervalo",
     "invalid",
     "isAdmin",
     "isAndroid",
@@ -1412,6 +1414,7 @@
     "painel",
     "painelVisivel",
     "panel",
+    "pararAtividade",
     "pararPendentes",
     "pararUsuario",
     "partes",
@@ -1486,6 +1489,7 @@
     "refreshWorkerAndCaches",
     "reg",
     "registrar",
+    "registrarAtividade",
     "registrarIA",
     "registrarVersao",
     "registration",
@@ -1702,6 +1706,7 @@
     "ultimoAdmin",
     "ultimoClique",
     "ultimoEmail",
+    "ultimoEnvio",
     "ultimoJson",
     "ultimoNome",
     "ultimoPulso",
@@ -1978,7 +1983,7 @@
   ],
   "summary": {
     "files": 144,
-    "symbols": 1187,
+    "symbols": 1192,
     "domIds": 169,
     "storageKeys": 14,
     "firestoreCollections": 10,
