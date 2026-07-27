@@ -1,0 +1,5 @@
+/* Correção visual isolada: mantém escuro o fundo revelado pelo overscroll do iPhone. */
+html {
+  min-height: 100%;
+  background: #030a14;
+}
