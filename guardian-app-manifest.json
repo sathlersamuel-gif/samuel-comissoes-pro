@@ -1,7 +1,7 @@
 {
   "app": "Samuel Comissões PRO",
-  "generatedAt": "2026-07-27T21:37:09.892Z",
-  "commit": "057d312ff2753941c915133243d1c35a0ebf3943",
+  "generatedAt": "2026-08-01T12:25:35.258Z",
+  "commit": "5d3081230d9e95ee15036159ccfaf2af04233706",
   "files": [
     {
       "path": ".github/workflows/build-android-apk.yml",
